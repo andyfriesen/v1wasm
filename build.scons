@@ -10,6 +10,7 @@ import os
 
 nacl_env = make_nacl_env.NaClEnvironment(use_c_plus_plus_libs=True)
 
-sources = ['v1nacl.cc']
+sources = ['v1nacl.cpp']
+sources = ['src/' + s for s in sources]
 
 nacl_env.AllNaClModules(sources, 'v1nacl')
