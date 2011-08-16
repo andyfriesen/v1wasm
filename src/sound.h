@@ -1,4 +1,4 @@
-extern sound_init();
-extern playsong(char *sngnme);
-extern stopsong();
-extern char speed,moneycheat;
+extern void sound_init();
+extern void playsong(char *sngnme);
+extern void stopsong();
+extern char speed, moneycheat;

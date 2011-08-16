@@ -3,14 +3,16 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "control.h"
 #include "entity.h"
 #include "keyboard.h"
+#include "menu.h"
 #include "render.h"
 #include "sound.h"
 #include "timer.h"
 #include "vga.h"
-extern err(char *ermsg);
+extern void err(char *ermsg);
 
 // ============================ Data ============================
 
@@ -155,6 +157,8 @@ struct mequipstruc mequip[255];          // equipment definition array
 
 // END NEW
 
+#include <string.h>
+
 struct equipstruc equip[255];          // equipment definition array
 char zonedelay,lz;                     // zone delay counter
 char tchars;                           // total characters in PARTY.DAT
@@ -196,9 +200,14 @@ extern int msofstbl[100];
 extern int vspm; // -- aen; 30/May/98 -- no longer used; see load_map().
 //extern int mapm; // -- aen; 30/May/98 -- no longer used; see load_map().
 
+void LoadVC(FILE* map);
+void CalcVSPMask();
+void ExecuteScript(int);
+void ExecuteStartUpScript(unsigned short s);
+
 // ============================ Code ============================
 
-void *valloc(int amount, char * whatfor)
+void *valloc(int amount, const char* whatfor) {
   /* -- ric: 10/May/98 --
    * Well actually this is aen's code to replace malloc. It'll help
    * with debugging :)
@@ -206,17 +215,16 @@ void *valloc(int amount, char * whatfor)
   /* -- aen: 10/May-98--
    * Well actually this is vec's idea. I just extended it a little.
    */
-  {
-  char *tmp;
-  static char debug_buf[256];
-  tmp=(char *)malloc(amount);
-  if (!tmp) {
-    sprintf(debug_buf,"Failed allocating %ld bytes for %s.",amount,whatfor);
-    err(debug_buf);
+    char *tmp;
+    static char debug_buf[256];
+    tmp = (char*)malloc(amount);
+    if (!tmp) {
+        sprintf(debug_buf,"Failed allocating %i bytes for %s.", amount, whatfor);
+        err(debug_buf);
     }
-  memset(tmp, 0, amount); // -- aen: 30/May/98; clear allocated mem
-  return tmp;
-  }
+    memset(tmp, 0, amount); // -- aen: 30/May/98; clear allocated mem
+    return tmp;
+}
 
 void vfree(void *thismem)
   {
@@ -225,40 +233,41 @@ void vfree(void *thismem)
   thismem = NULL;
   }
 
-allocbuffers()
-  {
-  //map0 = valloc(mapm*2, "map0"); // -- aen; 30/May/98 -- removed; this is
-  //map1 = valloc(mapm*2, "map1"); // -- taken care of automatically within
-  //mapp = valloc(mapm, "mapp");   // -- load_map().
+void InitVCMem();
 
-  //vsp0 = valloc(vspm, "vsp0");
-  chrs = valloc(512000, "chrs");
-  chr2 = valloc(46080, "chr2");
+void allocbuffers() {
+    //map0 = valloc(mapm*2, "map0"); // -- aen; 30/May/98 -- removed; this is
+    //map1 = valloc(mapm*2, "map1"); // -- taken care of automatically within
+    //mapp = valloc(mapm, "mapp");   // -- load_map().
 
-  // -- NichG; ??/??/?? --
-  magicicons = valloc(50688, "magicicons");
+    //vsp0 = valloc(vspm, "vsp0");
+    chrs = (unsigned char*)valloc(512000, "chrs");
+    chr2 = (unsigned char*)valloc(46080, "chr2");
 
-  itemicons = valloc(50688, "itemicons");
-  speech = valloc(450000, "speech");
-  msbuf = valloc(20000, "msbuf");
+    // -- NichG; ??/??/?? --
+    magicicons = (unsigned char*)valloc(50688, "magicicons");
 
-  //memset(map0,0,mapm*2);     /* -- ric:28/Apr/98 --                 */
-  //memset(map1,0,mapm*2);     /* Clear all the allocated memory just */
-  //memset(mapp,0,mapm);       /* in case.                            */
-  //memset(vsp0,0,vspm);
-  //memset(chrs,0,512000);     // -- aen; 30/May/98 -- removed; this is
-  //memset(chr2,0,46080);      // -- automatically taken care of by valloc()
-  //memset(speech,0,450000);   // -- now.
-  //memset(msbuf,0,20000);
-  //memset(flags,0,32000);
-  //memset(itemicons,0,50688);
-  //memset(&party, 0, sizeof party);
+    itemicons = (unsigned char*)valloc(50688, "itemicons");
+    speech = (char*)valloc(450000, "speech");
+    msbuf = (char*)valloc(20000, "msbuf");
 
-  InitVCMem();
-  }
+    //memset(map0,0,mapm*2);     /* -- ric:28/Apr/98 --                 */
+    //memset(map1,0,mapm*2);     /* Clear all the allocated memory just */
+    //memset(mapp,0,mapm);       /* in case.                            */
+    //memset(vsp0,0,vspm);
+    //memset(chrs,0,512000);     // -- aen; 30/May/98 -- removed; this is
+    //memset(chr2,0,46080);      // -- automatically taken care of by valloc()
+    //memset(speech,0,450000);   // -- now.
+    //memset(msbuf,0,20000);
+    //memset(flags,0,32000);
+    //memset(itemicons,0,50688);
+    //memset(&party, 0, sizeof party);
 
-addcharacter(int i)
-{ FILE *chrf,*p;
+    InitVCMem();
+}
+
+void addcharacter(int i) {
+ FILE *chrf,*p;
   int b;
         
   numchars++;
@@ -323,20 +332,20 @@ addcharacter(int i)
   fclose(chrf);
 }
 
-LoadCHRList()
+void LoadCHRList()
 { int i;
   FILE *f;
 
   for (i=0; i<20; i++)
-    if (strlen(&chrlist[i]))
+    if (strlen(chrlist[i].fname))
     {
-      f=fopen(&chrlist[i],"rb");
+      f=fopen(chrlist[i].fname,"rb");
       fread(chrs+((i+5)*15360),30,512,f);
       fclose(f);
     }
 }
 
-load_map(char *fname)
+void load_map(char *fname)
   {
   unsigned char b;
   int i;
@@ -384,9 +393,9 @@ load_map(char *fname)
   vfree(map1);
   vfree(mapp);
   // allocate exact amount of mem needed
-  map0 = valloc((xsize * ysize) * 2, "load_map:map0");
-  map1 = valloc((xsize * ysize) * 2, "load_map:map1");
-  mapp = valloc((xsize * ysize), "load_map:mapp");
+  map0 = (unsigned short*)valloc((xsize * ysize) * 2, "load_map:map0");
+  map1 = (unsigned short*)valloc((xsize * ysize) * 2, "load_map:map1");
+  mapp = (unsigned char*)valloc((xsize * ysize), "load_map:mapp");
 
   fread(map0, xsize, ysize*2, map); // read in background layer
   fread(map1, xsize, ysize*2, map); // read in foreground layer
@@ -431,7 +440,7 @@ load_map(char *fname)
   // -- aen; 31/May/98 -- dynamic map mem allocation
   vfree(vsp0);
   vspm = numtiles << 8;
-  vsp0 = valloc(vspm, "load_map:vsp0");
+  vsp0 = (unsigned char*)valloc(vspm, "load_map:vsp0");
 
   fread(vsp0, 1, vspm, vsp);
   fread(&va0, 1, sizeof(va0), vsp);
@@ -481,7 +490,7 @@ load_map(char *fname)
   ExecuteScript(0);
   }
 
-process_stepzone()
+void process_stepzone()
 { // Called each time the player steps in a new square. Looks up current zone
   // information, adjusts for delays and then makes a chance roll to see if
   // an event is called.
@@ -502,7 +511,7 @@ process_stepzone()
   }
 }
 
-lastmove(char n)
+void lastmove(char n)
 { // moves all the entrees in the lastmoves array down one, then places the
   // new direction at the front.
 
@@ -514,7 +523,7 @@ lastmove(char n)
   lastmoves[0]=n;
 }
 
-startfollow()
+void startfollow()
 { char i;
   for (i=1; i<numchars; i++)
       { if (lastmoves[i]==1)
@@ -542,7 +551,7 @@ int InvFace()
   }
 }
 
-Activate()
+void Activate()
 { int tx,ty;
   unsigned char cz,t;
 
@@ -583,7 +592,7 @@ int ObstructionAt(int tx,int ty)
   return 0;
 }
 
-process_entities()
+void process_entities()
 { int i;
 
   for (i=5; i<entities; i++)
@@ -594,7 +603,9 @@ process_entities()
        ProcessSpeedAdjEntity(i);
 }
 
-ProcessControls()
+void process_controls();
+
+void ProcessControls()
 {
   if (party[0].speed<4)
   {
@@ -615,7 +626,7 @@ ProcessControls()
   }
 }
 
-process_controls()
+void process_controls()
 { unsigned char i;
   char l,r,t,b;  /* -- ric: 21/Apr/98 - moved from top -- */
   party[0].speedct=0;
@@ -683,7 +694,7 @@ process_controls()
   }
 }
 
-check_tileanimation()
+void check_tileanimation()
 { unsigned char i;
 
   for (i=0; i<100; i++)
@@ -692,7 +703,7 @@ check_tileanimation()
         vadelay[i]++; }
 }
 
-UpdateEquipStats()
+void UpdateEquipStats()
 { int i,j,a;
 
   // This function takes the base stats of all characters and re-calculates
@@ -726,7 +737,7 @@ UpdateEquipStats()
   }
 }
 
-game_ai()                       // this is THE main loop
+void game_ai()                       // this is THE main loop
 {
   ProcessControls();
   process_entities();
@@ -735,7 +746,7 @@ game_ai()                       // this is THE main loop
   check_tileanimation();
 }
 
-CreateSaveImage(unsigned char *buf)
+void CreateSaveImage(unsigned char *buf)
 {
   memcpy(buf,chrs,512);
   if (numchars>1) memcpy(buf+512,chrs+15360,512);
@@ -748,7 +759,7 @@ CreateSaveImage(unsigned char *buf)
              else memset(buf+2048,0,512);
 }
 
-SaveGame(char *fn)
+void SaveGame(char *fn)
 { FILE *f;
   unsigned char cz;
   unsigned char temp[2560];
@@ -766,7 +777,7 @@ SaveGame(char *fn)
   fwrite(&sec, 1, 1, f);
   fwrite(&numchars, 1, 1, f);
   fwrite(&menuactive, 1, 1, f);
-  CreateSaveImage(&temp);
+  CreateSaveImage((unsigned char*)&temp);
   fwrite(&temp, 1, 2560, f);
   fwrite(&mapname, 1, 13, f);
   fwrite(&party, 1, sizeof party, f);
@@ -777,7 +788,7 @@ SaveGame(char *fn)
   fclose(f);
 }
 
-startmap(char *fname)
+void startmap(char *fname)
 {
   if (qabort) return;
 

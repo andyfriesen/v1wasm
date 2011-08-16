@@ -2,6 +2,7 @@
 // Handles keyboard/joystick interfaces into a unified system.
 // Copyright (C)1997 BJ Eirich
 
+#include <stdio.h>
 #include "keyboard.h"
 
 /* -- ric: 03/May/98 -- */
@@ -25,16 +26,16 @@ int upb,downb,leftb,rightb;           // barriers for axis determination
 char kb1, kb2, kb3, kb4;              // keyboard definable controls.
 char jb1, jb2, jb3, jb4;              // joystick definable controls.
 
-initcontrols(char joystk)
-{ int i;
-  j=joystk;
-  if (j)
-     if (!calibrate()) j=0;
-  for (i=0;i<128;i++) key_map[i].boundscript=0;    // no keys are bound yet
+void err(char* message);
+void ScreenShot();
+
+void readbuttons();
+void readjoystick();
+
+void initcontrols(char joystk) {
 }
 
-readb()
-{
+void readb() {
   if (j) readbuttons();
   else { b1=0; b2=0; b3=0; b4=0; }
   if (keyboard_map[kb1]) b1=1;
@@ -51,8 +52,8 @@ readb()
        ScreenShot(); }
 }
 
-readcontrols()
-{ int i;
+void readcontrols() {
+    int i;
   if (j) readjoystick();
   else { b1=0; b2=0; b3=0; b4=0;
          up=0; down=0; left=0; right=0; }
@@ -80,73 +81,17 @@ readcontrols()
        ScreenShot(); }
 }
 
-readbuttons()
-{ unsigned char b;
-  char btbl[4];
-
-  b=inportb(0x201);                   // poll joystick port
-  b=b >> 4;                           // lose high nibble
-  b=b ^ 15;                           // flip mask bits
-
-  btbl[0]=b & 1;                           // mask button status
-  btbl[1]=b & 2;
-  btbl[2]=b & 4;
-  btbl[3]=b & 8;
-
-  if (btbl[jb1-1]) b1=1; else b1=0;
-  if (btbl[jb2-1]) b2=1; else b2=0;
-  if (btbl[jb3-1]) b3=1; else b3=0;
-  if (btbl[jb4-1]) b4=1; else b4=0;
-
+void readbuttons() {
 }
 
-getcoordinates()
-// Gets raw, machine dependant coordinates from the joystick.
-{
-  foundx=0;
-  foundy=0;
-
-  asm("cli                            \n\t"  // disable interrupts
-      "movw $513, %%dx                \n\t"  // start joystick timer
-      "outb %%al, %%dx                \n\t"
-      "xorl %%ecx, %%ecx              \n\t"  // clear out counter
-      "movl $2, %%ebx                 \n\t"  // number of axii left to report
-"joyloop:                             \n\t"
-      "incl %%ecx                     \n\t"  // increment counter
-      "cmpl $65500, %%ecx             \n\t"  // time out?
-      "je j_end                       \n\t"
-      "inb %%dx, %%al                 \n\t"  // poll joystick status
-      "cmpb $1, _foundx               \n\t"
-      "je search_y                    \n\t"
-
-      "test $1, %%al                  \n\t"  // is this axis in?
-      "jnz j0                         \n\t"
-      "movl %%ecx, _jx                \n\t"  // if so, store coordinate
-      "movl $1, _foundx               \n\t"  // say we already got it
-      "decl %%ebx                     \n\t"  // one less axis to go.
-      "jz j_end                       \n\t"
-
-"j0:                                  \n\t"
-      "cmp $1, _foundy                \n\t"
-      "je joyloop                     \n\t"
-"search_y:                            \n\t"
-      "test $2, %%al                  \n\t"  // is the Y axis in?
-      "jnz joyloop                    \n\t"
-      "movl %%ecx, _jy                \n\t"  // if so, handle it.
-      "movl $1, _foundy               \n\t"
-      "decl %%ebx                     \n\t"
-      "jz j_end                       \n\t"  // are we done?
-      "jmp joyloop                    \n\t"
-
-"j_end:                               \n\t"
-      "sti                            \n\t"  // turn interrupts back on
-      :
-      :
-      : "eax","ebx","ecx","edx","cc" );
+void getcoordinates() {
+    // Gets raw, machine dependant coordinates from the joystick.
+    foundx=0;
+    foundy=0;
 }
 
-int calibrate()
-{ // assumes the stick is centered when called.
+int calibrate() {
+ // assumes the stick is centered when called.
 
   getcoordinates();                  // read stick position
   if ((!foundx) || (!foundy))
@@ -162,8 +107,7 @@ int calibrate()
   return 1;
 }
 
-readjoystick()
-{
+void readjoystick() {
   readbuttons();
   getcoordinates();
   up=0; down=0;

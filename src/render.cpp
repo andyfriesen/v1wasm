@@ -188,7 +188,7 @@ drawvclayer2()
 }
 
 
-drawmap()
+void drawmap()
 {
   if (cameratracking)
   {

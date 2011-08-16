@@ -86,7 +86,7 @@ int Zone(int cx, int cy)
   return mapp[((cy*xsize)+cx)] >> 1;
 }
 
-ProcessSpeedAdjEntity(int i)
+void ProcessSpeedAdjEntity(int i)
 {
   if (party[i].speed<4)
   {

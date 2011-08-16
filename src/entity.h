@@ -17,3 +17,6 @@ struct entitydata
 extern struct chrrec chrlist[100];           // CHR list
 extern struct entitydata entity[100];        // Entity data
 extern int entities;                         // number of active entities
+
+int EntityAt(int ex,int ey);
+void ProcessSpeedAdjEntity(int i);

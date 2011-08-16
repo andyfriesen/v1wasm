@@ -3,14 +3,16 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "control.h"
 #include "engine.h"
 #include "keyboard.h"
 #include "timer.h"
 #include "vga.h"
 
-extern *strbuf;
+extern char* strbuf;
 FILE *d;
+void UpdateEquipStats();
 
 char whotoattack()
 { unsigned char t1,t2;
@@ -147,7 +149,7 @@ void levelup (int chr)
   UpdateEquipStats();
 }
 
-battle()
+void battle()
 { unsigned char t1;
 
   t1=whotoattack();

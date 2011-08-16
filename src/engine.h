@@ -1,3 +1,5 @@
+#pragma once
+
 struct r_entity {                      // on-screen entities (chars)
   unsigned short x;                    // xwc position
   unsigned short y;                    // ywc position
@@ -131,5 +133,6 @@ extern unsigned short int *map0, *map1,xsize,ysize,vadelay[100];
 extern unsigned char *mapp,layerc,pmultx,pdivx,pmulty,pdivy,saveflag;
 extern unsigned char *vsp0, autoent;
 
-extern void *valloc(int amount, char * whatfor);
-extern void vfree(void *thismem);
+void *valloc(int amount, char * whatfor);
+void vfree(void *thismem);
+void ProcessControls();
