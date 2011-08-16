@@ -3,6 +3,7 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdio.h>
+#include <string.h>
 #include "control.h"
 #include "engine.h"
 #include "keyboard.h"

@@ -13,6 +13,8 @@
 
 #include "engine.h" // for valloc()
 
+void err(const char*);
+
 unsigned char pal[768];
 unsigned char pal2[768];
 extern char waitvrt,*speech,fade,cancelfade,*strbuf;

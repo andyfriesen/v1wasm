@@ -136,3 +136,4 @@ extern unsigned char *vsp0, autoent;
 void *valloc(int amount, char * whatfor);
 void vfree(void *thismem);
 void ProcessControls();
+void ExecuteScript(int);

@@ -1,3 +1,5 @@
+#pragma once
+
 // Single-byte opcode descriptors
 
 #define EXEC 1
@@ -47,3 +49,5 @@
 #define DIV 4
 #define MOD 5
 #define OP_END 255
+
+void ExecuteHookedScript(unsigned short s);
