@@ -60,6 +60,7 @@ void vgadump() {
     if (waitvrt) {
         wait();
     }
+#if 0
     asm("movl _virscr, %%esi              \n\t"
         "addl $5648, %%esi                \n\t"
         "movl _screen, %%edi              \n\t"
@@ -74,9 +75,11 @@ void vgadump() {
         :
         :
         : "esi", "edi", "cc", "eax", "ecx");
+#endif
 }
 
 void setpixel(int x, int y, char c) {
+#if 0
     asm ("movl %1, %%eax                 \n\t"
          "imul $352, %%eax               \n\t"
          "addl %0, %%eax                 \n\t"
@@ -87,6 +90,7 @@ void setpixel(int x, int y, char c) {
          :
          :"m" (x), "m" (y), "m" (c)
          : "eax", "edi", "cc" );
+#endif
 }
 
 void vline(int x, int y, int y2, char c) {
@@ -99,6 +103,7 @@ void vline(int x, int y, int y2, char c) {
 }
 
 void hline(int x, int y, int x2, char c) {
+#if 0
     asm ("movl %2, %%ecx                 \n\t"
          "subl %0, %%ecx                 \n\t"
          "movl %1, %%eax                 \n\t"
@@ -112,6 +117,7 @@ void hline(int x, int y, int x2, char c) {
          :
          : "m" (x), "m" (y), "m" (x2), "m" (c)
          : "eax", "edi", "ecx", "cc" );
+#endif
 }
 
 void box(int x, int y, int x2, int y2, char color) {
@@ -156,6 +162,7 @@ void copytile(int x, int y, char *spr)
 */
 
 void copytile(int x, int y, char* spr) {
+#if 0
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"
         "movl %1, %%edi                   \n\t"
@@ -186,9 +193,11 @@ void copytile(int x, int y, char* spr) {
         :
         : "m" (x), "m" (y), "m" (spr)
         : "eax", "ecx", "esi", "edi", "cc" );
+#endif
 }
 
 void copysprite(int x, int y, int width, int height, char* spr) {
+#if 0
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "csl0:                                  \n\t"
@@ -210,9 +219,11 @@ void copysprite(int x, int y, int width, int height, char* spr) {
         :
         : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
+#endif
 }
 
 void grabregion(int x, int y, int width, int height, char* spr) {
+#if 0
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%edi                   \n\t"
         "grl0:                                  \n\t"
@@ -234,9 +245,11 @@ void grabregion(int x, int y, int width, int height, char* spr) {
         :
         : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
+#endif
 }
 
 void tcopytile(int x, int y, char* spr, char* matte) {
+#if 0
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"
         "movl %1, %%edi                   \n\t"
@@ -269,9 +282,11 @@ void tcopytile(int x, int y, char* spr, char* matte) {
         :
         : "m" (x), "m" (y), "m" (spr), "m" (matte)
         : "eax", "ecx", "edx", "esi", "edi", "cc" );
+#endif
 }
 
 void tcopysprite(int x, int y, int width, int height, unsigned char* spr) {
+#if 0
     asm("movl %3, %%ecx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "tcsl0:                                 \n\t"
@@ -300,6 +315,7 @@ void tcopysprite(int x, int y, int width, int height, unsigned char* spr) {
         :
         : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
+#endif
 }
 
 void fin() {
@@ -455,6 +471,7 @@ void ColorField(int x1, int y1, int x2, int y2, unsigned char *colortbl)
 */
 
 void ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
+#if 0
     asm( "movl %3, %%edx                   \n\t"
          "subl %1, %%edx                   \n\t"   // get height
          "movl %4, %%esi                   \n\t"
@@ -480,6 +497,7 @@ void ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
          :
          : "m" (x), "m" (y), "m" (x2), "m" (y2), "m" (tbl)
          : "eax", "ebx", "ecx", "edx", "esi", "edi", "cc" );
+#endif
 }
 
 void Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
@@ -647,6 +665,7 @@ void putbox() {
 }
 
 void dec_to_asciiz(int num, char* buf) {
+#if 0
     asm ("movl $10, %%ebx              \n\t"
          "movl %0, %%eax               \n\t"
          "movl %1, %%edi               \n\t"
@@ -668,6 +687,7 @@ void dec_to_asciiz(int num, char* buf) {
          :
          : "m" (num), "m" (buf)
          : "eax", "ebx", "edi", "ecx", "cc" );
+#endif
 }
 
 void textwindow(char portrait, char* str1, char* str2, char* str3) {

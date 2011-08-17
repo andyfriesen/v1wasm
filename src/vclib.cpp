@@ -1165,6 +1165,7 @@ void VCLoadPCX() {
 }
 
 void VCcopysprite(int x, int y, int width, int height, char* spr) {
+#if 0
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "csl0:                                  \n\t"
@@ -1186,9 +1187,11 @@ void VCcopysprite(int x, int y, int width, int height, char* spr) {
         :
         : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
+#endif
 }
 
 void VCtcopysprite(int x, int y, int width, int height, unsigned char* spr) {
+#if 0
     asm("movl %3, %%ecx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "tcsl0:                                 \n\t"
@@ -1219,6 +1222,7 @@ void VCtcopysprite(int x, int y, int width, int height, unsigned char* spr) {
         :
         : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
+#endif
 }
 
 void VCBlitImage() {
@@ -1239,6 +1243,7 @@ void VCClear() {
 }
 
 void VChline(int x, int y, int x2, char c) {
+#if 0
     asm ("movl %2, %%ecx                 \n\t"
          "subl %0, %%ecx                 \n\t"
          "movl %1, %%eax                 \n\t"
@@ -1252,6 +1257,8 @@ void VChline(int x, int y, int x2, char c) {
          :
          : "m" (x), "m" (y), "m" (x2), "m" (c)
          : "eax", "edi", "ecx", "cc" );
+
+#endif
 }
 
 void VCClearRegion() {
