@@ -3,8 +3,8 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
+#include <cassert>
 #include "control.h"
 #include "engine.h"
 #include "keyboard.h"
@@ -31,7 +31,8 @@ struct menu {
 };
 
 struct menu menus[4];
-unsigned char itmptr[576], gsimg[512], iuflag = 0;
+
+unsigned char gsimg[512], iuflag = 0;
 extern unsigned char menuptr[256];
 
 void greyscale(int width, int height, unsigned char* src, unsigned char* dest) {
@@ -335,7 +336,8 @@ inputloop:
     }
 
     if ((b1) && (menus[mpos].linktype) && (mode == 2)) {
-        remove(savename[mpos]);
+        assert(!"No remove() on NaCl?");
+        //remove(savename[mpos]);
         r++;
         goto redraw;
     }

@@ -13,7 +13,6 @@
 #include "render.h"
 #include "timer.h"
 #include "sound.h"
-#include "mikmod.h"
 #include "vga.h"
 #include "vc.h"
 #include "vclib.h"
@@ -46,7 +45,6 @@ int Exist(char* fname) {
 void err(const char* ermsg) {
     keyboard_close();
     stopsound();
-    MD_Exit();
     timer_close();
     closevga();
     printf("%s \n", ermsg);

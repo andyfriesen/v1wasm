@@ -27,19 +27,18 @@ char filler[58];
 unsigned short int width, depth;
 unsigned short int bytes, i;
 unsigned char c, run, ss = 0;
-unsigned int vidoffset, n = 0;
+unsigned int vidoffset;
 FILE* pcxf;
 
 void ReadPCXLine(unsigned char* dest) {
-    int j;
-    n = 0;
+    int n = 0;
 
     do {
         c = fgetc(pcxf) & 0xff;
         if ((c & 0xc0) == 0xc0) {
             run = c & 0x3f;
             c = fgetc(pcxf);
-            for (j = 0; j < run; j++) {
+            for (int j = 0; j < run; j++) {
                 dest[vidoffset + n + j] = c;
             }
             n += run;

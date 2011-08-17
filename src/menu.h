@@ -1,6 +1,7 @@
 #pragma once
 
 extern unsigned char menuptr[256];
+extern unsigned char itmptr[576];
 
 void PutBuySellBox(char p);
 void PutGPBox();

@@ -2379,7 +2379,7 @@ void WriteVar0(int var, int value) {
         vcwritelayer(value);
         return; /* -- xBig_D: 05/May/98 */
     case 73:
-        MP_SetPosition(value);
+        //MP_SetPosition(value);
         return; /* -- xBig_D: 10/May/98 */
     }
 }

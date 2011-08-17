@@ -956,7 +956,7 @@ void PutBuyCharBox(char ptr, char p) {
                equip[items[a].equipidx].equipable[partyidx[4] - 1], p);
 }
 
-void BuyMenu(char p) {
+void BuyMenu() {
     int first = 1, ptr = 0;
     char mx = 0, my = 0, a;
 

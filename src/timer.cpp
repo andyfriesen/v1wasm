@@ -35,3 +35,7 @@ void timer_close() {
 
 void delay(int ms) {
 }
+
+int time() {
+    return 8;
+}

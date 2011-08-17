@@ -222,7 +222,7 @@ void copysprite(int x, int y, int width, int height, unsigned char* spr) {
 #endif
 }
 
-void grabregion(int x, int y, int width, int height, char* spr) {
+void grabregion(int x, int y, int width, int height, unsigned char* spr) {
 #if 0
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%edi                   \n\t"
