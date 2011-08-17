@@ -19,3 +19,9 @@ extern int entities;                         // number of active entities
 
 int EntityAt(int ex, int ey);
 void ProcessSpeedAdjEntity(int i);
+
+void GetNextCommand(int i);
+void MoveDown(int i);
+void MoveLeft(int i);
+void MoveRight(int i);
+void MoveUp(int i);

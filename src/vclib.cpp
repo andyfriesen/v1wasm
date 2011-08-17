@@ -2,6 +2,23 @@
 // The VergeC standard function library
 // Copyright (C)1997 BJ Eirich
 
+#include <stdlib.h>
+#include <string.h>
+#include "entity.h"
+#include "engine.h"
+#include "vc.h"
+#include "menu.h"
+#include "menu2.h"
+#include "main.h"
+#include "battle.h"
+#include "ricvc.h"
+#include "andyvc.h"
+#include "ricvc.h"
+#include "nichgvc.h"
+#include "xbigdvc.h"
+#include "render.h"
+#include "vga.h"
+
 /*  -- Added by Ric --
  * Added internal functions:
  *       VCvline (21/Apr/98)
@@ -74,15 +91,16 @@
 #include "engine.h"
 #include "keyboard.h"
 #include "pcx.h"
+#include "sound.h"
 #include "render.h"
 #include "timer.h"
 #include "vga.h"
 #include "mikmod.h"
 
-extern char* strbuf, killvc, *code, *menuptr, *mapvc, menuactive, drawparty, layer1trans, layervctrans, layervc2trans;
+extern char killvc, *code, *mapvc, menuactive, drawparty, layer1trans, layervctrans, layervc2trans;
 extern char cameratracking, *vcdatabuf, movesuccess, *msbuf, drawentities;
 extern unsigned int scriptofstbl[1024];
-extern int varl[10], tvar[26], msofstbl[100];
+extern int msofstbl[100];
 extern unsigned char mp_volume;
 
 char fade = 1, cancelfade = 0, stringbuffer[100], keepaz = 0;
@@ -117,7 +135,7 @@ void MapSwitch() {
     timer_count = 0;
 }
 
-Warp() {
+void Warp() {
     unsigned short int wx, wy;
     int i;
     char b;
@@ -149,7 +167,7 @@ Warp() {
     timer_count = 0;
 }
 
-AddCharacter() {
+void AddCharacter() {
     char c;
 
     c = ResolveOperand();
@@ -161,16 +179,16 @@ AddCharacter() {
     timer_count = 0;
 }
 
-SoundEffect() {
+void SoundEffect() {
     char c;
 
     c = ResolveOperand();
     playeffect(c - 1);
 }
 
-GiveItem () {
+void GiveItem() {
     short int c, d;
-    char* img, first = 1;
+    char first = 1;
     int i, j;
 
     c = ResolveOperand();
@@ -184,7 +202,7 @@ drawloop:
     printstring(items[c].name);
     printstring(" Obtained!");
     d = items[c].icon;
-    img = itemicons + (256 * d);
+    unsigned char* img = itemicons + (256 * d);
     tcopysprite(168, 110, 16, 16, img);
     vgadump();
     readcontrols();
@@ -218,7 +236,7 @@ drawloop:
     }
 }
 
-Text() {
+void Text() {
     char* str1, *str2, *str3, portrait, first = 1;
     portrait = ResolveOperand();
     str1 = code;
@@ -257,7 +275,7 @@ drawloop:
     }
 }
 
-AlterFTile() {
+void AlterFTile() {
     unsigned short int tx, ty, tt;
     unsigned char o, buf;
 
@@ -278,7 +296,7 @@ AlterFTile() {
     }
 }
 
-AlterBTile() {
+void AlterBTile() {
     unsigned short int tx, ty, tt;
     unsigned char o, buf;
 
@@ -299,21 +317,21 @@ AlterBTile() {
     }
 }
 
-FakeBattle() {
+void FakeBattle() {
     battle();
 }
 
-PlayMusic() {
+void PlayMusic() {
     GrabString(strbuf);
     playsong(strbuf);
     timer_count = 0;
 }
 
-StopMusic() {
+void StopMusic() {
     stopsound();
 }
 
-HealAll() {
+void HealAll() {
     int i;
     char idx;
 
@@ -353,7 +371,7 @@ inloop:
     timer_count = 0;
 }
 
-FadeOut() {
+void FadeOut() {
     int i, s;
 
     s = ResolveOperand();
@@ -369,7 +387,7 @@ outloop:
     timer_count = 0;
 }
 
-RemoveCharacter() {
+void RemoveCharacter() {
     unsigned char c;
     char foundit = 0, foundat = 0;
     char i;
@@ -403,7 +421,7 @@ RemoveCharacter() {
     timer_count = 0;
 }
 
-Banner() {
+void Banner() {
     char* str, first = 1;
     int duration;
 
@@ -446,7 +464,7 @@ drawloop:
     an = 0;
 }
 
-EnforceAnimation() {
+void EnforceAnimation() {
     /* -- ric:10/May/98 --
      * Temporarily removed to see if the bug this "fixes" still exists
     FILE *f;
@@ -470,7 +488,7 @@ EnforceAnimation() {
     */
 }
 
-WaitKeyUp() {
+void WaitKeyUp() {
     an = 1;
 drawloop:
     drawmap();
@@ -484,7 +502,7 @@ drawloop:
     timer_count = 0;
 }
 
-DestroyItemProcessChar(unsigned char i, unsigned char c) {
+void DestroyItemProcessChar(unsigned char i, unsigned char c) {
     unsigned char l, found = 0, foundat = 0;
 
     c--;
@@ -524,7 +542,7 @@ DestroyItemProcessChar(unsigned char i, unsigned char c) {
         }
 }
 
-DestroyItem() {
+void DestroyItem() {
     unsigned char i, c, l;
 
     i = ResolveOperand();
@@ -540,7 +558,7 @@ DestroyItem() {
     }
 }
 
-Prompt() {
+void Prompt() {
     char* str1, *str2, *str3, *opt1, *opt2, portrait, first = 1, selptr = 0;
     unsigned short int flagidx;
 
@@ -566,7 +584,7 @@ drawloop:
     printstring(opt1);
     gotoxy(220, 134);
     printstring(opt2);
-    tcopysprite(200, 122 + (selptr * 10), 16, 16, &menuptr);
+    tcopysprite(200, 122 + (selptr * 10), 16, 16, menuptr);
     vgadump();
     readcontrols();
 
@@ -599,7 +617,7 @@ drawloop:
     }
 }
 
-ChainEvent () {
+void ChainEvent() {
     char varcnt, i;
     unsigned short int t;
 
@@ -613,7 +631,7 @@ ChainEvent () {
     code = mapvc + scriptofstbl[t];
 }
 
-CallEvent () { /* -- ric: 03/May/98 - Now saves temp vars across call -- */
+void CallEvent() { /* -- ric: 03/May/98 - Now saves temp vars across call -- */
     char varcnt, i, *buf, savetmpvar;
     unsigned short int t;
     int savetvar[26];    /* -- New -- */
@@ -637,7 +655,7 @@ CallEvent () { /* -- ric: 03/May/98 - Now saves temp vars across call -- */
     code = buf;
 }
 
-Heal() {
+void Heal() {
     unsigned short int chr, amt;
 
     chr = ResolveOperand();
@@ -651,7 +669,7 @@ Heal() {
     }
 }
 
-EarthQuake() {
+void EarthQuake() {
     int i, j, k;
     int nxw, nyw;
     char switchflag = 0;
@@ -691,7 +709,7 @@ EarthQuake() {
     vgadump();
 }
 
-SaveMenu() {
+void SaveMenu() {
     LoadSaveErase(1);
     drawmap();
     vgadump();
@@ -699,15 +717,15 @@ SaveMenu() {
     timer_count = 0;
 }
 
-EnableSave() {
+void EnableSave() {
     saveflag = 1;
 }
 
-DisableSave() {
+void DisableSave() {
     saveflag = 0;
 }
 
-ReviveChar() {
+void ReviveChar() {
     short int a;
 
     a = ResolveOperand();
@@ -717,7 +735,7 @@ ReviveChar() {
     }
 }
 
-RestoreMP() {
+void RestoreMP() {
     unsigned short int chr, amt;
 
     chr = ResolveOperand();
@@ -729,12 +747,12 @@ RestoreMP() {
     }
 }
 
-Redraw() {
+void Redraw() {
     drawmap();
     vgadump();
 }
 
-SText() {
+void SText() {
     char* str1, *str2, *str3;
     char st1[31], st2[31], st3[31];
     char portrait, first = 1, line = 1, chr = 0;
@@ -788,7 +806,7 @@ drawloop:
     }
 
     drawmap();
-    textwindow(portrait, &st1, &st2, &st3);
+    textwindow(portrait, st1, st2, st3);
     vgadump();
 
     while (!timer_count) {
@@ -820,15 +838,15 @@ drawloop:
     }
 }
 
-DisableMenu() {
+void DisableMenu() {
     menuactive = 0;
 }
 
-EnableMenu() {
+void EnableMenu() {
     menuactive = 1;
 }
 
-Wait() {
+void Wait() {
     short int delaytime, ct2;
 
     delaytime = ResolveOperand();
@@ -851,7 +869,7 @@ main_loop:
     timer_count = 0;
 }
 
-SetFace() {
+void SetFace() {
     char c, d;
 
     c = ResolveOperand();
@@ -860,7 +878,7 @@ SetFace() {
     party[c - 1].facing = d;
 }
 
-MapPaletteGradient() {
+void MapPaletteGradient() {
     int sc, fc, f, m;
 
     sc = ResolveOperand();
@@ -870,19 +888,19 @@ MapPaletteGradient() {
 
     switch (m) {
     case 0:
-        ColorScale(&scrnxlatbl, sc, fc, f);
+        ColorScale(scrnxlatbl, sc, fc, f);
         screengradient = 1;
         break;
     case 1:
-        ColorScale(&menuxlatbl, sc, fc, f);
+        ColorScale(menuxlatbl, sc, fc, f);
         break;
     case 2:
-        ColorScale(&greyxlatbl, sc, fc, f);
+        ColorScale(greyxlatbl, sc, fc, f);
         break;
     }
 }
 
-BoxFadeOut() {
+void BoxFadeOut() {
     int duration, hd, vd;
 
     duration = ResolveOperand();
@@ -905,7 +923,7 @@ dloop:
     an = 0;
 }
 
-BoxFadeIn() {
+void BoxFadeIn() {
     int duration, hd, vd;
 
     duration = ResolveOperand();
@@ -930,15 +948,15 @@ dloop:
     an = 0;
 }
 
-GiveGP() {
+void GiveGP() {
     gp += ResolveOperand();
 }
 
-TakeGP() {
+void TakeGP() {
     gp -= ResolveOperand();
 }
 
-ChangeZone() {
+void ChangeZone() {
     int x, y;
     unsigned char nz, b;
 
@@ -950,7 +968,7 @@ ChangeZone() {
     mapp[(y * xsize) + x] = (nz << 1) | b;
 }
 
-GetItem() {
+void GetItem() {
     short int c, d;
     int i, j;
 
@@ -966,7 +984,7 @@ GetItem() {
     }
 }
 
-ForceEquip() {
+void ForceEquip() {
     int c, i, a, b;
 
     c = ResolveOperand() - 1;
@@ -981,7 +999,7 @@ ForceEquip() {
     UpdateEquipStats();
 }
 
-GiveXP() {
+void GiveXP() {
     int c, amt, fa, nx;
 
     c = ResolveOperand() - 1;
@@ -1001,7 +1019,7 @@ GiveXP() {
     }
 }
 
-Shop() {
+void Shop() {
     int first = 1, nv, p;
 
     // Egad.
@@ -1061,7 +1079,7 @@ drawloop:
 
 extern unsigned char pal[768], pal2[768];
 
-PaletteMorph() {
+void PaletteMorph() {
     int r, g, b, percent, intensity, i, wr, wg, wb;
 
     r = ResolveOperand();
@@ -1083,7 +1101,7 @@ PaletteMorph() {
         pal2[(i * 3) + 1] = wg * intensity / 63;
         pal2[(i * 3) + 2] = wb * intensity / 63;
     }
-    set_palette(&pal2);
+    set_palette(pal2);
 }
 
 int CharPos(char p1) {
@@ -1095,26 +1113,25 @@ int CharPos(char p1) {
         }
 }
 
-ChangeCHR() {
+void ChangeCHR() {
     int l;
-    char* img;
     FILE* f;
 
     l = ResolveOperand();
-    GrabString(&pstats[l - 1].chrfile);
-    img = chrs + (CharPos(l) * 15360);
+    GrabString(pstats[l - 1].chrfile);
+    unsigned char* img = chrs + (CharPos(l) * 15360);
     f = fopen(pstats[l - 1].chrfile, "rb");
     fread(img, 1, 15360, f);
     fclose(f);
 }
 
-VCPutPCX() {
+void VCPutPCX() {
     int x, y, i;
 
-    GrabString(&stringbuffer);
+    GrabString(stringbuffer);
     x = ResolveOperand();
     y = ResolveOperand();
-    LoadPCXHeaderNP(&stringbuffer);
+    LoadPCXHeaderNP(stringbuffer);
 
     for (i = 0; i < depth; i++) {
         vidoffset = ((i + y) * 320) + x;
@@ -1123,31 +1140,31 @@ VCPutPCX() {
     fclose(pcxf);
 }
 
-HookTimer() {
+void HookTimer() {
     int l;
 
     hooktimer = ResolveOperand();
 }
 
-HookRetrace() {
+void HookRetrace() {
     hookretrace = ResolveOperand();
 }
 
-VCLoadPCX() {
+void VCLoadPCX() {
     int ofs, i;
 
-    GrabString(&stringbuffer);
+    GrabString(stringbuffer);
     ofs = ResolveOperand();
-    LoadPCXHeaderNP(&stringbuffer);
+    LoadPCXHeaderNP(stringbuffer);
 
     for (i = 0; i < depth; i++) {
         vidoffset = (i * width) + ofs;
-        ReadPCXLine(vcdatabuf);
+        ReadPCXLine((unsigned char*)vcdatabuf);
     }
     fclose(pcxf);
 }
 
-VCcopysprite(int x, int y, int width, int height, char* spr) {
+void VCcopysprite(int x, int y, int width, int height, char* spr) {
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "csl0:                                  \n\t"
@@ -1171,7 +1188,7 @@ VCcopysprite(int x, int y, int width, int height, char* spr) {
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
 }
 
-VCtcopysprite(int x, int y, int width, int height, char* spr) {
+void VCtcopysprite(int x, int y, int width, int height, unsigned char* spr) {
     asm("movl %3, %%ecx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "tcsl0:                                 \n\t"
@@ -1204,7 +1221,7 @@ VCtcopysprite(int x, int y, int width, int height, char* spr) {
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
 }
 
-VCBlitImage() {
+void VCBlitImage() {
     int x1, y1, xs, ys, ofs;
 
     x1 = ResolveOperand();
@@ -1217,11 +1234,11 @@ VCBlitImage() {
 }
 
 
-VCClear() {
+void VCClear() {
     memset(vcscreen, 0, 64000);
 }
 
-VChline(int x, int y, int x2, char c) {
+void VChline(int x, int y, int x2, char c) {
     asm ("movl %2, %%ecx                 \n\t"
          "subl %0, %%ecx                 \n\t"
          "movl %1, %%eax                 \n\t"
@@ -1237,7 +1254,7 @@ VChline(int x, int y, int x2, char c) {
          : "eax", "edi", "ecx", "cc" );
 }
 
-VCClearRegion() {
+void VCClearRegion() {
     int x1, y1, x2, y2, i;
 
     x1 = ResolveOperand();
@@ -1250,16 +1267,16 @@ VCClearRegion() {
     }
 }
 
-VCText() {
+void VCText() {
     int x1, y1;
 
     x1 = ResolveOperand();
     y1 = ResolveOperand();
-    GrabString(&stringbuffer);
-    VCprintstring(x1, y1, &stringbuffer);
+    GrabString(stringbuffer);
+    VCprintstring(x1, y1, stringbuffer);
 }
 
-VCTBlitImage() {
+void VCTBlitImage() {
     int x1, y1, xs, ys, ofs;
 
     x1 = ResolveOperand();
@@ -1268,65 +1285,62 @@ VCTBlitImage() {
     ys = ResolveOperand();
     ofs = ResolveOperand();
 
-    VCtcopysprite(x1, y1, xs, ys, vcdatabuf + ofs);
+    VCtcopysprite(x1, y1, xs, ys, (unsigned char*)vcdatabuf + ofs);
 }
 
 extern char qabort;
 
-Exit() {
+void Exit() {
     qabort = 1;
     killvc = 1;
 }
 
-Quit() {
+void Quit() {
     GrabString(strbuf);
     err(strbuf);
 }
 
-VCCenterText() {
+void VCCenterText() {
     int x1, y1;
 
     y1 = ResolveOperand();
-    GrabString(&stringbuffer);
-    x1 = 160 - (strlen(&stringbuffer) * 4);
-    VCprintstring(x1, y1, &stringbuffer);
+    GrabString(stringbuffer);
+    x1 = 160 - (strlen(stringbuffer) * 4);
+    VCprintstring(x1, y1, stringbuffer);
 }
 
-ResetTimer() {
+void ResetTimer() {
     timer_count = 0;
 }
 
-VCBlitTile() {
-    int x1, y1, t;
-    char* img;
+void VCBlitTile() {
+    int x1 = ResolveOperand();
+    int y1 = ResolveOperand();
+    int t = ResolveOperand();
 
-    x1 = ResolveOperand();
-    y1 = ResolveOperand();
-    t = ResolveOperand();
-
-    img = vsp0 + (t * 256);
+    unsigned char* img = vsp0 + (t * 256);
     VCtcopysprite(x1, y1, 16, 16, img);
 }
 
-Sys_ClearScreen() {
+void Sys_ClearScreen() {
     memset(virscr, 0, 90000);
 }
 
-Sys_DisplayPCX() {
-    GrabString(&stringbuffer);
-    loadpcx(&stringbuffer, virscr);
+void Sys_DisplayPCX() {
+    GrabString(stringbuffer);
+    loadpcx(stringbuffer, virscr);
 }
 
-OldStartupMenu() {
+void OldStartupMenu() {
     StartupMenu();
 }
 
-NewGame() {
-    GrabString(&stringbuffer);
-    StartNewGame(&stringbuffer);
+void NewGame() {
+    GrabString(stringbuffer);
+    StartNewGame(stringbuffer);
 }
 
-Delay() {
+void Delay() {
     int s;
 
     s = ResolveOperand();
@@ -1339,7 +1353,7 @@ Delay() {
         }
 }
 
-GetNextMove() {
+void GetNextMove() {
     if (!party[0].scriptofs) {
         return;
     }
@@ -1441,7 +1455,7 @@ GetNextMove() {
     }
 }
 
-moveparty() {
+void moveparty() {
     int i;
 
     party[0].speedct = 0;
@@ -1486,7 +1500,7 @@ moveparty() {
     }
 }
 
-MoveParty() {
+void MoveParty() {
     if (party[0].speed < 4) {
         switch (party[0].speed) {
         case 1:
@@ -1529,9 +1543,9 @@ MoveParty() {
     }
 }
 
-PartyMove() {
+void PartyMove() {
     party[0].scriptofs = code;
-    GrabString(&stringbuffer);
+    GrabString(stringbuffer);
     timer_count = 0;
 
 main_loop:
@@ -1550,7 +1564,7 @@ main_loop:
     }
 }
 
-EntityMove() {
+void EntityMove() {
     int i;
 
     i = ResolveOperand();
@@ -1563,11 +1577,11 @@ EntityMove() {
     party[i].chasing = 0;
 
     party[i].scriptofs = code;
-    GrabString(&stringbuffer);
+    GrabString(stringbuffer);
     party[i].movecode = 4;
 }
 
-AutoOn() {
+void AutoOn() {
     int i;
 
     memset(&party[95].x, 0, 440);
@@ -1586,12 +1600,12 @@ AutoOn() {
     drawparty = 0;
 }
 
-AutoOff() {
+void AutoOff() {
     autoent = 0;
     drawparty = 1;
 }
 
-EntityMoveScript() {
+void EntityMoveScript() {
     int i;
 
     i = ResolveOperand();
@@ -1601,7 +1615,7 @@ EntityMoveScript() {
     party[i].curcmd = 0;
 }
 
-VCTextNum() {
+void VCTextNum() {
     int x1, y1, i;
     x1 = ResolveOperand();
     y1 = ResolveOperand();
@@ -1611,26 +1625,26 @@ VCTextNum() {
         VCprintstring(x1, y1, "-");
         x1 += 8;
     }
-    dec_to_asciiz(i, &stringbuffer);
-    VCprintstring(x1, y1, &stringbuffer);
+    dec_to_asciiz(i, stringbuffer);
+    VCprintstring(x1, y1, stringbuffer);
 }
 
-VCLoadRaw() {
+void VCLoadRaw() {
     int vcofs, fofs, flen;
     FILE* f;
 
-    GrabString(&stringbuffer);
+    GrabString(stringbuffer);
     vcofs = ResolveOperand();
     fofs = ResolveOperand();
     flen = ResolveOperand();
 
-    f = fopen(&stringbuffer, "rb");
+    f = fopen(stringbuffer, "rb");
     fseek(f, fofs, 0);
     fread(vcdatabuf + vcofs, flen, 1, f);
     fclose(f);
 }
 
-ExecLibFunc(unsigned char func) {
+void ExecLibFunc(unsigned char func) {
     switch (func) {
     case 1:
         MapSwitch();
@@ -2108,7 +2122,7 @@ int ReadVar0(int var) {
     }
 }
 
-WriteVar0(int var, int value) {
+void WriteVar0(int var, int value) {
     switch (var) {
     case 0:
         tvar[0] = value;
@@ -2449,7 +2463,7 @@ int ReadVar1(int var, int arg1) {
     case 32:
         return party[arg1].chasespeed;
     case 33:
-        return party[arg1].scriptofs;
+        return (int)party[arg1].scriptofs;
     case 34:
         return pstats[arg1 - 1].atk;
     case 35:
@@ -2511,7 +2525,7 @@ int ReadVar1(int var, int arg1) {
     }
 }
 
-WriteVar1(int var, int arg1, int value) {
+void WriteVar1(int var, int arg1, int value) {
     switch (var) {
     case 0:
         flags[arg1] = value;
@@ -2664,7 +2678,7 @@ int ReadVar2(int var, int arg1, int arg2) {
     }
 }
 
-WriteVar2(int var, int arg1, int arg2, int value) {
+void WriteVar2(int var, int arg1, int arg2, int value) {
     unsigned int mask;
     switch (var) {
     case 0:

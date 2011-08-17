@@ -429,7 +429,7 @@ BuildTable(char r, char g, char b, char* dest) {
     }
 }
 
-ColorScale(char* dest, int st, int fn, int inv) {
+void ColorScale(unsigned char* dest, int st, int fn, int inv) {
     int i, intensity;
 
     for (i = 0; i < 256; i++) {

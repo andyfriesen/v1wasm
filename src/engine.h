@@ -18,7 +18,7 @@ struct r_entity {                      // on-screen entities (chars)
              delayct, adjactv;     // yet more internal crap
     unsigned short x1, y1, x2, y2;       // bounding box coordinates
     unsigned char curcmd, cmdarg;        // Script commands/arguments
-    unsigned char* scriptofs;            // offset in script parsing
+    char* scriptofs;            // offset in script parsing
     unsigned char face, chasing,         // face player when activated | chasing
              chasespeed, chasedist; // chasing variables
     unsigned short cx, cy;               // current-tile pos (moving adjusted)
@@ -140,10 +140,18 @@ void vfree(void* thismem);
 void ProcessControls();
 void ExecuteScript(int);
 void UpdateEquipStats();
+void startfollow();
+void lastmove(char n);
+
+int ObstructionAt(int tx, int ty);
 
 void addcharacter(int i);
 
 void startmap(char* fname);
+void load_map(char* fname);
+
+void check_tileanimation();
+void process_entities();
 
 void SaveGame(char* fn);
 

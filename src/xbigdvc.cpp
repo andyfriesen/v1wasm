@@ -1,4 +1,8 @@
-vcwritelayer(int i) {
+
+#include "vc.h"
+#include "render.h"
+
+void vcwritelayer(int i) {
     //   int i;
     //   i=ResolveOperand();
 

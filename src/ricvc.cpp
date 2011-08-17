@@ -59,7 +59,6 @@
 #define bgcolor 154
 #define grey1 14
 #define grey2 26
-extern unsigned char oc;
 extern unsigned int effectofstbl[1024];
 extern unsigned int startupofstbl[1024];
 

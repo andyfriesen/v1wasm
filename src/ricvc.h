@@ -22,4 +22,5 @@ void equipMenu();
 void magicMenu();
 void statusScreen();
 void VCCr2();
-int ChooseChar();
+void VCTextBox();
+int ChooseChar(int x1, int y1);

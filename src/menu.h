@@ -17,7 +17,9 @@ void BuyMagic(char ptr);
 void PurchaseMagic(char c, char i);
 void SystemMenu();
 void MainMenu();
+void BuyMenu();
 void MBuyMenu();
+void SellMenu();
 void MSellMenu();
 
 void menubox(int x, int y, int x2, int y2);

@@ -374,7 +374,7 @@ void GetNextCommand(int i) {
 
 void MoveScript(int i) {
     if (!party[i].scriptofs) {
-        party[i].scriptofs = (unsigned char*)(msbuf + msofstbl[party[i].movescript]);
+        party[i].scriptofs = (msbuf + msofstbl[party[i].movescript]);
     }
     if (!party[i].curcmd) {
         GetNextCommand(i);
@@ -419,7 +419,7 @@ void MoveScript(int i) {
         party[i].cmdarg = 0;
         break;
     case 9:
-        party[i].scriptofs = (unsigned char*)msbuf + msofstbl[party[i].movescript];
+        party[i].scriptofs = msbuf + msofstbl[party[i].movescript];
         party[i].cmdarg = 0;
         break;
     case 10:
