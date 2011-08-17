@@ -3,11 +3,15 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "engine.h"
 #include "entity.h"
+#include "render.h"
 #include "vga.h"
-extern err(char* ermsg);
-extern char* strbuf;
+#include "vc.h"
+#include "main.h"
+#include "battle.h"
 
 // ============================ Data ============================
 
@@ -19,37 +23,37 @@ unsigned char* vcscreen, hookretrace, *vcscreen2, *vcscreen1; // VClayer buffer 
 char flipped[2048];                    // If animation bi-dir loop has flipped
 int tileidx[2048];                     // Animation-adjusted tile index
 int vspspeed;                          // vsp-speed up trick on/off flag
-char* vspmask;                         // vspspeed precalc transparency mask
+unsigned char* vspmask;                         // vspspeed precalc transparency mask
 int foregroundlock = 1, xwin1 = 0, ywin1 = 0; // front layer independent scrolling stuff
 unsigned char draworder[100], numdraw = 0; // y-sorted draw order buffer
 unsigned char layer1trans = 0, layervctrans = 0, layervc2trans = 0;
 
 int quake = 0, quakex, quakey, qswitch = 0; // render-quake flags
 int screengradient = 0;                // fullscreen mappalettegradient
-int (*DrawLayer1) (int xw, int yw);    // DrawLayer1 "driver"-style ptr
+void (*DrawLayer1) (int xw, int yw);    // DrawLayer1 "driver"-style ptr
 
-DrawLayer1NoSpeed(int xw, int yw);     // DrawLayer1 funcs pre-defines
-DrawLayer1Speed(int xw, int yw);       // DrawLayer1 funcs pre-defines
+void DrawLayer1NoSpeed(int xw, int yw);     // DrawLayer1 funcs pre-defines
+void DrawLayer1Speed(int xw, int yw);       // DrawLayer1 funcs pre-defines
 
 extern int vspm;                       // external def-amount of VSP memory
 
 // ============================ Code ============================
 
-InitRenderSystem() {
-    vcscreen1 = (char*) valloc(64000, "vcscreen1");
+void InitRenderSystem() {
+    vcscreen1 = (unsigned char*) valloc(64000, "vcscreen1");
     //memset(vcscreen1, 0, 64000);
-    vcscreen2 = (char*) valloc(64000, "vcscreen2");
+    vcscreen2 = (unsigned char*) valloc(64000, "vcscreen2");
     //memset(vcscreen2, 0, 64000);
     vcscreen = vcscreen1;
     if (vspspeed) {
-        vspmask = (char*) valloc(vspm, "vspmask");
+        vspmask = (unsigned char*) valloc(vspm, "vspmask");
         DrawLayer1 = &DrawLayer1Speed;
     } else {
         DrawLayer1 = &DrawLayer1NoSpeed;
     }
 }
 
-CalcVSPMask() {
+void CalcVSPMask() {
     int i;
 
     for (i = 0; i < (numtiles * 256); i++) {
@@ -61,8 +65,9 @@ CalcVSPMask() {
     }
 }
 
-drawchar(int i, int xw, int yw) {
-    char* img, fr;
+void drawchar(int i, int xw, int yw) {
+    unsigned char* img;
+    char fr;
     int dx, dy, drawmode = 0;
 
     dx = party[i].x - xw + 16;
@@ -136,7 +141,7 @@ drawchar(int i, int xw, int yw) {
     }
 }
 
-SwitchOrder(int i, int j) {
+void SwitchOrder(int i, int j) {
     unsigned char c;
 
     c = draworder[i];
@@ -144,7 +149,7 @@ SwitchOrder(int i, int j) {
     draworder[j] = c;
 }
 
-SortDrawOrder() {
+void SortDrawOrder() {
     int i, j;
 
     for (i = 1; i < numdraw; i++)
@@ -154,12 +159,12 @@ SortDrawOrder() {
             }
 }
 
-setdrawchar(unsigned char i) {
+void setdrawchar(unsigned char i) {
     draworder[numdraw] = i;
     numdraw++;
 }
 
-drawcharacters(int xw, int yw) {
+void drawcharacters(int xw, int yw) {
     int i;
 
     memset(&draworder, 0, 100);
@@ -183,7 +188,7 @@ drawcharacters(int xw, int yw) {
     drawchars(xw, yw);
 }
 
-drawchars(int xw, int yw) {
+void drawchars(int xw, int yw) {
     int i;
 
     for (i = 0; i < numdraw; i++) {
@@ -191,7 +196,7 @@ drawchars(int xw, int yw) {
     }
 }
 
-ProcessEarthQuake() {
+void ProcessEarthQuake() {
     int nx, ny;
 
     nx = xwin;
@@ -220,7 +225,7 @@ ProcessEarthQuake() {
     drawmaploc(nx, ny);
 }
 
-drawvclayer() {
+void drawvclayer() {
     if (layervctrans == 1) {
         Tcopysprite(16, 16, 320, 200, vcscreen1);
     } else if (layervctrans == 2) {
@@ -229,7 +234,8 @@ drawvclayer() {
         tcopysprite(16, 16, 320, 200, vcscreen1);
     }
 }
-drawvclayer2() {
+
+void drawvclayer2() {
     if (layervc2trans == 1) {
         Tcopysprite(16, 16, 320, 200, vcscreen2);
     } else if (layervc2trans == 2) {
@@ -296,11 +302,11 @@ void drawmap() {
         drawvclayer2();
     }
     if (screengradient) {
-        ColorField(16, 16, 336, 216, &scrnxlatbl);
+        ColorField(16, 16, 336, 216, scrnxlatbl);
     }
 }
 
-drawmaploc(int xw, int yw) {
+void drawmaploc(int xw, int yw) {
     if (hookretrace) {
         ExecuteScript(hookretrace);
     }
@@ -325,12 +331,12 @@ drawmaploc(int xw, int yw) {
         drawvclayer2();
     }
     if (screengradient) {
-        ColorField(16, 16, 336, 216, &scrnxlatbl);
+        ColorField(16, 16, 336, 216, scrnxlatbl);
     }
 }
 
-DrawLayer0(int xw, int yw) {
-    char* img;
+void DrawLayer0(int xw, int yw) {
+    unsigned char* img;
     int i, j, oxw, oyw;
 
     if ((!layerc) || (layerc == 1) || (layerc == 3)) {
@@ -354,8 +360,8 @@ DrawLayer0(int xw, int yw) {
         }
 }
 
-DrawLayer1Trans(int xw, int yw) {
-    char* img;
+void DrawLayer1Trans(int xw, int yw) {
+    unsigned char* img;
     int i, j, oxw, oyw;
 
     if (layerc < 3) {
@@ -381,8 +387,8 @@ DrawLayer1Trans(int xw, int yw) {
         }
 }
 
-_DrawLayer1Trans(int xw, int yw) {
-    char* img;
+void _DrawLayer1Trans(int xw, int yw) {
+    unsigned char* img;
     int i, j, oxw, oyw;
 
     if (layerc < 3) {
@@ -409,8 +415,8 @@ _DrawLayer1Trans(int xw, int yw) {
 }
 
 
-DrawLayer1NoSpeed(int xw, int yw) {
-    char* img;
+void DrawLayer1NoSpeed(int xw, int yw) {
+    unsigned char* img;
     int i, j, oxw, oyw;
 
     if (layer1trans == 1) {
@@ -446,8 +452,8 @@ DrawLayer1NoSpeed(int xw, int yw) {
         }
 }
 
-DrawLayer1Speed(int xw, int yw) {
-    char* img;
+void DrawLayer1Speed(int xw, int yw) {
+    unsigned char* img;
     int i, j, oxw, oyw, a;
 
     if (layer1trans == 1) {
@@ -486,7 +492,7 @@ DrawLayer1Speed(int xw, int yw) {
 
 // ============================= Animation code ==========================
 
-AnimateTile(char i, int l) {
+void AnimateTile(char i, int l) {
     switch (va0[i].mode) {
     case 0:
         if (tileidx[l] < va0[i].finish) {
@@ -524,7 +530,7 @@ AnimateTile(char i, int l) {
     }
 }
 
-animate(char i) {
+void animate(char i) {
     int l;
 
     vadelay[i] = 0;

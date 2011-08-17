@@ -4,5 +4,11 @@ extern int quakex, quakey, quake, screengradient, tileidx[2048], vspspeed;
 extern int foregroundlock, xwin1, ywin1;
 
 void animate(int);
-void drawmap();
+
 void InitRenderSystem();
+
+void drawmap();
+void drawchars(int xw, int yw);
+void drawmaploc(int xw, int yw);
+void DrawLayer0(int xw, int yw);
+

@@ -16,10 +16,15 @@ void get_palette();
 void gotoxy(int x, int y);
 void printstring(char* str);
 void bigprintstring(char* str);
+void copytile(int x, int y, unsigned char* spr);
+void tcopytile(int x, int y, unsigned char* spr, unsigned char* matte);
 void copysprite(int x, int y, int width, int height, unsigned char* spr);
 void tcopysprite(int x, int y, int width, int height, unsigned char* spr);
+void Tcopysprite(int x, int y, int width, int height, unsigned char* spr);
+void _Tcopysprite(int x, int y, int width, int height, unsigned char* spr);
 void grabregion(int x, int y, int width, int height, unsigned char* spr);
 void fontcolor(unsigned char c);
+void ColorField(int x, int y, int x2, int y2, unsigned char* tbl);
 
 void dec_to_asciiz(int num, char* buf);
 
@@ -27,4 +32,4 @@ extern unsigned char* screen;
 extern unsigned char* virscr;
 extern unsigned char pal[768];
 
-extern char menuxlatbl[256], greyxlatbl[256], scrnxlatbl[256], *transparencytbl;
+extern unsigned char menuxlatbl[256], greyxlatbl[256], scrnxlatbl[256], *transparencytbl;
