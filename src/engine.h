@@ -135,10 +135,10 @@ extern unsigned short int* map0, *map1, xsize, ysize, vadelay[100];
 extern unsigned char* mapp, layerc, pmultx, pdivx, pmulty, pdivy, saveflag;
 extern unsigned char* vsp0, autoent;
 
-void* valloc(int amount, char* whatfor);
+void* valloc(int amount, const char* whatfor);
 void vfree(void* thismem);
 void ProcessControls();
-void ExecuteScript(int);
+void ExecuteScript(unsigned short);
 void UpdateEquipStats();
 void startfollow();
 void lastmove(char n);

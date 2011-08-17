@@ -9,13 +9,11 @@
 #include "keyboard.h"
 #include "engine.h"
 #include "control.h"
-#include "mikmod.h"
+//#include "mikmod.h"
 #include "sound.h"
 #include "timer.h"
 #include "render.h"
 
-UNIMOD* mf;
-SAMPLE* sfx[60];
 char numfx;
 char curch;
 char jf;
@@ -31,9 +29,10 @@ char playingsong[13];
 extern char kb1, kb2, kb3, kb4;
 extern char jb1, jb2, jb3, jb4;
 
+unsigned char mp_volume;
+signed short mp_sngpos;
+
 void tickhandler() {
-    MP_HandleTick();
-    MD_SetBPM(mp_bpm);
 }
 
 int ParseSetup() {
@@ -127,34 +126,34 @@ parseloop:
 
     if (!strcmp(strbuf, "sounddevice")) {
         fscanf(s, "%s", strbuf);
-        md_device = atoi(strbuf);
+        //md_device = atoi(strbuf);
         goto parseloop;
     }
     if (!strcmp(strbuf, "mixrate")) {
         fscanf(s, "%s", strbuf);
-        md_mixfreq = atoi(strbuf);
+        //md_mixfreq = atoi(strbuf);
         goto parseloop;
     }
     if (!strcmp(strbuf, "dmabufsize")) {
         fscanf(s, "%s", strbuf);
-        md_dmabufsize = atoi(strbuf);
+        //md_dmabufsize = atoi(strbuf);
         goto parseloop;
     }
     if (!strcmp(strbuf, "forcemono")) {
-        md_mode &= ~DMODE_STEREO;
+        //md_mode &= ~DMODE_STEREO;
         goto parseloop;
     }
     if (!strcmp(strbuf, "force8bit")) {
-        md_mode &= ~DMODE_16BITS;
+        //md_mode &= ~DMODE_16BITS;
         goto parseloop;
     }
     if (!strcmp(strbuf, "interpolate")) {
-        md_mode |= DMODE_INTERP;
+        //md_mode |= DMODE_INTERP;
         goto parseloop;
     }
     if (!strcmp(strbuf, "volume")) {
         fscanf(s, "%s", strbuf);
-        mp_volume = atoi(strbuf);
+        //mp_volume = atoi(strbuf);
         goto parseloop;
     }
 
@@ -168,12 +167,6 @@ void sound_init()
 // they both use SETUP.CFG.
 {
     char t;
-
-    md_mixfreq = 44100;
-    md_dmabufsize = 2048;
-    md_mode = DMODE_16BITS | DMODE_STEREO;
-    md_device = 0;
-    mp_volume = 100;
 
     vspm = 256000;
     //mapvcm=50000; // -- aen; 31/May/09 -- no longer used; see LoadVC().
@@ -196,121 +189,21 @@ void sound_init()
     allocbuffers();
     initcontrols(jf);
     playingsong[0] = 0;
-
-    ML_RegisterLoader(&load_s3m);
-    ML_RegisterLoader(&load_uni);
-    ML_RegisterLoader(&load_xm);
-    ML_RegisterLoader(&load_mod);
-    MD_RegisterDriver(&drv_nos);
-    MD_RegisterDriver(&drv_sb);
-    MD_RegisterDriver(&drv_gus);
-    MD_RegisterPlayer(tickhandler);
-
-    if (!MD_Init()) {
-        printf("Driver error: %s.\n", myerr);
-        exit(1);
-    }
-    lastvol = mp_volume;
 }
 
 void sound_loadsfx(char* fname) {
-    FILE* f;
-    char i;
-
-    if (md_device == 3) {
-        return;
-    }
-    numfx = 0;
-    if (!(f = fopen(fname, "r"))) {
-        err("Could not open sound effect index file.");
-    }
-    fscanf(f, "%s", strbuf);
-    numfx = atoi(strbuf);
-
-    for (i = 0; i < numfx; i++) {
-        fscanf(f, "%s", strbuf);
-        if (!(sfx[i] = MW_LoadWavFN(strbuf))) {
-            err("WAV load error.");
-        }
-    }
-    fclose(f);
 }
 
 void sound_freesfx() {
-    char i;
-
-    for (i = 0; i < numfx; i++) {
-        MW_FreeWav(sfx[i]);
-    }
 }
 
 void playsong(char* sngnme) {
-    if (md_device == 3) {
-        return;
-    }
-    if (!strcmp(sngnme, playingsong)) {
-        return;
-    }
-    memcpy(&playingsong, sngnme, 13);
-
-    if (playing) {
-        stopsound();
-    }
-    if (!(mf = ML_LoadFN(sngnme))) {
-        err(myerr);
-    }
-    MP_Init(mf);
-    md_numchn = mf->numchn + 2;
-    mp_loop = 1;
-    mp_volume = lastvol;
-    sound_loadsfx("MAIN.SFX");
-    MD_PlayStart();
-    playing = 1;
-    playeffect(numfx - 1);
-    playeffect(numfx - 1);
 }
 
 void stopsound() {
-    if (md_device == 3) {
-        return;
-    }
-
-    lastvol = mp_volume;
-    mp_volume = 0;
-    if (MP_Ready()) {
-        return;
-    }
-    if (!playing) {
-        return;
-    }
-    MD_PlayStop();
-    sound_freesfx();
-    ML_Free(mf);
-    playing = 0;
 }
 
 void playeffect(char efc) {
-    char chanl;
-
-    if (md_device == 3) {
-        return;
-    }
-    if (!playing) {
-        return;
-    }
-
-    chanl = md_numchn - curch;
-    if (curch == 1) {
-        curch = 2;
-    } else {
-        curch = 1;
-    }
-
-    MD_VoiceSetVolume(chanl, 64);
-    MD_VoiceSetPanning(chanl, 128);
-    MD_VoiceSetFrequency(chanl, sfx[efc]->loopend);
-    MD_VoicePlay(chanl, sfx[efc]->handle, 0, sfx[efc]->length, 0, 0, sfx[efc]->flags);
-
 }
 
 /*playsound(char *fname,int rate)

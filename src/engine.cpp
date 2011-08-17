@@ -8,12 +8,13 @@
 #include "entity.h"
 #include "engine.h"
 #include "keyboard.h"
+#include "main.h"
 #include "menu.h"
 #include "render.h"
 #include "sound.h"
 #include "timer.h"
+#include "ricvc.h"
 #include "vga.h"
-extern void err(char* ermsg);
 
 // ============================ Data ============================
 
@@ -103,7 +104,7 @@ unsigned char autoent = 0;
 unsigned short int nx = 0, ny = 0;
 short int numtiles;
 
-extern char* strbuf, *speech, *msbuf, menuactive;
+extern char* strbuf, *msbuf, menuactive;
 extern unsigned char nummovescripts;
 //extern int mapvcm; // -- aen; 31/May/98 -- no longer used; see LoadVC().
 extern int msofstbl[100];
@@ -112,8 +113,6 @@ extern int vspm; // -- aen; 30/May/98 -- no longer used; see load_map().
 
 void LoadVC(FILE* map);
 void CalcVSPMask();
-void ExecuteScript(int);
-void ExecuteStartUpScript(unsigned short s);
 
 // ============================ Code ============================
 
@@ -158,7 +157,7 @@ void allocbuffers() {
     magicicons = (unsigned char*)valloc(50688, "magicicons");
 
     itemicons = (unsigned char*)valloc(50688, "itemicons");
-    speech = (char*)valloc(450000, "speech");
+    speech = (unsigned char*)valloc(450000, "speech");
     msbuf = (char*)valloc(20000, "msbuf");
 
     //memset(map0,0,mapm*2);     /* -- ric:28/Apr/98 --                 */

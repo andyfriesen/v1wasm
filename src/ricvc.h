@@ -24,3 +24,5 @@ void statusScreen();
 void VCCr2();
 void VCTextBox();
 int ChooseChar(int x1, int y1);
+
+void ExecuteStartUpScript(unsigned short int s);

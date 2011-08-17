@@ -1,5 +1,5 @@
-extern volatile char keyboard_map[128];
-extern volatile char last_pressed;
+extern char keyboard_map[128];
+extern char last_pressed;
 extern int keyboard_init(void);
 extern void keyboard_close(void);
 extern void keyboard_chain(int toggle);

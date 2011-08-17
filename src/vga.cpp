@@ -161,7 +161,7 @@ void copytile(int x, int y, char *spr)
 }
 */
 
-void copytile(int x, int y, char* spr) {
+void copytile(int x, int y, unsigned char* spr) {
 #if 0
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"
@@ -196,7 +196,7 @@ void copytile(int x, int y, char* spr) {
 #endif
 }
 
-void copysprite(int x, int y, int width, int height, char* spr) {
+void copysprite(int x, int y, int width, int height, unsigned char* spr) {
 #if 0
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%esi                   \n\t"
@@ -248,7 +248,7 @@ void grabregion(int x, int y, int width, int height, char* spr) {
 #endif
 }
 
-void tcopytile(int x, int y, char* spr, char* matte) {
+void tcopytile(int x, int y, unsigned char* spr, unsigned char* matte) {
 #if 0
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"

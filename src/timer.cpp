@@ -32,3 +32,6 @@ void timer_init() {
 
 void timer_close() {
 }
+
+void delay(int ms) {
+}

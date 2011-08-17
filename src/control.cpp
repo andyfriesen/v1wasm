@@ -3,6 +3,7 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdio.h>
+#include "main.h"
 #include "keyboard.h"
 
 /* -- ric: 03/May/98 -- */
@@ -12,6 +13,9 @@ struct keyb_map {
 };           // bound script
 
 struct keyb_map key_map[128];         // for recording bound keys
+
+char keyboard_map[128];
+char last_pressed;
 
 char j;                               // use joystick or not
 
@@ -27,7 +31,6 @@ int upb, downb, leftb, rightb;        // barriers for axis determination
 char kb1, kb2, kb3, kb4;              // keyboard definable controls.
 char jb1, jb2, jb3, jb4;              // joystick definable controls.
 
-void err(char* message);
 void ScreenShot();
 
 void readbuttons();
@@ -176,3 +179,12 @@ void readjoystick() {
     }
 }
 
+int keyboard_init() {
+    return 1;
+}
+
+void keyboard_chain(int) {
+}
+
+void keyboard_close() {
+}

@@ -764,7 +764,7 @@ drawloop:
     }
 }
 
-int atkp, defp, magp, mgrp, hitp, dodp, mblp, ferp, reap;
+extern int atkp, defp, magp, mgrp, hitp, dodp, mblp, ferp, reap;
 
 void CalcEquipPreview(int a, int i, int p) {
     int c, d;
