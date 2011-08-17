@@ -501,15 +501,15 @@ void startfollow() {
 }
 
 int InvFace() {
-    switch(party[0].facing) {
-        case 0:
-            return 1;
-        case 1:
-            return 0;
-        case 2:
-            return 3;
-        case 3:
-            return 2;
+    switch (party[0].facing) {
+    case 0:
+        return 1;
+    case 1:
+        return 0;
+    case 2:
+        return 3;
+    case 3:
+        return 2;
     }
 }
 
@@ -521,19 +521,19 @@ void Activate() {
     tx = party[0].x / 16;
     ty = party[0].y / 16;
     switch (party[0].facing) {
-        case 0: {
+    case 0: {
             ty++;
             break;
         }
-        case 1: {
+    case 1: {
             ty--;
             break;
         }
-        case 2: {
+    case 2: {
             tx++;
             break;
         }
-        case 3: {
+    case 3: {
             tx--;
             break;
         }
@@ -584,42 +584,42 @@ void process_controls();
 void ProcessControls() {
     if (party[0].speed < 4) {
         switch (party[0].speed) {
-            case 1:
-                if (party[0].speedct < 3) {
-                    party[0].speedct++;
-                    return;
-                }
-            case 2:
-                if (party[0].speedct < 2) {
-                    party[0].speedct++;
-                    return;
-                }
-            case 3:
-                if (party[0].speedct < 1) {
-                    party[0].speedct++;
-                    return;
-                }
+        case 1:
+            if (party[0].speedct < 3) {
+                party[0].speedct++;
+                return;
+            }
+        case 2:
+            if (party[0].speedct < 2) {
+                party[0].speedct++;
+                return;
+            }
+        case 3:
+            if (party[0].speedct < 1) {
+                party[0].speedct++;
+                return;
+            }
         }
     }
     if (party[0].speed < 5) {
         process_controls();
     }
     switch (party[0].speed) {
-        case 5:
-            process_controls();
-            process_controls();
-            return;
-        case 6:
-            process_controls();
-            process_controls();
-            process_controls();
-            return;
-        case 7:
-            process_controls();
-            process_controls();
-            process_controls();
-            process_controls();
-            return;
+    case 5:
+        process_controls();
+        process_controls();
+        return;
+    case 6:
+        process_controls();
+        process_controls();
+        process_controls();
+        return;
+    case 7:
+        process_controls();
+        process_controls();
+        process_controls();
+        process_controls();
+        return;
     }
 }
 
@@ -675,7 +675,7 @@ void process_controls() {
             MainMenu();
         }
 
-        for(i = 0; i < 128; i++) { /* -- ric: 03/May/98 -- */
+        for (i = 0; i < 128; i++) { /* -- ric: 03/May/98 -- */
             if ((key_map[i].pressed) && (key_map[i].boundscript)) {
                 //         dec_to_asciiz(i,strbuf);
                 //         err(strbuf);

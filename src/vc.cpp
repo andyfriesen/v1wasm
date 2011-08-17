@@ -106,29 +106,29 @@ ProcessVar0Assign() {
     t = GrabC();
     b = GrabC();
     switch (b) {
-        case SET:
-            WriteVar0(t, ResolveOperand());
-            return;
-        case INCSET:
-            w = ReadVar0(t);
-            w += ResolveOperand();
-            WriteVar0(t, w);
-            return;
-        case DECSET:
-            w = ReadVar0(t);
-            w -= ResolveOperand();
-            WriteVar0(t, w);
-            return;
-        case INCREMENT:
-            w = ReadVar0(t);
-            w++;
-            WriteVar0(t, w);
-            return;
-        case DECREMENT:
-            w = ReadVar0(t);
-            w--;
-            WriteVar0(t, w);
-            return;
+    case SET:
+        WriteVar0(t, ResolveOperand());
+        return;
+    case INCSET:
+        w = ReadVar0(t);
+        w += ResolveOperand();
+        WriteVar0(t, w);
+        return;
+    case DECSET:
+        w = ReadVar0(t);
+        w -= ResolveOperand();
+        WriteVar0(t, w);
+        return;
+    case INCREMENT:
+        w = ReadVar0(t);
+        w++;
+        WriteVar0(t, w);
+        return;
+    case DECREMENT:
+        w = ReadVar0(t);
+        w--;
+        WriteVar0(t, w);
+        return;
     }
 }
 
@@ -140,29 +140,29 @@ ProcessVar1Assign() {
     a = ResolveOperand();
     b = GrabC();
     switch (b) {
-        case SET:
-            WriteVar1(t, a, ResolveOperand());
-            return;
-        case INCSET:
-            w = ReadVar1(t, a);
-            w += ResolveOperand();
-            WriteVar1(t, a, w);
-            return;
-        case DECSET:
-            w = ReadVar1(t, a);
-            w -= ResolveOperand();
-            WriteVar1(t, a, w);
-            return;
-        case INCREMENT:
-            w = ReadVar1(t, a);
-            w++;
-            WriteVar1(t, a, w);
-            return;
-        case DECREMENT:
-            w = ReadVar1(t, a);
-            w--;
-            WriteVar1(t, a, w);
-            return;
+    case SET:
+        WriteVar1(t, a, ResolveOperand());
+        return;
+    case INCSET:
+        w = ReadVar1(t, a);
+        w += ResolveOperand();
+        WriteVar1(t, a, w);
+        return;
+    case DECSET:
+        w = ReadVar1(t, a);
+        w -= ResolveOperand();
+        WriteVar1(t, a, w);
+        return;
+    case INCREMENT:
+        w = ReadVar1(t, a);
+        w++;
+        WriteVar1(t, a, w);
+        return;
+    case DECREMENT:
+        w = ReadVar1(t, a);
+        w--;
+        WriteVar1(t, a, w);
+        return;
     }
 }
 
@@ -175,29 +175,29 @@ ProcessVar2Assign() {
     c = ResolveOperand();
     b = GrabC();
     switch (b) {
-        case SET:
-            WriteVar2(t, a, c, ResolveOperand());
-            return;
-        case INCSET:
-            w = ReadVar2(t, a, c);
-            w += ResolveOperand();
-            WriteVar2(t, a, c, w);
-            return;
-        case DECSET:
-            w = ReadVar2(t, a, c);
-            w -= ResolveOperand();
-            WriteVar2(t, a, c, w);
-            return;
-        case INCREMENT:
-            w = ReadVar2(t, a, c);
-            w++;
-            WriteVar2(t, a, c, w);
-            return;
-        case DECREMENT:
-            w = ReadVar2(t, a, c);
-            w--;
-            WriteVar2(t, a, c, w);
-            return;
+    case SET:
+        WriteVar2(t, a, c, ResolveOperand());
+        return;
+    case INCSET:
+        w = ReadVar2(t, a, c);
+        w += ResolveOperand();
+        WriteVar2(t, a, c, w);
+        return;
+    case DECSET:
+        w = ReadVar2(t, a, c);
+        w -= ResolveOperand();
+        WriteVar2(t, a, c, w);
+        return;
+    case INCREMENT:
+        w = ReadVar2(t, a, c);
+        w++;
+        WriteVar2(t, a, c, w);
+        return;
+    case DECREMENT:
+        w = ReadVar2(t, a, c);
+        w--;
+        WriteVar2(t, a, c, w);
+        return;
     }
 }
 
@@ -209,23 +209,23 @@ unsigned int ResolveOperand() {
     while (1) {
         c = GrabC();
         switch (c) {
-            case ADD:
-                cr += ProcessOperand();
-                continue;
-            case SUB:
-                cr -= ProcessOperand();
-                continue;
-            case DIV:
-                cr = cr / ProcessOperand();
-                continue;
-            case MULT:
-                cr = cr * ProcessOperand();
-                continue;
-            case MOD:
-                cr = cr % ProcessOperand();
-                continue;
-            case OP_END:
-                break;
+        case ADD:
+            cr += ProcessOperand();
+            continue;
+        case SUB:
+            cr -= ProcessOperand();
+            continue;
+        case DIV:
+            cr = cr / ProcessOperand();
+            continue;
+        case MULT:
+            cr = cr * ProcessOperand();
+            continue;
+        case MOD:
+            cr = cr % ProcessOperand();
+            continue;
+        case OP_END:
+            break;
         }
         break;
     }
@@ -238,21 +238,21 @@ int ProcessOperand() {
 
     op_desc = GrabC();
     switch (op_desc) {
-        case OP_IMMEDIATE:
-            return GrabD();
-        case OP_VAR0:
-            return ReadVar0(GrabC());
-        case OP_VAR1:
-            a = GrabC();
-            b = ResolveOperand();
-            return ReadVar1(a, b);
-        case OP_VAR2:
-            a = GrabC();
-            b = ResolveOperand();
-            c = ResolveOperand();
-            return ReadVar2(a, b, c);
-        case OP_GROUP:
-            return ResolveOperand();
+    case OP_IMMEDIATE:
+        return GrabD();
+    case OP_VAR0:
+        return ReadVar0(GrabC());
+    case OP_VAR1:
+        a = GrabC();
+        b = ResolveOperand();
+        return ReadVar1(a, b);
+    case OP_VAR2:
+        a = GrabC();
+        b = ResolveOperand();
+        c = ResolveOperand();
+        return ReadVar2(a, b, c);
+    case OP_GROUP:
+        return ResolveOperand();
     }
 }
 
@@ -273,67 +273,67 @@ ProcessIf() {
 
         if (controlbyte == ZERO || controlbyte == NONZERO) {
             switch (controlbyte) {
-                case ZERO:
-                    if (arg1) {
-                        exec = 0;
-                    }
-                    break;
-                case NONZERO:
-                    if (!arg1) {
-                        exec = 0;
-                    }
-                    break;
+            case ZERO:
+                if (arg1) {
+                    exec = 0;
+                }
+                break;
+            case NONZERO:
+                if (!arg1) {
+                    exec = 0;
+                }
+                break;
             }
         } else {
             arg2 = ResolveOperand();
             switch (controlbyte) {
-                case EQUALTO:
-                    if (arg1 != arg2) {
-                        exec = 0;
-                    }
+            case EQUALTO:
+                if (arg1 != arg2) {
+                    exec = 0;
+                }
+                break;
+            case NOTEQUAL:
+                if (arg1 == arg2) {
+                    exec = 0;
+                }
+                break;
+            case GREATERTHAN:
+                if (arg1 < 0 && arg2 > 0) {
+                    exec = 0;  // ANDY ADDED May 18 '99
                     break;
-                case NOTEQUAL:
-                    if (arg1 == arg2) {
-                        exec = 0;
-                    }
-                    break;
-                case GREATERTHAN:
-                    if (arg1 < 0 && arg2 > 0) {
-                        exec = 0;  // ANDY ADDED May 18 '99
-                        break;
-                    }
-                    if (arg1 <= arg2) {
-                        exec = 0;
-                    }
-                    break;
+                }
+                if (arg1 <= arg2) {
+                    exec = 0;
+                }
+                break;
 
-                case GREATERTHANOREQUAL:
-                    if (arg1 < 0 && arg2 > 0) {
-                        exec = 0;  // ANDY ADDED May 18 '99
-                        break;
-                    }
-                    if (arg1 < arg2) {
-                        exec = 0;
-                    }
+            case GREATERTHANOREQUAL:
+                if (arg1 < 0 && arg2 > 0) {
+                    exec = 0;  // ANDY ADDED May 18 '99
                     break;
-                case LESSTHAN:
-                    if (arg1 > 0 && arg2 < 0) {
-                        exec = 0;  // ANDY ADDED May 18 '99
-                        break;
-                    }
-                    if (arg1 >= arg2) {
-                        exec = 0;
-                    }
+                }
+                if (arg1 < arg2) {
+                    exec = 0;
+                }
+                break;
+            case LESSTHAN:
+                if (arg1 > 0 && arg2 < 0) {
+                    exec = 0;  // ANDY ADDED May 18 '99
                     break;
-                case LESSTHANOREQUAL:
-                    if (arg1 > 0 && arg2 < 0) {
-                        exec = 0;  // ANDY ADDED May 18 '99
-                        break;
-                    }
-                    if (arg1 > arg2) {
-                        exec = 0;
-                    }
+                }
+                if (arg1 >= arg2) {
+                    exec = 0;
+                }
+                break;
+            case LESSTHANOREQUAL:
+                if (arg1 > 0 && arg2 < 0) {
+                    exec = 0;  // ANDY ADDED May 18 '99
                     break;
+                }
+                if (arg1 > arg2) {
+                    exec = 0;
+                }
+                break;
             }
         }
 

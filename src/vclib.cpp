@@ -273,13 +273,13 @@ AlterFTile() {
 
     map1[(ty * xsize) + tx] = tt;
     switch (o) {
-        case 0:
-            buf = mapp[(ty * xsize) + tx] >> 1;
-            mapp[(ty * xsize) + tx] = buf << 1;
-            break;
-        case 1:
-            mapp[(ty * xsize) + tx] = mapp[(ty * xsize) + tx] | 1;
-            break;
+    case 0:
+        buf = mapp[(ty * xsize) + tx] >> 1;
+        mapp[(ty * xsize) + tx] = buf << 1;
+        break;
+    case 1:
+        mapp[(ty * xsize) + tx] = mapp[(ty * xsize) + tx] | 1;
+        break;
     }
 }
 
@@ -294,13 +294,13 @@ AlterBTile() {
 
     map0[(ty * xsize) + tx] = tt;
     switch (o) {
-        case 0:
-            buf = mapp[(ty * xsize) + tx] >> 1;
-            mapp[(ty * xsize) + tx] = buf << 1;
-            break;
-        case 1:
-            mapp[(ty * xsize) + tx] = mapp[(ty * xsize) + tx] | 1;
-            break;
+    case 0:
+        buf = mapp[(ty * xsize) + tx] >> 1;
+        mapp[(ty * xsize) + tx] = buf << 1;
+        break;
+    case 1:
+        mapp[(ty * xsize) + tx] = mapp[(ty * xsize) + tx] | 1;
+        break;
     }
 }
 
@@ -761,33 +761,33 @@ SText() {
 drawloop:
     while (timer_count != 0) {
         switch (line) {
-            case 1:
-                st1[chr] = str1[chr];
-                st1[chr + 1] = 0;
-                if (chr == strlen(str1)) {
-                    chr = 0;
-                    line = 2;
-                } else {
-                    chr++;
-                }
-                break;
-            case 2:
-                st2[chr] = str2[chr];
-                st2[chr + 1] = 0;
-                if (chr == strlen(str2)) {
-                    chr = 0;
-                    line = 3;
-                } else {
-                    chr++;
-                }
-                break;
-            case 3:
-                st3[chr] = str3[chr];
-                st3[chr + 1] = 0;
-                if (chr < strlen(str3)) {
-                    chr++;
-                }
-                break;
+        case 1:
+            st1[chr] = str1[chr];
+            st1[chr + 1] = 0;
+            if (chr == strlen(str1)) {
+                chr = 0;
+                line = 2;
+            } else {
+                chr++;
+            }
+            break;
+        case 2:
+            st2[chr] = str2[chr];
+            st2[chr + 1] = 0;
+            if (chr == strlen(str2)) {
+                chr = 0;
+                line = 3;
+            } else {
+                chr++;
+            }
+            break;
+        case 3:
+            st3[chr] = str3[chr];
+            st3[chr + 1] = 0;
+            if (chr < strlen(str3)) {
+                chr++;
+            }
+            break;
         }
         timer_count--;
     }
@@ -874,16 +874,16 @@ MapPaletteGradient() {
     m = ResolveOperand();
 
     switch (m) {
-        case 0:
-            ColorScale(&scrnxlatbl, sc, fc, f);
-            screengradient = 1;
-            break;
-        case 1:
-            ColorScale(&menuxlatbl, sc, fc, f);
-            break;
-        case 2:
-            ColorScale(&greyxlatbl, sc, fc, f);
-            break;
+    case 0:
+        ColorScale(&scrnxlatbl, sc, fc, f);
+        screengradient = 1;
+        break;
+    case 1:
+        ColorScale(&menuxlatbl, sc, fc, f);
+        break;
+    case 2:
+        ColorScale(&greyxlatbl, sc, fc, f);
+        break;
     }
 }
 
@@ -1352,94 +1352,94 @@ GetNextMove() {
         GetNextCommand(0);
     }
 
-    switch(party[0].curcmd) {
-        case 1:
-            MoveUp(0);
-            if (movesuccess) {
-                party[0].cmdarg--;
-                lastmove(2);
-                startfollow();
-            }
-            break;
-        case 2:
-            MoveDown(0);
-            if (movesuccess) {
-                party[0].cmdarg--;
-                lastmove(1);
-                startfollow();
-            }
-            break;
-        case 3:
-            MoveLeft(0);
-            if (movesuccess) {
-                party[0].cmdarg--;
-                lastmove(4);
-                startfollow();
-            }
-            break;
-        case 4:
-            MoveRight(0);
-            if (movesuccess) {
-                party[0].cmdarg--;
-                lastmove(3);
-                startfollow();
-            }
-            break;
-        case 5:
-            party[0].speed = party[0].cmdarg;
-            party[0].cmdarg = 0;
-            break;
-        case 6:
+    switch (party[0].curcmd) {
+    case 1:
+        MoveUp(0);
+        if (movesuccess) {
             party[0].cmdarg--;
-            break;
-        case 7:
-            party[0].scriptofs = 0;
-            party[0].curcmd = 0;
-            return;
-        case 8:
-            err("Script spawning not supported in PartyMove.");
-        case 9:
-            err("Looping not supported in PartyMove.");
-        case 10:
-            if (party[0].cx < party[0].cmdarg) {
-                MoveRight(0);
-                lastmove(3);
-                startfollow();
-            }
-            if (party[0].cx > party[0].cmdarg) {
-                MoveLeft(0);
-                lastmove(4);
-                startfollow();
-            }
-            if (party[0].cx == party[0].cmdarg) {
-                party[0].cmdarg = 0;
-            }
-            break;
-            break;
-        case 11:
-            if (party[0].cy < party[0].cmdarg) {
-                MoveDown(0);
-                lastmove(1);
-                startfollow();
-            }
-            if (party[0].cy > party[0].cmdarg) {
-                MoveUp(0);
-                lastmove(2);
-                startfollow();
-            }
-            if (party[0].cy == party[0].cmdarg) {
-                party[0].cmdarg = 0;
-            }
-            break;
-            break;
-        case 12:
-            party[0].facing = party[0].cmdarg;
+            lastmove(2);
+            startfollow();
+        }
+        break;
+    case 2:
+        MoveDown(0);
+        if (movesuccess) {
+            party[0].cmdarg--;
+            lastmove(1);
+            startfollow();
+        }
+        break;
+    case 3:
+        MoveLeft(0);
+        if (movesuccess) {
+            party[0].cmdarg--;
+            lastmove(4);
+            startfollow();
+        }
+        break;
+    case 4:
+        MoveRight(0);
+        if (movesuccess) {
+            party[0].cmdarg--;
+            lastmove(3);
+            startfollow();
+        }
+        break;
+    case 5:
+        party[0].speed = party[0].cmdarg;
+        party[0].cmdarg = 0;
+        break;
+    case 6:
+        party[0].cmdarg--;
+        break;
+    case 7:
+        party[0].scriptofs = 0;
+        party[0].curcmd = 0;
+        return;
+    case 8:
+        err("Script spawning not supported in PartyMove.");
+    case 9:
+        err("Looping not supported in PartyMove.");
+    case 10:
+        if (party[0].cx < party[0].cmdarg) {
+            MoveRight(0);
+            lastmove(3);
+            startfollow();
+        }
+        if (party[0].cx > party[0].cmdarg) {
+            MoveLeft(0);
+            lastmove(4);
+            startfollow();
+        }
+        if (party[0].cx == party[0].cmdarg) {
             party[0].cmdarg = 0;
-            break;
-        case 13:
-            party[0].specframe = party[0].cmdarg;
+        }
+        break;
+        break;
+    case 11:
+        if (party[0].cy < party[0].cmdarg) {
+            MoveDown(0);
+            lastmove(1);
+            startfollow();
+        }
+        if (party[0].cy > party[0].cmdarg) {
+            MoveUp(0);
+            lastmove(2);
+            startfollow();
+        }
+        if (party[0].cy == party[0].cmdarg) {
             party[0].cmdarg = 0;
-            break;
+        }
+        break;
+        break;
+    case 12:
+        party[0].facing = party[0].cmdarg;
+        party[0].cmdarg = 0;
+        break;
+    case 13:
+        party[0].specframe = party[0].cmdarg;
+        party[0].cmdarg = 0;
+        break;
     }
     if (!party[0].cmdarg) {
         party[0].curcmd = 0;
@@ -1460,27 +1460,27 @@ moveparty() {
 
     if (party[0].moving)
         for (i = 0; i < numchars; i++) {
-            switch(party[i].moving) {
-                case 1:
-                    party[i].y++;
-                    party[i].movcnt--;
-                    party[i].framectr++;
-                    break;
-                case 2:
-                    party[i].y--;
-                    party[i].movcnt--;
-                    party[i].framectr++;
-                    break;
-                case 3:
-                    party[i].x++;
-                    party[i].movcnt--;
-                    party[i].framectr++;
-                    break;
-                case 4:
-                    party[i].x--;
-                    party[i].movcnt--;
-                    party[i].framectr++;
-                    break;
+            switch (party[i].moving) {
+            case 1:
+                party[i].y++;
+                party[i].movcnt--;
+                party[i].framectr++;
+                break;
+            case 2:
+                party[i].y--;
+                party[i].movcnt--;
+                party[i].framectr++;
+                break;
+            case 3:
+                party[i].x++;
+                party[i].movcnt--;
+                party[i].framectr++;
+                break;
+            case 4:
+                party[i].x--;
+                party[i].movcnt--;
+                party[i].framectr++;
+                break;
             }
             if (party[i].framectr == 80) {
                 party[i].framectr = 0;
@@ -1494,21 +1494,21 @@ moveparty() {
 MoveParty() {
     if (party[0].speed < 4) {
         switch (party[0].speed) {
-            case 1:
-                if (party[0].speedct < 3) {
-                    party[0].speedct++;
-                    return;
-                }
-            case 2:
-                if (party[0].speedct < 2) {
-                    party[0].speedct++;
-                    return;
-                }
-            case 3:
-                if (party[0].speedct < 1) {
-                    party[0].speedct++;
-                    return;
-                }
+        case 1:
+            if (party[0].speedct < 3) {
+                party[0].speedct++;
+                return;
+            }
+        case 2:
+            if (party[0].speedct < 2) {
+                party[0].speedct++;
+                return;
+            }
+        case 3:
+            if (party[0].speedct < 1) {
+                party[0].speedct++;
+                return;
+            }
         }
     }
     if (party[0].speed < 5) {
@@ -1516,21 +1516,21 @@ MoveParty() {
         return;
     }
     switch (party[0].speed) {
-        case 5:
-            moveparty();
-            moveparty();
-            return;
-        case 6:
-            moveparty();
-            moveparty();
-            moveparty();
-            return;
-        case 7:
-            moveparty();
-            moveparty();
-            moveparty();
-            moveparty();
-            return;
+    case 5:
+        moveparty();
+        moveparty();
+        return;
+    case 6:
+        moveparty();
+        moveparty();
+        moveparty();
+        return;
+    case 7:
+        moveparty();
+        moveparty();
+        moveparty();
+        moveparty();
+        return;
     }
 }
 
@@ -1637,734 +1637,734 @@ VCLoadRaw() {
 
 ExecLibFunc(unsigned char func) {
     switch (func) {
-        case 1:
-            MapSwitch();
-            break;
-        case 2:
-            Warp();
-            break;
-        case 3:
-            AddCharacter();
-            break;
-        case 4:
-            SoundEffect();
-            break;
-        case 5:
-            GiveItem();
-            break;
-        case 6:
-            Text();
-            break;
-        case 7:
-            AlterFTile();
-            break;
-        case 8:
-            AlterBTile();
-            break;
-        case 9:
-            FakeBattle();
-            break;
-        case 10:
-            break;
-        case 11:
-            PlayMusic();
-            break;
-        case 12:
-            StopMusic();
-            break;
-        case 13:
-            HealAll();
-            break;
-        case 14:
-            AlterParallax();
-            break;
-        case 15:
-            FadeIn();
-            break;
-        case 16:
-            FadeOut();
-            break;
-        case 17:
-            RemoveCharacter();
-            break;
-        case 18:
-            Banner();
-            break;
-        case 19:
-            EnforceAnimation();
-            break;
-        case 20:
-            WaitKeyUp();
-            break;
-        case 21:
-            DestroyItem();
-            break;
-        case 22:
-            Prompt();
-            break;
-        case 23:
-            ChainEvent();
-            break;
-        case 24:
-            CallEvent();
-            break;
-        case 25:
-            Heal();
-            break;                                  // effect
-        case 26:
-            EarthQuake();
-            break;
-        case 27:
-            SaveMenu();
-            break;
-        case 28:
-            EnableSave();
-            break;
-        case 29:
-            DisableSave();
-            break;
-        case 30:
-            ReviveChar();
-            break;                            // effect
-        case 31:
-            RestoreMP();
-            break;                             // effect
-        case 32:
-            Redraw();
-            break;
-        case 33:
-            SText();
-            break;
-        case 34:
-            DisableMenu();
-            break;
-        case 35:
-            EnableMenu();
-            break;
-        case 36:
-            Wait();
-            break;
-        case 37:
-            SetFace();
-            break;
-        case 38:
-            MapPaletteGradient();
-            break;
-        case 39:
-            BoxFadeOut();
-            break;
-        case 40:
-            BoxFadeIn();
-            break;
-        case 41:
-            GiveGP();
-            break;
-        case 42:
-            TakeGP();
-            break;
-        case 43:
-            ChangeZone();
-            break;
-        case 44:
-            GetItem();
-            break;
-        case 45:
-            ForceEquip();
-            break;
-        case 46:
-            GiveXP();
-            break;
-        case 47:
-            Shop();
-            break;
-        case 48:
-            PaletteMorph();
-            break;
-        case 49:
-            ChangeCHR();
-            break;
-        case 50:
-            readcontrols();
-            break;
-        case 51:
-            VCPutPCX();
-            break;
-        case 52:
-            HookTimer();
-            break;
-        case 53:
-            HookRetrace();
-            break;
-        case 54:
-            VCLoadPCX();
-            break;
-        case 55:
-            VCBlitImage();
-            break;
-        case 57:
-            VCClear();
-            break;
-        case 58:
-            VCClearRegion();
-            break;
-        case 59:
-            VCText();
-            break;
-        case 60:
-            VCTBlitImage();
-            break;
-        case 61:
-            Exit();
-            break;
-        case 62:
-            Quit();
-            break;
-        case 63:
-            VCCenterText();
-            break;
-        case 64:
-            ResetTimer();
-            break;
-        case 65:
-            VCBlitTile();
-            break;
-        case 66:
-            Sys_ClearScreen();
-            break;
-        case 67:
-            Sys_DisplayPCX();
-            break;
-        case 68:
-            OldStartupMenu();
-            break;
-        case 69:
-            vgadump();
-            break;
-        case 70:
-            NewGame();
-            break;
-        case 71:
-            LoadSaveErase(0);
-            break;
-        case 72:
-            Delay();
-            break;
-        case 73:
-            PartyMove();
-            break;
-        case 74:
-            EntityMove();
-            break;
-        case 75:
-            AutoOn();
-            break;
-        case 76:
-            AutoOff();
-            break;
-        case 77:
-            EntityMoveScript();
-            break;
-        case 78:
-            VCTextNum();
-            break;
-        case 79:
-            VCLoadRaw();
-            break;
+    case 1:
+        MapSwitch();
+        break;
+    case 2:
+        Warp();
+        break;
+    case 3:
+        AddCharacter();
+        break;
+    case 4:
+        SoundEffect();
+        break;
+    case 5:
+        GiveItem();
+        break;
+    case 6:
+        Text();
+        break;
+    case 7:
+        AlterFTile();
+        break;
+    case 8:
+        AlterBTile();
+        break;
+    case 9:
+        FakeBattle();
+        break;
+    case 10:
+        break;
+    case 11:
+        PlayMusic();
+        break;
+    case 12:
+        StopMusic();
+        break;
+    case 13:
+        HealAll();
+        break;
+    case 14:
+        AlterParallax();
+        break;
+    case 15:
+        FadeIn();
+        break;
+    case 16:
+        FadeOut();
+        break;
+    case 17:
+        RemoveCharacter();
+        break;
+    case 18:
+        Banner();
+        break;
+    case 19:
+        EnforceAnimation();
+        break;
+    case 20:
+        WaitKeyUp();
+        break;
+    case 21:
+        DestroyItem();
+        break;
+    case 22:
+        Prompt();
+        break;
+    case 23:
+        ChainEvent();
+        break;
+    case 24:
+        CallEvent();
+        break;
+    case 25:
+        Heal();
+        break;                                  // effect
+    case 26:
+        EarthQuake();
+        break;
+    case 27:
+        SaveMenu();
+        break;
+    case 28:
+        EnableSave();
+        break;
+    case 29:
+        DisableSave();
+        break;
+    case 30:
+        ReviveChar();
+        break;                            // effect
+    case 31:
+        RestoreMP();
+        break;                             // effect
+    case 32:
+        Redraw();
+        break;
+    case 33:
+        SText();
+        break;
+    case 34:
+        DisableMenu();
+        break;
+    case 35:
+        EnableMenu();
+        break;
+    case 36:
+        Wait();
+        break;
+    case 37:
+        SetFace();
+        break;
+    case 38:
+        MapPaletteGradient();
+        break;
+    case 39:
+        BoxFadeOut();
+        break;
+    case 40:
+        BoxFadeIn();
+        break;
+    case 41:
+        GiveGP();
+        break;
+    case 42:
+        TakeGP();
+        break;
+    case 43:
+        ChangeZone();
+        break;
+    case 44:
+        GetItem();
+        break;
+    case 45:
+        ForceEquip();
+        break;
+    case 46:
+        GiveXP();
+        break;
+    case 47:
+        Shop();
+        break;
+    case 48:
+        PaletteMorph();
+        break;
+    case 49:
+        ChangeCHR();
+        break;
+    case 50:
+        readcontrols();
+        break;
+    case 51:
+        VCPutPCX();
+        break;
+    case 52:
+        HookTimer();
+        break;
+    case 53:
+        HookRetrace();
+        break;
+    case 54:
+        VCLoadPCX();
+        break;
+    case 55:
+        VCBlitImage();
+        break;
+    case 57:
+        VCClear();
+        break;
+    case 58:
+        VCClearRegion();
+        break;
+    case 59:
+        VCText();
+        break;
+    case 60:
+        VCTBlitImage();
+        break;
+    case 61:
+        Exit();
+        break;
+    case 62:
+        Quit();
+        break;
+    case 63:
+        VCCenterText();
+        break;
+    case 64:
+        ResetTimer();
+        break;
+    case 65:
+        VCBlitTile();
+        break;
+    case 66:
+        Sys_ClearScreen();
+        break;
+    case 67:
+        Sys_DisplayPCX();
+        break;
+    case 68:
+        OldStartupMenu();
+        break;
+    case 69:
+        vgadump();
+        break;
+    case 70:
+        NewGame();
+        break;
+    case 71:
+        LoadSaveErase(0);
+        break;
+    case 72:
+        Delay();
+        break;
+    case 73:
+        PartyMove();
+        break;
+    case 74:
+        EntityMove();
+        break;
+    case 75:
+        AutoOn();
+        break;
+    case 76:
+        AutoOff();
+        break;
+    case 77:
+        EntityMoveScript();
+        break;
+    case 78:
+        VCTextNum();
+        break;
+    case 79:
+        VCLoadRaw();
+        break;
 
-        case 80:
-            VCBox();
-            break;       /* -- ric: 21/Apr/98 -- */
-        case 81:
-            VCCharName();
-            break;  /* -- ric: 21/Apr/98 -- */
-        case 82:
-            VCItemName();
-            break;  /* -- ric: 21/Apr/98 -- */
-        case 83:
-            VCItemDesc();
-            break;  /* -- ric: 21/Apr/98 -- */
-        case 84:
-            VCItemImage();
-            break; /* -- ric: 22/Apr/98 -- */
-        case 85:
-            VCATextNum();
-            break;  /* -- ric: 24/Apr/98 -- */
-        case 86:
-            VCSpc();
-            break;       /* -- ric: 24/Apr/98 -- */
-        case 87:
-            CallEffect();
-            break;  /* -- ric: 24/Apr/98 -- */
-        case 88:
-            CallScript();
-            break;  /* -- ric: 25/Apr/98 -- */
+    case 80:
+        VCBox();
+        break;       /* -- ric: 21/Apr/98 -- */
+    case 81:
+        VCCharName();
+        break;  /* -- ric: 21/Apr/98 -- */
+    case 82:
+        VCItemName();
+        break;  /* -- ric: 21/Apr/98 -- */
+    case 83:
+        VCItemDesc();
+        break;  /* -- ric: 21/Apr/98 -- */
+    case 84:
+        VCItemImage();
+        break; /* -- ric: 22/Apr/98 -- */
+    case 85:
+        VCATextNum();
+        break;  /* -- ric: 24/Apr/98 -- */
+    case 86:
+        VCSpc();
+        break;       /* -- ric: 24/Apr/98 -- */
+    case 87:
+        CallEffect();
+        break;  /* -- ric: 24/Apr/98 -- */
+    case 88:
+        CallScript();
+        break;  /* -- ric: 25/Apr/98 -- */
 
-        case 89:
-            VCLine();
-            break;
-        case 90:
-            GetMagic();
-            break;
-        case 91:
-            BindKey();
-            break;     /* -- ric: 03/May/98 -- */
-        case 92:
-            TextMenu();
-            break;    /* -- ric: 03/May/98 -- */
-        case 93:
-            itemMenu();
-            break;    /* -- ric: 03/May/98 -- */
-        case 94:
-            equipMenu();
-            break;   /* -- ric: 03/May/98 -- */
-        case 95:
-            magicMenu();
-            break;   /* -- ric: 03/May/98 -- */
-        case 96:
-            statusScreen();
-            break;/* -- ric: 03/May/98 -- */
-        case 97:
-            VCCr2();
-            break;       /* -- ric: 03/May/98 -- */
-        case 98:
-            VCSpellName();
-            break;
-        case 99:
-            VCSpellDesc();
-            break;
-        case 100:
-            VCSpellImage();
-            break;
-        case 101:
-            MagicShop();
-            break;
-        case 102:
-            VCTextBox();
-            break;   /* -- ric: 04/May/98 -- */
-        case 103:
-            PlayVAS();
-            break;
-        case 104:
-            SmallText();
-            break;       // ANDY 03/Mar/99
-        case 105:
-            VCEllipse();
-            break;       // ANDY 30/Jul/99
-            //    case 104: VCMagicImage(); break;/* -- ric: 04/May/98 -- */
-            //    case 105: vcwritelayer(); break; /* -- xBig_D: 05/May/98 */
+    case 89:
+        VCLine();
+        break;
+    case 90:
+        GetMagic();
+        break;
+    case 91:
+        BindKey();
+        break;     /* -- ric: 03/May/98 -- */
+    case 92:
+        TextMenu();
+        break;    /* -- ric: 03/May/98 -- */
+    case 93:
+        itemMenu();
+        break;    /* -- ric: 03/May/98 -- */
+    case 94:
+        equipMenu();
+        break;   /* -- ric: 03/May/98 -- */
+    case 95:
+        magicMenu();
+        break;   /* -- ric: 03/May/98 -- */
+    case 96:
+        statusScreen();
+        break;/* -- ric: 03/May/98 -- */
+    case 97:
+        VCCr2();
+        break;       /* -- ric: 03/May/98 -- */
+    case 98:
+        VCSpellName();
+        break;
+    case 99:
+        VCSpellDesc();
+        break;
+    case 100:
+        VCSpellImage();
+        break;
+    case 101:
+        MagicShop();
+        break;
+    case 102:
+        VCTextBox();
+        break;   /* -- ric: 04/May/98 -- */
+    case 103:
+        PlayVAS();
+        break;
+    case 104:
+        SmallText();
+        break;       // ANDY 03/Mar/99
+    case 105:
+        VCEllipse();
+        break;       // ANDY 30/Jul/99
+        //    case 104: VCMagicImage(); break;/* -- ric: 04/May/98 -- */
+        //    case 105: vcwritelayer(); break; /* -- xBig_D: 05/May/98 */
 
-        default:
-            err("*error* Unknown library function in VC code");
+    default:
+        err("*error* Unknown library function in VC code");
     }
 }
 
 int ReadVar0(int var) {
     switch (var) {
-        case 0:
-            return tvar[0];
-        case 1:
-            return tvar[1];
-        case 2:
-            return tvar[2];
-        case 3:
-            return tvar[3];
-        case 4:
-            return tvar[4];
-        case 5:
-            return tvar[5];
-        case 6:
-            return tvar[6];
-        case 7:
-            return tvar[7];
-        case 8:
-            return tvar[8];
-        case 9:
-            return tvar[9];
-        case 10:
-            return tvar[10];
-        case 11:
-            return tvar[11];
-        case 12:
-            return tvar[12];
-        case 13:
-            return tvar[13];
-        case 14:
-            return tvar[14];
-        case 15:
-            return tvar[15];
-        case 16:
-            return tvar[16];
-        case 17:
-            return tvar[17];
-        case 18:
-            return tvar[18];
-        case 19:
-            return tvar[19];
-        case 20:
-            return tvar[20];
-        case 21:
-            return tvar[21];
-        case 22:
-            return tvar[22];
-        case 23:
-            return tvar[23];
-        case 24:
-            return tvar[24];
-        case 25:
-            return tvar[25];
-        case 26:
-            return numchars;
-        case 27:
-            return gp;
-        case 28:
-            return party[0].x / 16;
-        case 29:
-            return party[0].y / 16;
-        case 30:
-            return timer;
-        case 31:
-            return drawparty;
-        case 32:
-            return cameratracking;
-        case 33:
-            return xwin;
-        case 34:
-            return ywin;
-        case 35:
-            return b1;
-        case 36:
-            return b2;
-        case 37:
-            return b3;
-        case 38:
-            return b4;
-        case 39:
-            return up;
-        case 40:
-            return down;
-        case 41:
-            return left;
-        case 42:
-            return right;
-        case 43:
-            return an;
-        case 44:
-            return fade;
-        case 45:
-            return layer0;
-        case 46:
-            return layer1;
-        case 47:
-            return layervc;
-        case 48:
-            return quakex;
-        case 49:
-            return quakey;
-        case 50:
-            return quake;
-        case 51:
-            return screengradient;
-        case 52:
-            return pmultx;
-        case 53:
-            return pmulty;
-        case 54:
-            return pdivx;
-        case 55:
-            return pdivy;
-        case 56:
-            return mp_volume;
-        case 57:
-            return layerc;
-        case 58:
-            return cancelfade;
-        case 59:
-            return drawentities;
-        case 60:
-            return mapp[((party[0].cy) * xsize) + (party[0].cx)] >> 1;
-        case 61:
-            return map0[((party[0].cy) * xsize) + (party[0].cx)];
-        case 62:
-            return map1[((party[0].cy) * xsize) + (party[0].cx)];
-        case 63:
-            return foregroundlock;
-        case 64:
-            return xwin1;
-        case 65:
-            return ywin1;
-        case 66:
-            return layer1trans;
-        case 67:
-            return layervctrans;
+    case 0:
+        return tvar[0];
+    case 1:
+        return tvar[1];
+    case 2:
+        return tvar[2];
+    case 3:
+        return tvar[3];
+    case 4:
+        return tvar[4];
+    case 5:
+        return tvar[5];
+    case 6:
+        return tvar[6];
+    case 7:
+        return tvar[7];
+    case 8:
+        return tvar[8];
+    case 9:
+        return tvar[9];
+    case 10:
+        return tvar[10];
+    case 11:
+        return tvar[11];
+    case 12:
+        return tvar[12];
+    case 13:
+        return tvar[13];
+    case 14:
+        return tvar[14];
+    case 15:
+        return tvar[15];
+    case 16:
+        return tvar[16];
+    case 17:
+        return tvar[17];
+    case 18:
+        return tvar[18];
+    case 19:
+        return tvar[19];
+    case 20:
+        return tvar[20];
+    case 21:
+        return tvar[21];
+    case 22:
+        return tvar[22];
+    case 23:
+        return tvar[23];
+    case 24:
+        return tvar[24];
+    case 25:
+        return tvar[25];
+    case 26:
+        return numchars;
+    case 27:
+        return gp;
+    case 28:
+        return party[0].x / 16;
+    case 29:
+        return party[0].y / 16;
+    case 30:
+        return timer;
+    case 31:
+        return drawparty;
+    case 32:
+        return cameratracking;
+    case 33:
+        return xwin;
+    case 34:
+        return ywin;
+    case 35:
+        return b1;
+    case 36:
+        return b2;
+    case 37:
+        return b3;
+    case 38:
+        return b4;
+    case 39:
+        return up;
+    case 40:
+        return down;
+    case 41:
+        return left;
+    case 42:
+        return right;
+    case 43:
+        return an;
+    case 44:
+        return fade;
+    case 45:
+        return layer0;
+    case 46:
+        return layer1;
+    case 47:
+        return layervc;
+    case 48:
+        return quakex;
+    case 49:
+        return quakey;
+    case 50:
+        return quake;
+    case 51:
+        return screengradient;
+    case 52:
+        return pmultx;
+    case 53:
+        return pmulty;
+    case 54:
+        return pdivx;
+    case 55:
+        return pdivy;
+    case 56:
+        return mp_volume;
+    case 57:
+        return layerc;
+    case 58:
+        return cancelfade;
+    case 59:
+        return drawentities;
+    case 60:
+        return mapp[((party[0].cy) * xsize) + (party[0].cx)] >> 1;
+    case 61:
+        return map0[((party[0].cy) * xsize) + (party[0].cx)];
+    case 62:
+        return map1[((party[0].cy) * xsize) + (party[0].cx)];
+    case 63:
+        return foregroundlock;
+    case 64:
+        return xwin1;
+    case 65:
+        return ywin1;
+    case 66:
+        return layer1trans;
+    case 67:
+        return layervctrans;
 
-        case 68:
-            return oc; /* -- ric: 21/Apr/98 -- */
-        case 69:
-            return keepaz; /* -- ric: 03/May/98 -- */
+    case 68:
+        return oc; /* -- ric: 21/Apr/98 -- */
+    case 69:
+        return keepaz; /* -- ric: 03/May/98 -- */
 
-        case 70:
-            return layervc2; /* -- xBig_D: 05/May/98 */
-        case 71:
-            return layervc2trans; /* -- xBig_D: 05/May/98 */
-        case 72:
-            return layervcwrite; /* -- xBig_D: 05/May/98 */
-        case 73:
-            return mp_sngpos; /* -- xBig_D: 10/May/98 */
+    case 70:
+        return layervc2; /* -- xBig_D: 05/May/98 */
+    case 71:
+        return layervc2trans; /* -- xBig_D: 05/May/98 */
+    case 72:
+        return layervcwrite; /* -- xBig_D: 05/May/98 */
+    case 73:
+        return mp_sngpos; /* -- xBig_D: 10/May/98 */
     }
 }
 
 WriteVar0(int var, int value) {
     switch (var) {
-        case 0:
-            tvar[0] = value;
-            return;
-        case 1:
-            tvar[1] = value;
-            return;
-        case 2:
-            tvar[2] = value;
-            return;
-        case 3:
-            tvar[3] = value;
-            return;
-        case 4:
-            tvar[4] = value;
-            return;
-        case 5:
-            tvar[5] = value;
-            return;
-        case 6:
-            tvar[6] = value;
-            return;
-        case 7:
-            tvar[7] = value;
-            return;
-        case 8:
-            tvar[8] = value;
-            return;
-        case 9:
-            tvar[9] = value;
-            return;
-        case 10:
-            tvar[10] = value;
-            return;
-        case 11:
-            tvar[11] = value;
-            return;
-        case 12:
-            tvar[12] = value;
-            return;
-        case 13:
-            tvar[13] = value;
-            return;
-        case 14:
-            tvar[14] = value;
-            return;
-        case 15:
-            tvar[15] = value;
-            return;
-        case 16:
-            tvar[16] = value;
-            return;
-        case 17:
-            tvar[17] = value;
-            return;
-        case 18:
-            tvar[18] = value;
-            return;
-        case 19:
-            tvar[19] = value;
-            return;
-        case 20:
-            tvar[20] = value;
-            return;
-        case 21:
-            tvar[21] = value;
-            return;
-        case 22:
-            tvar[22] = value;
-            return;
-        case 23:
-            tvar[23] = value;
-            return;
-        case 24:
-            tvar[24] = value;
-            return;
-        case 25:
-            tvar[25] = value;
-            return;
-        case 26:
-            return;
-        case 27:
-            gp = value;
-            return;
-        case 28:
-            return;
-        case 29:
-            return;
-        case 30:
-            timer = value;
-            return;
-        case 31:
-            drawparty = value;
-            return;
-        case 32:
-            cameratracking = value;
-            return;
-        case 33:
-            if (value < 0) {
-                value = 0;
-            }
-            if (value > (xsize << 4) - 320) {
-                value = (xsize << 4) - 320;
-            }
-            xwin = value;
-            return;
-        case 34:
-            if (value < 0) {
-                value = 0;
-            }
-            if (value > (ysize << 4) - 200) {
-                value = (ysize << 4) - 200;
-            }
-            ywin = value;
-            return;
-        case 35:
-            keyboard_map[kb1] = value;
-            b1 = value;
-            return;
-        case 36:
-            keyboard_map[kb2] = value;
-            b2 = value;
-            return;
-        case 37:
-            keyboard_map[kb3] = value;
-            b3 = value;
-            return;
-        case 38:
-            keyboard_map[kb4] = value;
-            b4 = value;
-            return;
-        case 39:
-            keyboard_map[SCAN_UP] = value;
-            up = value;
-            return;
-        case 40:
-            keyboard_map[SCAN_DOWN] = value;
-            down = value;
-            return;
-        case 41:
-            keyboard_map[SCAN_LEFT] = value;
-            left = value;
-            return;
-        case 42:
-            keyboard_map[SCAN_RIGHT] = value;
-            right = value;
-            return;
-        case 43:
-            an = value;
-            return;
-        case 44:
-            fade = value;
-            return;
-        case 45:
-            layer0 = value;
-            return;
-        case 46:
-            layer1 = value;
-            return;
-        case 47:
-            layervc = value;
-            return;
-        case 48:
-            quakex = value;
-            return;
-        case 49:
-            quakey = value;
-            return;
-        case 50:
-            quake = value;
-            return;
-        case 51:
-            screengradient = value;
-            return;
-        case 52:
-            pmultx = value;
-            return;
-        case 53:
-            pmulty = value;
-            return;
-        case 54:
-            pdivx = value;
-            return;
-        case 55:
-            pdivy = value;
-            return;
-        case 56:
-            mp_volume = value;
-            return;
-        case 57:
-            layerc = value;
-            return;
-        case 58:
-            cancelfade = value;
-            return;
-        case 59:
-            drawentities = value;
-            return;
-        case 60:
-            return;
-        case 61:
-            return;
-        case 62:
-            return;
-        case 63:
-            foregroundlock = value;
-            return;
-        case 64:
-            if (value < 0) {
-                value = 0;
-            }
-            if (value > (xsize << 4) - 320) {
-                value = (xsize << 4) - 320;
-            }
-            xwin1 = value;
-            return;
-        case 65:
-            if (value < 0) {
-                value = 0;
-            }
-            if (value > (ysize << 4) - 200) {
-                value = (ysize << 4) - 200;
-            }
-            ywin1 = value;
-            return;
-        case 66:
-            layer1trans = value;
-            return;
-        case 67:
-            layervctrans = value;
-            return;
+    case 0:
+        tvar[0] = value;
+        return;
+    case 1:
+        tvar[1] = value;
+        return;
+    case 2:
+        tvar[2] = value;
+        return;
+    case 3:
+        tvar[3] = value;
+        return;
+    case 4:
+        tvar[4] = value;
+        return;
+    case 5:
+        tvar[5] = value;
+        return;
+    case 6:
+        tvar[6] = value;
+        return;
+    case 7:
+        tvar[7] = value;
+        return;
+    case 8:
+        tvar[8] = value;
+        return;
+    case 9:
+        tvar[9] = value;
+        return;
+    case 10:
+        tvar[10] = value;
+        return;
+    case 11:
+        tvar[11] = value;
+        return;
+    case 12:
+        tvar[12] = value;
+        return;
+    case 13:
+        tvar[13] = value;
+        return;
+    case 14:
+        tvar[14] = value;
+        return;
+    case 15:
+        tvar[15] = value;
+        return;
+    case 16:
+        tvar[16] = value;
+        return;
+    case 17:
+        tvar[17] = value;
+        return;
+    case 18:
+        tvar[18] = value;
+        return;
+    case 19:
+        tvar[19] = value;
+        return;
+    case 20:
+        tvar[20] = value;
+        return;
+    case 21:
+        tvar[21] = value;
+        return;
+    case 22:
+        tvar[22] = value;
+        return;
+    case 23:
+        tvar[23] = value;
+        return;
+    case 24:
+        tvar[24] = value;
+        return;
+    case 25:
+        tvar[25] = value;
+        return;
+    case 26:
+        return;
+    case 27:
+        gp = value;
+        return;
+    case 28:
+        return;
+    case 29:
+        return;
+    case 30:
+        timer = value;
+        return;
+    case 31:
+        drawparty = value;
+        return;
+    case 32:
+        cameratracking = value;
+        return;
+    case 33:
+        if (value < 0) {
+            value = 0;
+        }
+        if (value > (xsize << 4) - 320) {
+            value = (xsize << 4) - 320;
+        }
+        xwin = value;
+        return;
+    case 34:
+        if (value < 0) {
+            value = 0;
+        }
+        if (value > (ysize << 4) - 200) {
+            value = (ysize << 4) - 200;
+        }
+        ywin = value;
+        return;
+    case 35:
+        keyboard_map[kb1] = value;
+        b1 = value;
+        return;
+    case 36:
+        keyboard_map[kb2] = value;
+        b2 = value;
+        return;
+    case 37:
+        keyboard_map[kb3] = value;
+        b3 = value;
+        return;
+    case 38:
+        keyboard_map[kb4] = value;
+        b4 = value;
+        return;
+    case 39:
+        keyboard_map[SCAN_UP] = value;
+        up = value;
+        return;
+    case 40:
+        keyboard_map[SCAN_DOWN] = value;
+        down = value;
+        return;
+    case 41:
+        keyboard_map[SCAN_LEFT] = value;
+        left = value;
+        return;
+    case 42:
+        keyboard_map[SCAN_RIGHT] = value;
+        right = value;
+        return;
+    case 43:
+        an = value;
+        return;
+    case 44:
+        fade = value;
+        return;
+    case 45:
+        layer0 = value;
+        return;
+    case 46:
+        layer1 = value;
+        return;
+    case 47:
+        layervc = value;
+        return;
+    case 48:
+        quakex = value;
+        return;
+    case 49:
+        quakey = value;
+        return;
+    case 50:
+        quake = value;
+        return;
+    case 51:
+        screengradient = value;
+        return;
+    case 52:
+        pmultx = value;
+        return;
+    case 53:
+        pmulty = value;
+        return;
+    case 54:
+        pdivx = value;
+        return;
+    case 55:
+        pdivy = value;
+        return;
+    case 56:
+        mp_volume = value;
+        return;
+    case 57:
+        layerc = value;
+        return;
+    case 58:
+        cancelfade = value;
+        return;
+    case 59:
+        drawentities = value;
+        return;
+    case 60:
+        return;
+    case 61:
+        return;
+    case 62:
+        return;
+    case 63:
+        foregroundlock = value;
+        return;
+    case 64:
+        if (value < 0) {
+            value = 0;
+        }
+        if (value > (xsize << 4) - 320) {
+            value = (xsize << 4) - 320;
+        }
+        xwin1 = value;
+        return;
+    case 65:
+        if (value < 0) {
+            value = 0;
+        }
+        if (value > (ysize << 4) - 200) {
+            value = (ysize << 4) - 200;
+        }
+        ywin1 = value;
+        return;
+    case 66:
+        layer1trans = value;
+        return;
+    case 67:
+        layervctrans = value;
+        return;
 
-        case 68:
-            fontcolor(value);
-            return; /* -- ric: 21/Apr/98 -- */
-        case 69:
-            keepaz = value;
-            return; /* -- ric: 03/May/98 -- */
+    case 68:
+        fontcolor(value);
+        return; /* -- ric: 21/Apr/98 -- */
+    case 69:
+        keepaz = value;
+        return; /* -- ric: 03/May/98 -- */
 
-        case 70:
-            layervc2 = value;
-            return; /* -- xBig_D: 05/May/98 */
-        case 71:
-            layervc2trans = value;
-            return; /* -- xBig_D: 05/May/98 */
-        case 72:
-            vcwritelayer(value);
-            return; /* -- xBig_D: 05/May/98 */
-        case 73:
-            MP_SetPosition(value);
-            return; /* -- xBig_D: 10/May/98 */
+    case 70:
+        layervc2 = value;
+        return; /* -- xBig_D: 05/May/98 */
+    case 71:
+        layervc2trans = value;
+        return; /* -- xBig_D: 05/May/98 */
+    case 72:
+        vcwritelayer(value);
+        return; /* -- xBig_D: 05/May/98 */
+    case 73:
+        MP_SetPosition(value);
+        return; /* -- xBig_D: 10/May/98 */
     }
 }
 
@@ -2372,260 +2372,260 @@ int ReadVar1(int var, int arg1) {
     int i, j, l;
 
     switch (var) {
-        case 0:
-            return flags[arg1];
-        case 1:
-            if (party[0].facing == arg1) {
-                return 1;
-            } else {
-                return 0;
+    case 0:
+        return flags[arg1];
+    case 1:
+        if (party[0].facing == arg1) {
+            return 1;
+        } else {
+            return 0;
+        }
+    case 2:
+        for (i = 0; i < numchars; i++)
+            if (partyidx[i] == arg1) {
+                return i + 1;
             }
-        case 2:
-            for (i = 0; i < numchars; i++)
-                if (partyidx[i] == arg1) {
-                    return i + 1;
+        return 0;
+    case 3:
+        for (j = 0; j < numchars; j++) {
+            l = partyidx[j] - 1;
+            for (i = 0; i < pstats[l].invcnt; i++)
+                if (pstats[l].inv[i] == arg1) {
+                    return 1;
                 }
-            return 0;
-        case 3:
-            for (j = 0; j < numchars; j++) {
-                l = partyidx[j] - 1;
-                for (i = 0; i < pstats[l].invcnt; i++)
-                    if (pstats[l].inv[i] == arg1) {
-                        return 1;
-                    }
-            }
-            return 0;
-        case 4:
-            return varl[arg1];
-        case 5:
-            return partyidx[arg1 - 1] - 1;
-        case 6:
-            return pstats[arg1 - 1].exp;
-        case 7:
-            return pstats[arg1 - 1].curhp;
-        case 8:
-            return pstats[arg1 - 1].maxhp;
-        case 9:
-            return pstats[arg1 - 1].curmp;
-        case 10:
-            return pstats[arg1 - 1].maxmp;
-        case 11:
-            return keyboard_map[arg1];
-        case 12:
-            return (char) vcdatabuf[arg1];
-        case 13:
-            return party[arg1].specframe;
-        case 14:
-            return party[arg1].facing;
-        case 15:
-            return party[arg1].speed;
-        case 16:
-            return party[arg1].moving;
-        case 17:
-            return party[arg1].chrindex;
-        case 18:
-            return party[arg1].movecode;
-        case 19:
-            return party[arg1].activmode;
-        case 20:
-            return party[arg1].obsmode;
-        case 21:
-            return party[arg1].step;
-        case 22:
-            return party[arg1].delay;
-        case 23:
-            return party[arg1].cx;
-        case 24:
-            return party[arg1].cy;
-        case 25:
-            return party[arg1].x1;
-        case 26:
-            return party[arg1].x2;
-        case 27:
-            return party[arg1].y1;
-        case 28:
-            return party[arg1].y2;
-        case 29:
-            return party[arg1].face;
-        case 30:
-            return party[arg1].chasing;
-        case 31:
-            return party[arg1].chasedist;
-        case 32:
-            return party[arg1].chasespeed;
-        case 33:
-            return party[arg1].scriptofs;
-        case 34:
-            return pstats[arg1 - 1].atk;
-        case 35:
-            return pstats[arg1 - 1].def;
-        case 36:
-            return pstats[arg1 - 1].hitc;
-        case 37:
-            return pstats[arg1 - 1].dodc;
-        case 38:
-            return pstats[arg1 - 1].magc;
-        case 39:
-            return pstats[arg1 - 1].mgrc;
-        case 40:
-            return pstats[arg1 - 1].reac;
-        case 41:
-            return pstats[arg1 - 1].mblc;
-        case 42:
-            return pstats[arg1 - 1].ferc;
+        }
+        return 0;
+    case 4:
+        return varl[arg1];
+    case 5:
+        return partyidx[arg1 - 1] - 1;
+    case 6:
+        return pstats[arg1 - 1].exp;
+    case 7:
+        return pstats[arg1 - 1].curhp;
+    case 8:
+        return pstats[arg1 - 1].maxhp;
+    case 9:
+        return pstats[arg1 - 1].curmp;
+    case 10:
+        return pstats[arg1 - 1].maxmp;
+    case 11:
+        return keyboard_map[arg1];
+    case 12:
+        return (char) vcdatabuf[arg1];
+    case 13:
+        return party[arg1].specframe;
+    case 14:
+        return party[arg1].facing;
+    case 15:
+        return party[arg1].speed;
+    case 16:
+        return party[arg1].moving;
+    case 17:
+        return party[arg1].chrindex;
+    case 18:
+        return party[arg1].movecode;
+    case 19:
+        return party[arg1].activmode;
+    case 20:
+        return party[arg1].obsmode;
+    case 21:
+        return party[arg1].step;
+    case 22:
+        return party[arg1].delay;
+    case 23:
+        return party[arg1].cx;
+    case 24:
+        return party[arg1].cy;
+    case 25:
+        return party[arg1].x1;
+    case 26:
+        return party[arg1].x2;
+    case 27:
+        return party[arg1].y1;
+    case 28:
+        return party[arg1].y2;
+    case 29:
+        return party[arg1].face;
+    case 30:
+        return party[arg1].chasing;
+    case 31:
+        return party[arg1].chasedist;
+    case 32:
+        return party[arg1].chasespeed;
+    case 33:
+        return party[arg1].scriptofs;
+    case 34:
+        return pstats[arg1 - 1].atk;
+    case 35:
+        return pstats[arg1 - 1].def;
+    case 36:
+        return pstats[arg1 - 1].hitc;
+    case 37:
+        return pstats[arg1 - 1].dodc;
+    case 38:
+        return pstats[arg1 - 1].magc;
+    case 39:
+        return pstats[arg1 - 1].mgrc;
+    case 40:
+        return pstats[arg1 - 1].reac;
+    case 41:
+        return pstats[arg1 - 1].mblc;
+    case 42:
+        return pstats[arg1 - 1].ferc;
 
-        case 43:
-            return items[arg1].useflag;   /* -- ric: 21/Apr/98 -- */
-        case 44:
-            return items[arg1].useeffect; /* -- ric: 24/Apr/98 -- */
-        case 45:
-            return items[arg1].itemtype;  /* -- ric: 24/Apr/98 -- */
-        case 46:
-            return items[arg1].equipflag; /* -- ric: 24/Apr/98 -- */
-        case 47:
-            return items[arg1].equipidx;  /* -- ric: 24/Apr/98 -- */
-        case 48:
-            return items[arg1].price;     /* -- ric: 24/Apr/98 -- */
-        case 49:
-            return magic[arg1].useflag;
-        case 50:
-            return magic[arg1].useeffect;
-        case 51:
-            return magic[arg1].itemtype;
-        case 52:
-            return magic[arg1].cost;
-        case 53:
-            return magic[arg1].price;
-        case 54:
-            return pstats[arg1 - 1].lv;   /* -- ric: 03/May/98 -- */
-        case 55:
-            return pstats[arg1 - 1].nxt;  /* -- ric: 03/May/98 -- */
-        case 56:
-            return pstats[arg1 - 1].status; /* -- ric: 03/May/98 -- */
+    case 43:
+        return items[arg1].useflag;   /* -- ric: 21/Apr/98 -- */
+    case 44:
+        return items[arg1].useeffect; /* -- ric: 24/Apr/98 -- */
+    case 45:
+        return items[arg1].itemtype;  /* -- ric: 24/Apr/98 -- */
+    case 46:
+        return items[arg1].equipflag; /* -- ric: 24/Apr/98 -- */
+    case 47:
+        return items[arg1].equipidx;  /* -- ric: 24/Apr/98 -- */
+    case 48:
+        return items[arg1].price;     /* -- ric: 24/Apr/98 -- */
+    case 49:
+        return magic[arg1].useflag;
+    case 50:
+        return magic[arg1].useeffect;
+    case 51:
+        return magic[arg1].itemtype;
+    case 52:
+        return magic[arg1].cost;
+    case 53:
+        return magic[arg1].price;
+    case 54:
+        return pstats[arg1 - 1].lv;   /* -- ric: 03/May/98 -- */
+    case 55:
+        return pstats[arg1 - 1].nxt;  /* -- ric: 03/May/98 -- */
+    case 56:
+        return pstats[arg1 - 1].status; /* -- ric: 03/May/98 -- */
 
-        case 57:
-            for (j = 0; j < numchars; j++) {
-                l = partyidx[j] - 1;
-                for (i = 0; i < pstats[l].magcnt; i++)
-                    if (pstats[l].maginv[i] == arg1) {
-                        return 1;
-                    }
-            }
-            return 0;
+    case 57:
+        for (j = 0; j < numchars; j++) {
+            l = partyidx[j] - 1;
+            for (i = 0; i < pstats[l].magcnt; i++)
+                if (pstats[l].maginv[i] == arg1) {
+                    return 1;
+                }
+        }
+        return 0;
 
     }
 }
 
 WriteVar1(int var, int arg1, int value) {
     switch (var) {
-        case 0:
-            flags[arg1] = value;
-            return;
-        case 1:
-            return;
-        case 2:
-            return;
-        case 3:
-            return;
-        case 4:
-            varl[arg1] = value;
-            return;
-        case 5:
-            return;
-        case 6:
-            return;
-        case 7:
-            pstats[arg1 - 1].curhp = value;
-            return;
-        case 8:
-            pstats[arg1 - 1].maxhp = value;
-            return;
-        case 9:
-            pstats[arg1 - 1].curmp = value;
-            return;
-        case 10:
-            pstats[arg1 - 1].maxmp = value;
-            return;
-        case 11:
-            keyboard_map[arg1] = value;
-            return;
-        case 12:
-            vcdatabuf[arg1] = (char) value;
-            return;
-        case 13:
-            party[arg1].specframe = value;
-            return;
-        case 14:
-            party[arg1].facing = value;
-            return;
-        case 15:
-            party[arg1].speed = value;
-            return;
-        case 16:
-            party[arg1].moving = value;
-            return;
-        case 17:
-            party[arg1].chrindex = value;
-            return;
-        case 18:
-            party[arg1].movecode = value;
-            return;
-        case 19:
-            party[arg1].activmode = value;
-            return;
-        case 20:
-            party[arg1].obsmode = value;
-            return;
-        case 21:
-            party[arg1].step = value;
-            return;
-        case 22:
-            party[arg1].delay = value;
-            return;
-        case 23:
-            party[arg1].cx = value;
-            party[arg1].x = value * 16;
-            party[arg1].moving = 0;
-            party[arg1].movcnt = 0;
-            return;
-        case 24:
-            party[arg1].cy = value;
-            party[arg1].y = value * 16;
-            party[arg1].moving = 0;
-            party[arg1].movcnt = 0;
-            return;
-        case 25:
-            party[arg1].x1 = value;
-            return;
-        case 26:
-            party[arg1].x2 = value;
-            return;
-        case 27:
-            party[arg1].y1 = value;
-            return;
-        case 28:
-            party[arg1].y2 = value;
-            return;
-        case 29:
-            party[arg1].face = value;
-            return;
-        case 30:
-            party[arg1].chasing = value;
-            return;
-        case 31:
-            party[arg1].chasedist = value;
-            return;
-        case 32:
-            party[arg1].chasespeed = value;
-            return;
-        case 33:
-            return;
+    case 0:
+        flags[arg1] = value;
+        return;
+    case 1:
+        return;
+    case 2:
+        return;
+    case 3:
+        return;
+    case 4:
+        varl[arg1] = value;
+        return;
+    case 5:
+        return;
+    case 6:
+        return;
+    case 7:
+        pstats[arg1 - 1].curhp = value;
+        return;
+    case 8:
+        pstats[arg1 - 1].maxhp = value;
+        return;
+    case 9:
+        pstats[arg1 - 1].curmp = value;
+        return;
+    case 10:
+        pstats[arg1 - 1].maxmp = value;
+        return;
+    case 11:
+        keyboard_map[arg1] = value;
+        return;
+    case 12:
+        vcdatabuf[arg1] = (char) value;
+        return;
+    case 13:
+        party[arg1].specframe = value;
+        return;
+    case 14:
+        party[arg1].facing = value;
+        return;
+    case 15:
+        party[arg1].speed = value;
+        return;
+    case 16:
+        party[arg1].moving = value;
+        return;
+    case 17:
+        party[arg1].chrindex = value;
+        return;
+    case 18:
+        party[arg1].movecode = value;
+        return;
+    case 19:
+        party[arg1].activmode = value;
+        return;
+    case 20:
+        party[arg1].obsmode = value;
+        return;
+    case 21:
+        party[arg1].step = value;
+        return;
+    case 22:
+        party[arg1].delay = value;
+        return;
+    case 23:
+        party[arg1].cx = value;
+        party[arg1].x = value * 16;
+        party[arg1].moving = 0;
+        party[arg1].movcnt = 0;
+        return;
+    case 24:
+        party[arg1].cy = value;
+        party[arg1].y = value * 16;
+        party[arg1].moving = 0;
+        party[arg1].movcnt = 0;
+        return;
+    case 25:
+        party[arg1].x1 = value;
+        return;
+    case 26:
+        party[arg1].x2 = value;
+        return;
+    case 27:
+        party[arg1].y1 = value;
+        return;
+    case 28:
+        party[arg1].y2 = value;
+        return;
+    case 29:
+        party[arg1].face = value;
+        return;
+    case 30:
+        party[arg1].chasing = value;
+        return;
+    case 31:
+        party[arg1].chasedist = value;
+        return;
+    case 32:
+        party[arg1].chasespeed = value;
+        return;
+    case 33:
+        return;
 
-            // ADDED BY ANDY FRIESEN!!!
-        case 56:
-            pstats[arg1 - 1].status = value;
-            return;
-            // END OF STUFF ANDY FRIESEN ADDED!!!
+        // ADDED BY ANDY FRIESEN!!!
+    case 56:
+        pstats[arg1 - 1].status = value;
+        return;
+        // END OF STUFF ANDY FRIESEN ADDED!!!
     }
 }
 
@@ -2633,63 +2633,63 @@ int ReadVar2(int var, int arg1, int arg2) {
     int i, j, l;
 
     switch (var) {
-        case 0:
-            arg2++;
-            while (1) {
-                if (arg2 < arg1) {
-                    i = arg2;
-                    arg2 = arg1;
-                    arg1 = i;
-                }
-                j = (rand() % (arg2 - arg1));
-                j += arg1;
-                return j;
+    case 0:
+        arg2++;
+        while (1) {
+            if (arg2 < arg1) {
+                i = arg2;
+                arg2 = arg1;
+                arg1 = i;
             }
-        case 1:
-            return (unsigned char) vcscreen[(arg2 * 320) + arg1];
-        case 2:
-            return pstats[arg1].inv[arg2];
+            j = (rand() % (arg2 - arg1));
+            j += arg1;
+            return j;
+        }
+    case 1:
+        return (unsigned char) vcscreen[(arg2 * 320) + arg1];
+    case 2:
+        return pstats[arg1].inv[arg2];
 
-            /* -- ric: 24/Apr/98 --
-             * CanEquip(party.dat index, item.dat index) (R) (24/Apr/98)
-             * ChooseChar(x,y)                           (R) (25/Apr/98) -- */
-        case 3:
-            return (items[arg2].equipflag && equip[items[arg2].equipidx].equipable[arg1]);
-        case 4:
-            return ChooseChar(arg1, arg2);
+        /* -- ric: 24/Apr/98 --
+         * CanEquip(party.dat index, item.dat index) (R) (24/Apr/98)
+         * ChooseChar(x,y)                           (R) (25/Apr/98) -- */
+    case 3:
+        return (items[arg2].equipflag && equip[items[arg2].equipidx].equipable[arg1]);
+    case 4:
+        return ChooseChar(arg1, arg2);
 
-            /* NichG: Whenever */
-        case 5:
-            return ObstructionAt(arg1, arg2);
-        case 6:
-            return pstats[arg1].maginv[arg2];
-            // ANDY May 21/99
-        case 7:
-            return ((flags[arg1] >> arg2) & 1);
+        /* NichG: Whenever */
+    case 5:
+        return ObstructionAt(arg1, arg2);
+    case 6:
+        return pstats[arg1].maginv[arg2];
+        // ANDY May 21/99
+    case 7:
+        return ((flags[arg1] >> arg2) & 1);
     }
 }
 
 WriteVar2(int var, int arg1, int arg2, int value) {
     unsigned int mask;
     switch (var) {
-        case 0:
+    case 0:
+        return;
+    case 1:
+        vcscreen[(arg2 * 320) + arg1] = value;
+        return;
+    case 2:
+        pstats[arg1].inv[arg2] = (char) value;
+        break;
+        // ANDY May 21/99
+    case 7:
+        mask = (value & 1);
+        if (mask) {
+            flags[arg1] = (flags[arg1] | (mask << arg2));
             return;
-        case 1:
-            vcscreen[(arg2 * 320) + arg1] = value;
-            return;
-        case 2:
-            pstats[arg1].inv[arg2] = (char) value;
-            break;
-            // ANDY May 21/99
-        case 7:
-            mask = (value & 1);
-            if (mask) {
-                flags[arg1] = (flags[arg1] | (mask << arg2));
-                return;
-            }
-            mask = 1 << arg2;
-            mask = 0 - 1 - mask;
-            flags[arg1] = (flags[arg1] & mask);
-            return;
+        }
+        mask = 1 << arg2;
+        mask = 0 - 1 - mask;
+        flags[arg1] = (flags[arg1] & mask);
+        return;
     }
 }

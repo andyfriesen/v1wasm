@@ -84,18 +84,18 @@ drawchar(int i, int xw, int yw) {
     img = chrs + (party[i].chrindex * 15360);
 
     switch (party[i].facing) {
-        case 0:
-            fr = 0;
-            break;
-        case 1:
-            fr = 5;
-            break;
-        case 2:
-            fr = 10;
-            break;
-        case 3:
-            fr = 15;
-            break;
+    case 0:
+        fr = 0;
+        break;
+    case 1:
+        fr = 5;
+        break;
+    case 2:
+        fr = 10;
+        break;
+    case 3:
+        fr = 15;
+        break;
     }
     if (party[i].moving && !party[i].specframe) {
         if ((party[i].framectr > 10) && (party[i].framectr < 21)) {
@@ -124,15 +124,15 @@ drawchar(int i, int xw, int yw) {
     img += (fr * 512);
 
     switch (drawmode) {
-        case 0:
-            tcopysprite(dx, dy, 16, 32, img);
-            break;
-        case 1:
-            tcopysprite(dx, dy + 16, 16, 16, img + 256);
-            break;
-        case 2:
-            tcopysprite(dx, dy, 16, 16, img);
-            break;
+    case 0:
+        tcopysprite(dx, dy, 16, 32, img);
+        break;
+    case 1:
+        tcopysprite(dx, dy + 16, 16, 16, img + 256);
+        break;
+    case 2:
+        tcopysprite(dx, dy, 16, 16, img);
+        break;
     }
 }
 
@@ -488,39 +488,39 @@ DrawLayer1Speed(int xw, int yw) {
 
 AnimateTile(char i, int l) {
     switch (va0[i].mode) {
-        case 0:
-            if (tileidx[l] < va0[i].finish) {
-                tileidx[l]++;
-            } else {
-                tileidx[l] = va0[i].start;
-            }
-            break;
-        case 1:
-            if (tileidx[l] > va0[i].start) {
+    case 0:
+        if (tileidx[l] < va0[i].finish) {
+            tileidx[l]++;
+        } else {
+            tileidx[l] = va0[i].start;
+        }
+        break;
+    case 1:
+        if (tileidx[l] > va0[i].start) {
+            tileidx[l]--;
+        } else {
+            tileidx[l] = va0[i].finish;
+        }
+        break;
+    case 2:
+        tileidx[l] = random(va0[i].start, va0[i].finish);
+        break;
+    case 3:
+        if (flipped[l]) {
+            if (tileidx[l] != va0[i].start) {
                 tileidx[l]--;
             } else {
-                tileidx[l] = va0[i].finish;
+                tileidx[l]++;
+                flipped[l] = 0;
             }
-            break;
-        case 2:
-            tileidx[l] = random(va0[i].start, va0[i].finish);
-            break;
-        case 3:
-            if (flipped[l]) {
-                if (tileidx[l] != va0[i].start) {
-                    tileidx[l]--;
-                } else {
-                    tileidx[l]++;
-                    flipped[l] = 0;
-                }
+        } else {
+            if (tileidx[l] != va0[i].finish) {
+                tileidx[l]++;
             } else {
-                if (tileidx[l] != va0[i].finish) {
-                    tileidx[l]++;
-                } else {
-                    tileidx[l]--;
-                    flipped[l] = 1;
-                }
+                tileidx[l]--;
+                flipped[l] = 1;
             }
+        }
     }
 }
 

@@ -202,7 +202,7 @@ sound_init()
     MD_RegisterDriver(&drv_gus);
     MD_RegisterPlayer(tickhandler);
 
-    if(!MD_Init()) {
+    if (!MD_Init()) {
         printf("Driver error: %s.\n", myerr);
         exit(1);
     }

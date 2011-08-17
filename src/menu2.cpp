@@ -231,7 +231,7 @@ inputloop:
         if (menus[mpos].linktype) {
             greyscale(80, 32, img, tbuf);
             tcopysprite(menus[mpos].posx, menus[mpos].posy, 16, 32, tbuf);
-            tcopysprite(menus[mpos].posx + 16, menus[mpos].posy, 16, 32, tbuf +512);
+            tcopysprite(menus[mpos].posx + 16, menus[mpos].posy, 16, 32, tbuf + 512);
             tcopysprite(menus[mpos].posx + 32, menus[mpos].posy, 16, 32, tbuf + 1024);
             tcopysprite(menus[mpos].posx + 48, menus[mpos].posy, 16, 32, tbuf + 1536);
             tcopysprite(menus[mpos].posx + 64, menus[mpos].posy, 16, 32, tbuf + 2048);
@@ -651,35 +651,35 @@ drawloop:
 
     if (b1)   {
         switch (ptr) {
-            case 0:
-                ItemUse(c, p);
+        case 0:
+            ItemUse(c, p);
+            first = 2;
+            break;
+        case 1:
+            if (numchars == 1) {
+                break;
+            }
+            ItemGive(c, p);
+            first = 2;
+            break;
+        case 2:
+            if (!items[pstats[l].inv[p]].price) {
+                playeffect(3);
                 first = 2;
                 break;
-            case 1:
-                if (numchars == 1) {
-                    break;
+            }
+            if (p > 5) {
+                RemoveItem(l, p);
+            } else {
+                a = pstats[l].inv[p];
+                if (equip[items[a].equipidx].ondeequip) {
+                    ExecuteEffect(equip[items[a].equipidx].ondeequip - 1);
                 }
-                ItemGive(c, p);
-                first = 2;
-                break;
-            case 2:
-                if (!items[pstats[l].inv[p]].price) {
-                    playeffect(3);
-                    first = 2;
-                    break;
-                }
-                if (p > 5) {
-                    RemoveItem(l, p);
-                } else {
-                    a = pstats[l].inv[p];
-                    if (equip[items[a].equipidx].ondeequip) {
-                        ExecuteEffect(equip[items[a].equipidx].ondeequip - 1);
-                    }
-                    pstats[l].inv[p] = 0;
-                }
-                UpdateEquipStats();
-                first = 2;
-                break;
+                pstats[l].inv[p] = 0;
+            }
+            UpdateEquipStats();
+            first = 2;
+            break;
         }
         playeffect(1);
     }
@@ -1423,35 +1423,35 @@ drawloop:
 
     if (b1)   {
         switch (ptr) {
-            case 0:
-                MagicUse(c, p);
+        case 0:
+            MagicUse(c, p);
+            first = 2;
+            break;
+        case 1:
+            if (numchars == 1) {
+                break;
+            }
+            ItemGive(c, p);
+            first = 2;
+            break;
+        case 2:
+            if (!magic[pstats[l].maginv[p]].price) {
+                playeffect(3);
                 first = 2;
                 break;
-            case 1:
-                if (numchars == 1) {
-                    break;
+            }
+            if (p > 5) {
+                RemoveItem(l, p);
+            } else {
+                a = pstats[l].maginv[p];
+                if (equip[magic[a].equipidx].ondeequip) {
+                    ExecuteMagicEffect(equip[magic[a].equipidx].ondeequip - 1);
                 }
-                ItemGive(c, p);
-                first = 2;
-                break;
-            case 2:
-                if (!magic[pstats[l].maginv[p]].price) {
-                    playeffect(3);
-                    first = 2;
-                    break;
-                }
-                if (p > 5) {
-                    RemoveItem(l, p);
-                } else {
-                    a = pstats[l].maginv[p];
-                    if (equip[magic[a].equipidx].ondeequip) {
-                        ExecuteMagicEffect(equip[magic[a].equipidx].ondeequip - 1);
-                    }
-                    pstats[l].maginv[p] = 0;
-                }
-                UpdateEquipStats();
-                first = 2;
-                break;
+                pstats[l].maginv[p] = 0;
+            }
+            UpdateEquipStats();
+            first = 2;
+            break;
         }
         playeffect(1);
     }

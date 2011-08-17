@@ -129,42 +129,42 @@ int Zone(int cx, int cy) {
 void ProcessSpeedAdjEntity(int i) {
     if (party[i].speed < 4) {
         switch (party[i].speed) {
-            case 1:
-                if (party[i].speedct < 3) {
-                    party[i].speedct++;
-                    return;
-                }
-            case 2:
-                if (party[i].speedct < 2) {
-                    party[i].speedct++;
-                    return;
-                }
-            case 3:
-                if (party[i].speedct < 1) {
-                    party[i].speedct++;
-                    return;
-                }
+        case 1:
+            if (party[i].speedct < 3) {
+                party[i].speedct++;
+                return;
+            }
+        case 2:
+            if (party[i].speedct < 2) {
+                party[i].speedct++;
+                return;
+            }
+        case 3:
+            if (party[i].speedct < 1) {
+                party[i].speedct++;
+                return;
+            }
         }
     }
     if (party[i].speed < 5) {
         ProcessEntity(i);
     }
     switch (party[i].speed) {
-        case 5:
-            ProcessEntity(i);
-            ProcessEntity(i);
-            return;
-        case 6:
-            ProcessEntity(i);
-            ProcessEntity(i);
-            ProcessEntity(i);
-            return;
-        case 7:
-            ProcessEntity(i);
-            ProcessEntity(i);
-            ProcessEntity(i);
-            ProcessEntity(i);
-            return;
+    case 5:
+        ProcessEntity(i);
+        ProcessEntity(i);
+        return;
+    case 6:
+        ProcessEntity(i);
+        ProcessEntity(i);
+        ProcessEntity(i);
+        return;
+    case 7:
+        ProcessEntity(i);
+        ProcessEntity(i);
+        ProcessEntity(i);
+        ProcessEntity(i);
+        return;
     }
 }
 
@@ -181,19 +181,19 @@ void Wander1(int i) {
         return;
     }
     if (party[i].data1 > 1) {
-        switch(party[i].data2) {
-            case 0:
-                MoveUp(i);
-                break;
-            case 1:
-                MoveDown(i);
-                break;
-            case 2:
-                MoveLeft(i);
-                break;
-            case 3:
-                MoveRight(i);
-                break;
+        switch (party[i].data2) {
+        case 0:
+            MoveUp(i);
+            break;
+        case 1:
+            MoveDown(i);
+            break;
+        case 2:
+            MoveLeft(i);
+            break;
+        case 3:
+            MoveRight(i);
+            break;
         }
         party[i].data1--;
         if (party[i].data1 == 1) {
@@ -215,27 +215,27 @@ void Wander2(int i) {
         return;
     }
     if (party[i].data1 > 1) {
-        switch(party[i].data2) {
-            case 0:
-                if (party[i].cy > party[i].y1) {
-                    MoveUp(i);
-                }
-                break;
-            case 1:
-                if (party[i].cy < party[i].y2) {
-                    MoveDown(i);
-                }
-                break;
-            case 2:
-                if (party[i].cx > party[i].x1) {
-                    MoveLeft(i);
-                }
-                break;
-            case 3:
-                if (party[i].cx < party[i].x2) {
-                    MoveRight(i);
-                }
-                break;
+        switch (party[i].data2) {
+        case 0:
+            if (party[i].cy > party[i].y1) {
+                MoveUp(i);
+            }
+            break;
+        case 1:
+            if (party[i].cy < party[i].y2) {
+                MoveDown(i);
+            }
+            break;
+        case 2:
+            if (party[i].cx > party[i].x1) {
+                MoveLeft(i);
+            }
+            break;
+        case 3:
+            if (party[i].cx < party[i].x2) {
+                MoveRight(i);
+            }
+            break;
         }
         party[i].data1--;
         if (party[i].data1 == 1) {
@@ -257,27 +257,27 @@ void Wander3(int i) {
         return;
     }
     if (party[i].data1 > 1) {
-        switch(party[i].data2) {
-            case 0:
-                if (Zone(party[i].cx, party[i].cy - 1) == party[i].data3) {
-                    MoveUp(i);
-                }
-                break;
-            case 1:
-                if (Zone(party[i].cx, party[i].cy + 1) == party[i].data3) {
-                    MoveDown(i);
-                }
-                break;
-            case 2:
-                if (Zone(party[i].cx - 1, party[i].cy) == party[i].data3) {
-                    MoveLeft(i);
-                }
-                break;
-            case 3:
-                if (Zone(party[i].cx + 1, party[i].cy) == party[i].data3) {
-                    MoveRight(i);
-                }
-                break;
+        switch (party[i].data2) {
+        case 0:
+            if (Zone(party[i].cx, party[i].cy - 1) == party[i].data3) {
+                MoveUp(i);
+            }
+            break;
+        case 1:
+            if (Zone(party[i].cx, party[i].cy + 1) == party[i].data3) {
+                MoveDown(i);
+            }
+            break;
+        case 2:
+            if (Zone(party[i].cx - 1, party[i].cy) == party[i].data3) {
+                MoveLeft(i);
+            }
+            break;
+        case 3:
+            if (Zone(party[i].cx + 1, party[i].cy) == party[i].data3) {
+                MoveRight(i);
+            }
+            break;
         }
         party[i].data1--;
         if (party[i].data1 == 1) {
@@ -314,61 +314,61 @@ void GetNextCommand(int i) {
     s = *party[i].scriptofs;
     party[i].scriptofs++;
     switch (s) {
-        case 'U':
-            party[i].curcmd = 1;
-            GetArg(i);
-            break;
-        case 'D':
-            party[i].curcmd = 2;
-            GetArg(i);
-            break;
-        case 'L':
-            party[i].curcmd = 3;
-            GetArg(i);
-            break;
-        case 'R':
-            party[i].curcmd = 4;
-            GetArg(i);
-            break;
-        case 'S':
-            party[i].curcmd = 5;
-            GetArg(i);
-            break;
-        case 'W':
-            party[i].curcmd = 6;
-            GetArg(i);
-            break;
-        case 0:
-            party[i].movecode = 0;
-            party[i].curcmd = 7;
-            party[i].cmdarg = 0;
-            party[i].scriptofs = 0;
-            break;
-        case 'C':
-            party[i].curcmd = 8;
-            GetArg(i);
-            break;
-        case 'B':
-            party[i].curcmd = 9;
-            break;
-        case 'X':
-            party[i].curcmd = 10;
-            GetArg(i);
-            break;
-        case 'Y':
-            party[i].curcmd = 11;
-            GetArg(i);
-            break;
-        case 'F':
-            party[i].curcmd = 12;
-            GetArg(i);
-            break;
-        case 'Z':
-            party[i].curcmd = 13;
-            GetArg(i);
-            break;
-        default:
-            err("Invalid entity movement script.");
+    case 'U':
+        party[i].curcmd = 1;
+        GetArg(i);
+        break;
+    case 'D':
+        party[i].curcmd = 2;
+        GetArg(i);
+        break;
+    case 'L':
+        party[i].curcmd = 3;
+        GetArg(i);
+        break;
+    case 'R':
+        party[i].curcmd = 4;
+        GetArg(i);
+        break;
+    case 'S':
+        party[i].curcmd = 5;
+        GetArg(i);
+        break;
+    case 'W':
+        party[i].curcmd = 6;
+        GetArg(i);
+        break;
+    case 0:
+        party[i].movecode = 0;
+        party[i].curcmd = 7;
+        party[i].cmdarg = 0;
+        party[i].scriptofs = 0;
+        break;
+    case 'C':
+        party[i].curcmd = 8;
+        GetArg(i);
+        break;
+    case 'B':
+        party[i].curcmd = 9;
+        break;
+    case 'X':
+        party[i].curcmd = 10;
+        GetArg(i);
+        break;
+    case 'Y':
+        party[i].curcmd = 11;
+        GetArg(i);
+        break;
+    case 'F':
+        party[i].curcmd = 12;
+        GetArg(i);
+        break;
+    case 'Z':
+        party[i].curcmd = 13;
+        GetArg(i);
+        break;
+    default:
+        err("Invalid entity movement script.");
     }
 }
 
@@ -380,80 +380,80 @@ void MoveScript(int i) {
         GetNextCommand(i);
     }
 
-    switch(party[i].curcmd) {
-        case 1:
-            MoveUp(i);
-            if (movesuccess) {
-                party[i].cmdarg--;
-            }
-            break;
-        case 2:
-            MoveDown(i);
-            if (movesuccess) {
-                party[i].cmdarg--;
-            }
-            break;
-        case 3:
-            MoveLeft(i);
-            if (movesuccess) {
-                party[i].cmdarg--;
-            }
-            break;
-        case 4:
-            MoveRight(i);
-            if (movesuccess) {
-                party[i].cmdarg--;
-            }
-            break;
-        case 5:
-            party[i].speed = party[i].cmdarg;
-            party[i].cmdarg = 0;
-            break;
-        case 6:
+    switch (party[i].curcmd) {
+    case 1:
+        MoveUp(i);
+        if (movesuccess) {
             party[i].cmdarg--;
-            break;
-        case 7:
-            return;
-        case 8:
-            ExecuteScript(party[i].cmdarg);
+        }
+        break;
+    case 2:
+        MoveDown(i);
+        if (movesuccess) {
+            party[i].cmdarg--;
+        }
+        break;
+    case 3:
+        MoveLeft(i);
+        if (movesuccess) {
+            party[i].cmdarg--;
+        }
+        break;
+    case 4:
+        MoveRight(i);
+        if (movesuccess) {
+            party[i].cmdarg--;
+        }
+        break;
+    case 5:
+        party[i].speed = party[i].cmdarg;
+        party[i].cmdarg = 0;
+        break;
+    case 6:
+        party[i].cmdarg--;
+        break;
+    case 7:
+        return;
+    case 8:
+        ExecuteScript(party[i].cmdarg);
+        party[i].cmdarg = 0;
+        break;
+    case 9:
+        party[i].scriptofs = (unsigned char*)msbuf + msofstbl[party[i].movescript];
+        party[i].cmdarg = 0;
+        break;
+    case 10:
+        if (party[i].cx < party[i].cmdarg) {
+            MoveRight(i);
+        }
+        if (party[i].cx > party[i].cmdarg) {
+            MoveLeft(i);
+        }
+        if (party[i].cx == party[i].cmdarg) {
             party[i].cmdarg = 0;
-            break;
-        case 9:
-            party[i].scriptofs = (unsigned char*)msbuf + msofstbl[party[i].movescript];
+        }
+        break;
+        break;
+    case 11:
+        if (party[i].cy < party[i].cmdarg) {
+            MoveDown(i);
+        }
+        if (party[i].cy > party[i].cmdarg) {
+            MoveUp(i);
+        }
+        if (party[i].cy == party[i].cmdarg) {
             party[i].cmdarg = 0;
-            break;
-        case 10:
-            if (party[i].cx < party[i].cmdarg) {
-                MoveRight(i);
-            }
-            if (party[i].cx > party[i].cmdarg) {
-                MoveLeft(i);
-            }
-            if (party[i].cx == party[i].cmdarg) {
-                party[i].cmdarg = 0;
-            }
-            break;
-            break;
-        case 11:
-            if (party[i].cy < party[i].cmdarg) {
-                MoveDown(i);
-            }
-            if (party[i].cy > party[i].cmdarg) {
-                MoveUp(i);
-            }
-            if (party[i].cy == party[i].cmdarg) {
-                party[i].cmdarg = 0;
-            }
-            break;
-            break;
-        case 12:
-            party[i].facing = party[i].cmdarg;
-            party[i].cmdarg = 0;
-            break;
-        case 13:
-            party[i].specframe = party[i].cmdarg;
-            party[i].cmdarg = 0;
-            break;
+        }
+        break;
+        break;
+    case 12:
+        party[i].facing = party[i].cmdarg;
+        party[i].cmdarg = 0;
+        break;
+    case 13:
+        party[i].specframe = party[i].cmdarg;
+        party[i].cmdarg = 0;
+        break;
     }
     if (!party[i].cmdarg) {
         party[i].curcmd = 0;
@@ -521,26 +521,26 @@ void ProcessEntity(int i) {
     }
 
     if (!party[i].moving) {
-        switch(party[i].movecode) {
-            case 0:
-                return;
-            case 1:
-                Wander1(i);
-                break;
-            case 2:
-                Wander2(i);
-                break;
-            case 3:
-                Wander3(i);
-                break;
-            case 4:
-                MoveScript(i);
-                break;
-            case 5:
-                Chase(i);
-                break;
-            default:
-                err("*error* unknown entity movement pattern");
+        switch (party[i].movecode) {
+        case 0:
+            return;
+        case 1:
+            Wander1(i);
+            break;
+        case 2:
+            Wander2(i);
+            break;
+        case 3:
+            Wander3(i);
+            break;
+        case 4:
+            MoveScript(i);
+            break;
+        case 5:
+            Chase(i);
+            break;
+        default:
+            err("*error* unknown entity movement pattern");
         }
     }
 
