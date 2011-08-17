@@ -10,3 +10,4 @@ extern char up, down, left, right;     // stick position flags
 extern char kb1, kb2, kb3, kb4;        // config keys
 
 void readcontrols();
+void initcontrols(char jf);

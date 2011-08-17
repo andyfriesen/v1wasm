@@ -146,3 +146,5 @@ void addcharacter(int i);
 void startmap(char* fname);
 
 void SaveGame(char* fn);
+
+void allocbuffers();

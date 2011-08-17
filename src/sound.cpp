@@ -3,8 +3,15 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "main.h"
 #include "keyboard.h"
+#include "engine.h"
+#include "control.h"
 #include "mikmod.h"
+#include "sound.h"
+#include "timer.h"
 #include "render.h"
 
 UNIMOD* mf;
@@ -21,18 +28,15 @@ int vcbufm;
 char playing = 0;
 char playingsong[13];
 
-extern char* strbuf;
-extern err(char* ermsg);
-
 extern char kb1, kb2, kb3, kb4;
 extern char jb1, jb2, jb3, jb4;
 
-tickhandler() {
+void tickhandler() {
     MP_HandleTick();
     MD_SetBPM(mp_bpm);
 }
 
-ParseSetup() {
+int ParseSetup() {
     FILE* s;
 
     if (!(s = fopen("SETUP.CFG", "r"))) {
@@ -159,7 +163,7 @@ parseloop:
 
 int lastvol;
 
-sound_init()
+void sound_init()
 // Incidently, sound_init() also initializes the control interface, since
 // they both use SETUP.CFG.
 {
@@ -209,7 +213,7 @@ sound_init()
     lastvol = mp_volume;
 }
 
-sound_loadsfx(char* fname) {
+void sound_loadsfx(char* fname) {
     FILE* f;
     char i;
 
@@ -232,7 +236,7 @@ sound_loadsfx(char* fname) {
     fclose(f);
 }
 
-sound_freesfx() {
+void sound_freesfx() {
     char i;
 
     for (i = 0; i < numfx; i++) {
@@ -240,11 +244,11 @@ sound_freesfx() {
     }
 }
 
-playsong(char* sngnme) {
+void playsong(char* sngnme) {
     if (md_device == 3) {
         return;
     }
-    if (!strcmp(sngnme, &playingsong)) {
+    if (!strcmp(sngnme, playingsong)) {
         return;
     }
     memcpy(&playingsong, sngnme, 13);
@@ -266,7 +270,7 @@ playsong(char* sngnme) {
     playeffect(numfx - 1);
 }
 
-stopsound() {
+void stopsound() {
     if (md_device == 3) {
         return;
     }
@@ -285,7 +289,7 @@ stopsound() {
     playing = 0;
 }
 
-playeffect(char efc) {
+void playeffect(char efc) {
     char chanl;
 
     if (md_device == 3) {
