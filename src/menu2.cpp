@@ -2,11 +2,16 @@
 // Save/loadgame menu, Item menu, Equip menu.
 // Copyright (C)1997 BJ Eirich
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "control.h"
 #include "engine.h"
 #include "keyboard.h"
 #include "timer.h"
+#include "main.h"
+#include "sound.h"
+#include "pcx.h"
 #include "vga.h"
 
 char sg1[]="SAVEDAT.000";
@@ -23,7 +28,7 @@ struct menu {
 
 struct menu menus[4];
 unsigned char itmptr[576],gsimg[512],iuflag=0;
-extern unsigned char menuptr[256],*strbuf;
+extern unsigned char menuptr[256];
 extern short int varl[10];
 
 void greyscale(int width, int height, unsigned char *src, unsigned char *dest) {
@@ -48,7 +53,7 @@ void greyscale(int width, int height, unsigned char *src, unsigned char *dest) {
         }
 }
 
-LoadSaveErase(char mode)
+void LoadSaveErase(char mode)
 // The Save Game / Load Game / Erase Game menu interface. Since the three
 // functions are almost identical in their interface, I crammed them all
 // into one function, using the Mode variable to specify the intent.
@@ -74,7 +79,7 @@ parseloop:
 
     if (strcmp(strbuf,"background")==0) {
         fscanf(f,"%s",strbuf);
-        loadpcx(strbuf,virscr);
+        loadpcx(strbuf, virscr);
         goto parseloop;
     }
 
@@ -154,18 +159,18 @@ parseloop:
             printstring(strbuf);
             fread(&b,1,2,f);
             fread(&j,1,1,f);
-            if (!i) img=&buf1;
-            if (i==1) img=&buf2;
-            if (i==2) img=&buf3;
-            if (i==3) img=&buf4;
+            if (!i) img=(char*)&buf1;
+            if (i==1) img=(char*)&buf2;
+            if (i==2) img=(char*)&buf3;
+            if (i==3) img=(char*)&buf4;
             fread(img,1,2560,f);
-            greyscale(80,32,img,&tbuf);
+            greyscale(80,32, (unsigned char*)img, &tbuf[0]);
 
-            tcopysprite(menus[i].posx,menus[i].posy,16,32,&tbuf);
-            tcopysprite(menus[i].posx+16,menus[i].posy,16,32,&tbuf[512]);
-            tcopysprite(menus[i].posx+32,menus[i].posy,16,32,&tbuf[1024]);
-            tcopysprite(menus[i].posx+48,menus[i].posy,16,32,&tbuf[1536]);
-            tcopysprite(menus[i].posx+64,menus[i].posy,16,32,&tbuf[2048]);
+            tcopysprite(menus[i].posx,menus[i].posy,16,32,tbuf);
+            tcopysprite(menus[i].posx+16,menus[i].posy,16,32,tbuf+512);
+            tcopysprite(menus[i].posx+32,menus[i].posy,16,32,&tbuf+1024);
+            tcopysprite(menus[i].posx+48,menus[i].posy,16,32,&tbuf+1536);
+            tcopysprite(menus[i].posx+64,menus[i].posy,16,32,&tbuf+2048);
         }
         fclose(f);
     }
