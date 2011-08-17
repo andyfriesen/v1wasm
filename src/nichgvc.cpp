@@ -6,6 +6,7 @@
 #include "main.h"
 #include "menu.h"
 #include "vga.h"
+#include "pcx.h"
 #include "control.h"
 #include "render.h"
 #include "ricvc.h"
@@ -337,20 +338,20 @@ drawloop:
 }
 
 // Play VAS?
-PlayVAS() {
+void PlayVAS() {
     int i, i2, frames, speed, ansave, sizex, sizey, sizeoff, wherex, wherey;
     // play_fli (&stringbuffer);
     ansave = an;
     an = 1;
 
-    GrabString(&stringbuffer);
+    GrabString(stringbuffer);
     speed = ResolveOperand();
     sizex = ResolveOperand();
     sizey = ResolveOperand();
     wherex = ResolveOperand();
     wherey = ResolveOperand();
 
-    LoadPCXHeaderNP(&stringbuffer);
+    LoadPCXHeaderNP(stringbuffer);
 
 
     frames = depth / sizey;
@@ -360,14 +361,14 @@ PlayVAS() {
 
     for (i2 = 0; i2 < depth; i2++) {
         vidoffset = (i2 * width);
-        ReadPCXLine(vcdatabuf);
+        ReadPCXLine((unsigned char*)vcdatabuf);
     }
     fclose(pcxf);
 
     timer_count = 0;
     while (i < frames) {
         memset(vcscreen, 0, 64000);
-        VCtcopysprite(wherex, wherey, sizex, sizey, vcdatabuf + (i * sizeoff));
+        VCtcopysprite(wherex, wherey, sizex, sizey, (unsigned char*)vcdatabuf + (i * sizeoff));
         drawmap();
         vgadump();
 

@@ -330,7 +330,7 @@ HealAll() {
     }
 }
 
-AlterParallax() {
+void AlterParallax() {
     unsigned char t;
 
     t = ResolveOperand();
@@ -343,7 +343,7 @@ AlterParallax() {
     pdivy = t;
 }
 
-FadeIn() {
+void FadeIn() {
     int i, s;
 
     s = ResolveOperand();

@@ -60,3 +60,4 @@ unsigned char GrabC();
 void GrabString(char* str);
 
 extern char* code;
+extern char* vcdatabuf;
