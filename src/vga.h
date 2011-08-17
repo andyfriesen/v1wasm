@@ -18,6 +18,8 @@ void printstring(char* str);
 void bigprintstring(char* str);
 void copysprite(int x, int y, int width, int height, unsigned char* spr);
 void tcopysprite(int x, int y, int width, int height, unsigned char* spr);
+void grabregion(int x, int y, int width, int height, unsigned char* spr);
+void fontcolor(unsigned char c);
 
 void dec_to_asciiz(int num, char* buf);
 

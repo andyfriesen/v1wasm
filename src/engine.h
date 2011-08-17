@@ -54,9 +54,9 @@ struct charstats {                     // Stat record for single character
 };
 
 struct itemdesc {
-    unsigned char name[20];              // item name
+    char name[20];              // item name
     unsigned short int icon;             // icon index
-    unsigned char desc[40];              // item description
+    char desc[40];              // item description
     unsigned char useflag;               // Useable flag <see below>
     unsigned short int useeffect;        // effect list index
     unsigned char itemtype;              // item type index
@@ -69,9 +69,9 @@ struct itemdesc {
 // NEW MAGIC
 
 struct magicdesc {
-    unsigned char name[20];              // magic name
+    char name[20];              // magic name
     unsigned short int icon;             // icon index
-    unsigned char desc[40];              // magic description
+    char desc[40];              // magic description
     unsigned char useflag;               // Useable flag <see below>
     unsigned short int useeffect;        // magic effect list index
     unsigned char itemtype;              // magic type index
@@ -124,7 +124,8 @@ extern struct mequipstruc mequip[255];
 
 extern struct equipstruc equip[255];
 extern unsigned short int nx, ny;
-extern short int flags[8000], numtiles;
+extern short int flags[16000];
+extern short int numtiles;
 
 
 extern char partyidx[5];
@@ -143,3 +144,5 @@ void UpdateEquipStats();
 void addcharacter(int i);
 
 void startmap(char* fname);
+
+void SaveGame(char* fn);

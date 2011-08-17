@@ -9,7 +9,10 @@
 #include "engine.h"
 #include "keyboard.h"
 #include "timer.h"
+#include "render.h"
 #include "main.h"
+#include "menu.h"
+#include "menu2.h"
 #include "sound.h"
 #include "pcx.h"
 #include "vga.h"
@@ -63,7 +66,7 @@ void LoadSaveErase(char mode)
     int i, j, r = 0;
     unsigned char tbuf[2560], buf1[2560], buf2[2560], buf3[2560], buf4[2560];
     unsigned char rbuf[256];
-    char* img, mpos, b;
+    unsigned char* img;
     char mnu1[] = "LOADGAME.MNU";
     char mnu2[] = "SAVEGAME.MNU";
     char mnu3[] = "DELGAME.MNU";
@@ -148,6 +151,7 @@ parseloop:
             dec_to_asciiz(j, strbuf);
             printstring(strbuf);
             printstring(" G");
+            char b;
             fread(&b, 1, 1, f);
             gotoxy(menus[i].posx + 162, menus[i].posy + 21);
             dec_to_asciiz(b, strbuf);
@@ -165,38 +169,38 @@ parseloop:
             fread(&b, 1, 2, f);
             fread(&j, 1, 1, f);
             if (!i) {
-                img = (char*)&buf1;
+                img = buf1;
             }
             if (i == 1) {
-                img = (char*)&buf2;
+                img = buf2;
             }
             if (i == 2) {
-                img = (char*)&buf3;
+                img = buf3;
             }
             if (i == 3) {
-                img = (char*)&buf4;
+                img = buf4;
             }
             fread(img, 1, 2560, f);
             greyscale(80, 32, (unsigned char*)img, &tbuf[0]);
 
             tcopysprite(menus[i].posx, menus[i].posy, 16, 32, tbuf);
             tcopysprite(menus[i].posx + 16, menus[i].posy, 16, 32, tbuf + 512);
-            tcopysprite(menus[i].posx + 32, menus[i].posy, 16, 32, &tbuf + 1024);
-            tcopysprite(menus[i].posx + 48, menus[i].posy, 16, 32, &tbuf + 1536);
-            tcopysprite(menus[i].posx + 64, menus[i].posy, 16, 32, &tbuf + 2048);
+            tcopysprite(menus[i].posx + 32, menus[i].posy, 16, 32, tbuf + 1024);
+            tcopysprite(menus[i].posx + 48, menus[i].posy, 16, 32, tbuf + 1536);
+            tcopysprite(menus[i].posx + 64, menus[i].posy, 16, 32, tbuf + 2048);
         }
         fclose(f);
     }
 
-    mpos = 0;
-    grabregion(menus[0].posx - 16, menus[0].posy + 10, 16, 16, &rbuf);
-    tcopysprite(menus[0].posx - 16, menus[0].posy + 10, 16, 16, &menuptr);
+    int mpos = 0;
+    grabregion(menus[0].posx - 16, menus[0].posy + 10, 16, 16, rbuf);
+    tcopysprite(menus[0].posx - 16, menus[0].posy + 10, 16, 16, menuptr);
     if (menus[0].linktype) {
-        tcopysprite(menus[0].posx, menus[0].posy, 16, 32, &buf1);
-        tcopysprite(menus[0].posx + 16, menus[0].posy, 16, 32, &buf1[512]);
-        tcopysprite(menus[0].posx + 32, menus[0].posy, 16, 32, &buf1[1024]);
-        tcopysprite(menus[0].posx + 48, menus[0].posy, 16, 32, &buf1[1536]);
-        tcopysprite(menus[0].posx + 64, menus[0].posy, 16, 32, &buf1[2048]);
+        tcopysprite(menus[0].posx, menus[0].posy, 16, 32, buf1);
+        tcopysprite(menus[0].posx + 16, menus[0].posy, 16, 32, buf1 + 512);
+        tcopysprite(menus[0].posx + 32, menus[0].posy, 16, 32, buf1 + 1024);
+        tcopysprite(menus[0].posx + 48, menus[0].posy, 16, 32, buf1 + 1536);
+        tcopysprite(menus[0].posx + 64, menus[0].posy, 16, 32, buf1 + 2048);
     }
     vgadump();
     if (!r) {
@@ -210,45 +214,45 @@ inputloop:
     readcontrols();
 
     if (down) {
-        copysprite(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, &rbuf);
+        copysprite(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, rbuf);
         if (!mpos) {
-            img = &buf1;
+            img = buf1;
         }
         if (mpos == 1) {
-            img = &buf2;
+            img = buf2;
         }
         if (mpos == 2) {
-            img = &buf3;
+            img = buf3;
         }
         if (mpos == 3) {
-            img = &buf4;
+            img = buf4;
         }
         if (menus[mpos].linktype) {
-            greyscale(80, 32, img, &tbuf);
-            tcopysprite(menus[mpos].posx, menus[mpos].posy, 16, 32, &tbuf);
-            tcopysprite(menus[mpos].posx + 16, menus[mpos].posy, 16, 32, &tbuf[512]);
-            tcopysprite(menus[mpos].posx + 32, menus[mpos].posy, 16, 32, &tbuf[1024]);
-            tcopysprite(menus[mpos].posx + 48, menus[mpos].posy, 16, 32, &tbuf[1536]);
-            tcopysprite(menus[mpos].posx + 64, menus[mpos].posy, 16, 32, &tbuf[2048]);
+            greyscale(80, 32, img, tbuf);
+            tcopysprite(menus[mpos].posx, menus[mpos].posy, 16, 32, tbuf);
+            tcopysprite(menus[mpos].posx + 16, menus[mpos].posy, 16, 32, tbuf +512);
+            tcopysprite(menus[mpos].posx + 32, menus[mpos].posy, 16, 32, tbuf + 1024);
+            tcopysprite(menus[mpos].posx + 48, menus[mpos].posy, 16, 32, tbuf + 1536);
+            tcopysprite(menus[mpos].posx + 64, menus[mpos].posy, 16, 32, tbuf + 2048);
         }
         mpos++;
         if (mpos == 4) {
             mpos = 0;
         }
-        grabregion(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, &rbuf);
-        tcopysprite(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, &menuptr);
+        grabregion(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, rbuf);
+        tcopysprite(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, menuptr);
         if (menus[mpos].linktype) {
             if (!mpos) {
-                img = &buf1;
+                img = buf1;
             }
             if (mpos == 1) {
-                img = &buf2;
+                img = buf2;
             }
             if (mpos == 2) {
-                img = &buf3;
+                img = buf3;
             }
             if (mpos == 3) {
-                img = &buf4;
+                img = buf4;
             }
             tcopysprite(menus[mpos].posx, menus[mpos].posy, 16, 32, img);
             tcopysprite(menus[mpos].posx + 16, menus[mpos].posy, 16, 32, img + 512);
@@ -264,46 +268,46 @@ inputloop:
     }
 
     if (up) {
-        copysprite(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, &rbuf);
+        copysprite(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, rbuf);
         if (!mpos) {
-            img = &buf1;
+            img = buf1;
         }
         if (mpos == 1) {
-            img = &buf2;
+            img = buf2;
         }
         if (mpos == 2) {
-            img = &buf3;
+            img = buf3;
         }
         if (mpos == 3) {
-            img = &buf4;
+            img = buf4;
         }
         if (menus[mpos].linktype) {
-            greyscale(80, 32, img, &tbuf);
-            tcopysprite(menus[mpos].posx, menus[mpos].posy, 16, 32, &tbuf);
-            tcopysprite(menus[mpos].posx + 16, menus[mpos].posy, 16, 32, &tbuf[512]);
-            tcopysprite(menus[mpos].posx + 32, menus[mpos].posy, 16, 32, &tbuf[1024]);
-            tcopysprite(menus[mpos].posx + 48, menus[mpos].posy, 16, 32, &tbuf[1536]);
-            tcopysprite(menus[mpos].posx + 64, menus[mpos].posy, 16, 32, &tbuf[2048]);
+            greyscale(80, 32, img, tbuf);
+            tcopysprite(menus[mpos].posx, menus[mpos].posy, 16, 32, tbuf);
+            tcopysprite(menus[mpos].posx + 16, menus[mpos].posy, 16, 32, tbuf + 512);
+            tcopysprite(menus[mpos].posx + 32, menus[mpos].posy, 16, 32, tbuf + 1024);
+            tcopysprite(menus[mpos].posx + 48, menus[mpos].posy, 16, 32, tbuf + 1536);
+            tcopysprite(menus[mpos].posx + 64, menus[mpos].posy, 16, 32, tbuf + 2048);
         }
         if (!mpos) {
             mpos = 3;
         } else {
             mpos--;
         }
-        grabregion(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, &rbuf);
-        tcopysprite(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, &menuptr);
+        grabregion(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, rbuf);
+        tcopysprite(menus[mpos].posx - 16, menus[mpos].posy + 10, 16, 16, menuptr);
         if (menus[mpos].linktype) {
             if (!mpos) {
-                img = &buf1;
+                img = buf1;
             }
             if (mpos == 1) {
-                img = &buf2;
+                img = buf2;
             }
             if (mpos == 2) {
-                img = &buf3;
+                img = buf3;
             }
             if (mpos == 3) {
-                img = &buf4;
+                img = buf4;
             }
             tcopysprite(menus[mpos].posx, menus[mpos].posy, 16, 32, img);
             tcopysprite(menus[mpos].posx + 16, menus[mpos].posy, 16, 32, img + 512);
@@ -343,7 +347,7 @@ inputloop:
     timer_count = 0;
 }
 
-RemoveItem(char c, char i) {
+void RemoveItem(char c, char i) {
     char j;
 
     for (j = i; j < pstats[c].invcnt - 1; j++) {
@@ -353,7 +357,7 @@ RemoveItem(char c, char i) {
     pstats[c].invcnt--;
 }
 
-DrawItemMenu(char c, char ptr) {
+void DrawItemMenu(char c, char ptr) {
     unsigned char l, i, a, *img, z;
     int j, k;
 
