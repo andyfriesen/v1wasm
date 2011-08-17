@@ -11,9 +11,9 @@ import os
 nacl_env = make_nacl_env.NaClEnvironment(use_c_plus_plus_libs=True)
 
 sources = Split("""
-battle.cpp  entity.cpp  nacl.cpp    render.cpp  timer.cpp   vga.cpp
-control.cpp main.cpp    nichgvc.cpp ricvc.cpp   vc.cpp      xbigdvc.cpp
-engine.cpp  menu2.cpp   pcx.cpp     sound.cpp   vclib.cpp
+andyvc.cpp  engine.cpp  menu.cpp    nichgvc.cpp ricvc.cpp   vc.cpp      xbigdvc.cpp
+battle.cpp  entity.cpp  menu2.cpp   pcx.cpp     sound.cpp   vclib.cpp
+control.cpp main.cpp    nacl.cpp    render.cpp  timer.cpp   vga.cpp
 """)
 
 sources = ['src/' + s for s in sources]

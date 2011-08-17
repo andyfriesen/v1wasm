@@ -4,7 +4,17 @@
  * SmallText     Mar  3, '99   *
  * VCEllipse     Jul 30, '99   */
 
-SmallText() {
+#include <stdlib.h>
+#include <string.h>
+#include "control.h"
+#include "main.h"
+#include "menu.h"
+#include "render.h"
+#include "timer.h"
+#include "vc.h"
+#include "vga.h"
+
+void SmallText() {
     char* buf1, *buf2;
     char* opt;
     int  x1, y1, x2, y2;
@@ -52,7 +62,7 @@ drawloop:
     while (b4 || b2 || b1) { first = 2; goto drawloop; }
 }
 
-VCEllipse() {
+void VCEllipse() {
     int mx, my, a, b, color;
 
     int x, mx1, mx2, my1, my2;
