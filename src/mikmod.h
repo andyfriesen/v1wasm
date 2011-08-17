@@ -128,33 +128,33 @@ BOOL    MyCmp(UBYTE *a,UBYTE *b,UWORD l);
 */
 
 enum {
-		UNI_NOTE=1,
-		UNI_INSTRUMENT,
-		UNI_PTEFFECT0,
-		UNI_PTEFFECT1,
-		UNI_PTEFFECT2,
-		UNI_PTEFFECT3,
-		UNI_PTEFFECT4,
-		UNI_PTEFFECT5,
-		UNI_PTEFFECT6,
-		UNI_PTEFFECT7,
-		UNI_PTEFFECT8,
-		UNI_PTEFFECT9,
-		UNI_PTEFFECTA,
-		UNI_PTEFFECTB,
-		UNI_PTEFFECTC,
-		UNI_PTEFFECTD,
-		UNI_PTEFFECTE,
-		UNI_PTEFFECTF,
-		UNI_S3MEFFECTA,
-		UNI_S3MEFFECTD,
-		UNI_S3MEFFECTE,
-		UNI_S3MEFFECTF,
-		UNI_S3MEFFECTI,
-		UNI_S3MEFFECTQ,
-		UNI_S3MEFFECTT,
-		UNI_XMEFFECTA,
-		UNI_XMEFFECTP
+    UNI_NOTE=1,
+    UNI_INSTRUMENT,
+    UNI_PTEFFECT0,
+    UNI_PTEFFECT1,
+    UNI_PTEFFECT2,
+    UNI_PTEFFECT3,
+    UNI_PTEFFECT4,
+    UNI_PTEFFECT5,
+    UNI_PTEFFECT6,
+    UNI_PTEFFECT7,
+    UNI_PTEFFECT8,
+    UNI_PTEFFECT9,
+    UNI_PTEFFECTA,
+    UNI_PTEFFECTB,
+    UNI_PTEFFECTC,
+    UNI_PTEFFECTD,
+    UNI_PTEFFECTE,
+    UNI_PTEFFECTF,
+    UNI_S3MEFFECTA,
+    UNI_S3MEFFECTD,
+    UNI_S3MEFFECTE,
+    UNI_S3MEFFECTF,
+    UNI_S3MEFFECTI,
+    UNI_S3MEFFECTQ,
+    UNI_S3MEFFECTT,
+    UNI_XMEFFECTA,
+    UNI_XMEFFECTP
 };
 
 
@@ -194,53 +194,53 @@ enum {
 #define UF_LINEAR       2               /* if set use LINEAR periods */
 
 
-typedef struct ENVPT{
-	SWORD pos;
-	SWORD val;
+typedef struct ENVPT {
+    SWORD pos;
+    SWORD val;
 } ENVPT;
 
 
-typedef struct SAMPLE{
-	UWORD c2spd;            /* finetune frequency */
-	SBYTE transpose;        /* transpose value */
-	UBYTE volume;           /* volume 0-64 */
-	UBYTE panning;          /* panning */
-	ULONG length;           /* length of sample (in samples!) */
-	ULONG loopstart;        /* repeat position (relative to start, in samples) */
-	ULONG loopend;          /* repeat end */
-	UWORD flags;            /* sample format */
-	ULONG seekpos;			/* seek position in file */
-	char *samplename;       /* name of the sample */
-	SWORD handle;           /* sample handle */
+typedef struct SAMPLE {
+    UWORD c2spd;            /* finetune frequency */
+    SBYTE transpose;        /* transpose value */
+    UBYTE volume;           /* volume 0-64 */
+    UBYTE panning;          /* panning */
+    ULONG length;           /* length of sample (in samples!) */
+    ULONG loopstart;        /* repeat position (relative to start, in samples) */
+    ULONG loopend;          /* repeat end */
+    UWORD flags;            /* sample format */
+    ULONG seekpos;			/* seek position in file */
+    char *samplename;       /* name of the sample */
+    SWORD handle;           /* sample handle */
 } SAMPLE;
 
 
-typedef struct INSTRUMENT{
-	UBYTE numsmp;
-	UBYTE samplenumber[96];
+typedef struct INSTRUMENT {
+    UBYTE numsmp;
+    UBYTE samplenumber[96];
 
-	UBYTE volflg;           /* bit 0: on 1: sustain 2: loop */
-	UBYTE volpts;
-	UBYTE volsus;
-	UBYTE volbeg;
-	UBYTE volend;
-	ENVPT volenv[12];
+    UBYTE volflg;           /* bit 0: on 1: sustain 2: loop */
+    UBYTE volpts;
+    UBYTE volsus;
+    UBYTE volbeg;
+    UBYTE volend;
+    ENVPT volenv[12];
 
-	UBYTE panflg;           /* bit 0: on 1: sustain 2: loop */
-	UBYTE panpts;
-	UBYTE pansus;
-	UBYTE panbeg;
-	UBYTE panend;
-	ENVPT panenv[12];
+    UBYTE panflg;           /* bit 0: on 1: sustain 2: loop */
+    UBYTE panpts;
+    UBYTE pansus;
+    UBYTE panbeg;
+    UBYTE panend;
+    ENVPT panenv[12];
 
-	UBYTE vibtype;
-	UBYTE vibsweep;
-	UBYTE vibdepth;
-	UBYTE vibrate;
+    UBYTE vibtype;
+    UBYTE vibsweep;
+    UBYTE vibdepth;
+    UBYTE vibrate;
 
-	UWORD volfade;
-	char  *insname;
-	SAMPLE *samples;
+    UWORD volfade;
+    char  *insname;
+    SAMPLE *samples;
 } INSTRUMENT;
 
 
@@ -249,25 +249,25 @@ typedef struct INSTRUMENT{
 	====================
 */
 
-typedef struct UNIMOD{
-	UBYTE		numchn;			/* number of channels */
-	UWORD       numpos;         /* number of positions in this song */
-	UWORD		reppos;			/* restart position */
-	UWORD       numpat;         /* number of patterns in this song */
-	UWORD       numtrk;         /* number of tracks */
-	UWORD       numins;         /* number of samples */
-	UBYTE       initspeed;      /* */
-	UBYTE       inittempo;      /* */
-	UBYTE       positions[256]; /* all positions */
-	UBYTE       panning[32];  	/* 32 panning positions */
-	UBYTE       flags;          /* */
-	char       *songname;       /* name of the song */
-	char       *modtype;        /* string type of module */
-	char       *comment;        /* module comments */
-	INSTRUMENT *instruments;    /* all samples */
-	UWORD      *patterns;       /* array of PATTERN */
-	UWORD      *pattrows;       /* array of number of rows for each pattern */
-	UBYTE     **tracks;         /* array of pointers to tracks */
+typedef struct UNIMOD {
+    UBYTE		numchn;			/* number of channels */
+    UWORD       numpos;         /* number of positions in this song */
+    UWORD		reppos;			/* restart position */
+    UWORD       numpat;         /* number of patterns in this song */
+    UWORD       numtrk;         /* number of tracks */
+    UWORD       numins;         /* number of samples */
+    UBYTE       initspeed;      /* */
+    UBYTE       inittempo;      /* */
+    UBYTE       positions[256]; /* all positions */
+    UBYTE       panning[32];  	/* 32 panning positions */
+    UBYTE       flags;          /* */
+    char       *songname;       /* name of the song */
+    char       *modtype;        /* string type of module */
+    char       *comment;        /* module comments */
+    INSTRUMENT *instruments;    /* all samples */
+    UWORD      *patterns;       /* array of PATTERN */
+    UWORD      *pattrows;       /* array of number of rows for each pattern */
+    UBYTE     **tracks;         /* array of pointers to tracks */
 } UNIMOD;
 
 
@@ -279,14 +279,14 @@ typedef struct UNIMOD{
 	loader structure:
 */
 
-typedef struct LOADER{
-	struct LOADER *next;
-	char	*type;
-	char 	*version;
-	BOOL    (*Init)(void);
-	BOOL	(*Test)(void);
-	BOOL	(*Load)(void);
-	void	(*Cleanup)(void);
+typedef struct LOADER {
+    struct LOADER *next;
+    char	*type;
+    char 	*version;
+    BOOL    (*Init)(void);
+    BOOL	(*Test)(void);
+    BOOL	(*Load)(void);
+    void	(*Cleanup)(void);
 } LOADER;
 
 
@@ -372,22 +372,22 @@ void MW_FreeWav(SAMPLE *si);
 	driver structure:
 */
 
-typedef struct DRIVER{
-	struct DRIVER *next;
-	char    *Name;
-	char    *Version;
-	BOOL    (*IsPresent)            (void);
-	SWORD   (*SampleLoad)           (FILE *fp,ULONG size,ULONG reppos,ULONG repend,UWORD flags);
-	void    (*SampleUnLoad)         (SWORD handle);
-	BOOL    (*Init)                 (void);
-	void    (*Exit)                 (void);
-	void    (*PlayStart)            (void);
-	void    (*PlayStop)             (void);
-	void    (*Update)               (void);
-	void 	(*VoiceSetVolume)		(UBYTE voice,UBYTE vol);
-	void 	(*VoiceSetFrequency)	(UBYTE voice,ULONG frq);
-	void 	(*VoiceSetPanning)		(UBYTE voice,ULONG pan);
-	void	(*VoicePlay)			(UBYTE voice,SWORD handle,ULONG start,ULONG size,ULONG reppos,ULONG repend,UWORD flags);
+typedef struct DRIVER {
+    struct DRIVER *next;
+    char    *Name;
+    char    *Version;
+    BOOL    (*IsPresent)            (void);
+    SWORD   (*SampleLoad)           (FILE *fp,ULONG size,ULONG reppos,ULONG repend,UWORD flags);
+    void    (*SampleUnLoad)         (SWORD handle);
+    BOOL    (*Init)                 (void);
+    void    (*Exit)                 (void);
+    void    (*PlayStart)            (void);
+    void    (*PlayStop)             (void);
+    void    (*Update)               (void);
+    void 	(*VoiceSetVolume)		(UBYTE voice,UBYTE vol);
+    void 	(*VoiceSetFrequency)	(UBYTE voice,ULONG frq);
+    void 	(*VoiceSetPanning)		(UBYTE voice,ULONG pan);
+    void	(*VoicePlay)			(UBYTE voice,SWORD handle,ULONG start,ULONG size,ULONG reppos,ULONG repend,UWORD flags);
 } DRIVER;
 
 
@@ -444,83 +444,83 @@ extern DRIVER drv_vox;		/* linux voxware driver */
 **************************************************************************/
 
 
-typedef struct ENVPR{
-	UBYTE flg;          /* envelope flag */
-	UBYTE pts;			/* number of envelope points */
-	UBYTE sus;			/* envelope sustain index */
-	UBYTE beg;			/* envelope loop begin */
-	UBYTE end;			/* envelope loop end */
-	SWORD p;			/* current envelope counter */
-	UWORD a;			/* envelope index a */
-	UWORD b;			/* envelope index b */
-	ENVPT *env;			/* envelope points */
+typedef struct ENVPR {
+    UBYTE flg;          /* envelope flag */
+    UBYTE pts;			/* number of envelope points */
+    UBYTE sus;			/* envelope sustain index */
+    UBYTE beg;			/* envelope loop begin */
+    UBYTE end;			/* envelope loop end */
+    SWORD p;			/* current envelope counter */
+    UWORD a;			/* envelope index a */
+    UWORD b;			/* envelope index b */
+    ENVPT *env;			/* envelope points */
 } ENVPR;
 
 
-typedef struct AUDTMP{
-	INSTRUMENT 	*i;
-	SAMPLE      *s;
+typedef struct AUDTMP {
+    INSTRUMENT 	*i;
+    SAMPLE      *s;
 
-	SWORD fadevol;		/* fading volume */
+    SWORD fadevol;		/* fading volume */
 
-	ENVPR venv;
-	ENVPR penv;
+    ENVPR venv;
+    ENVPR penv;
 
-	UBYTE keyon;		/* if true=key is pressed. */
-	UBYTE kick;			/* if true=sample has to be restarted */
-	UBYTE sample;		/* which sample number (0-31) */
-	SWORD handle;		/* which sample-handle */
+    UBYTE keyon;		/* if true=key is pressed. */
+    UBYTE kick;			/* if true=sample has to be restarted */
+    UBYTE sample;		/* which sample number (0-31) */
+    SWORD handle;		/* which sample-handle */
 
-	ULONG start;		/* The start byte index in the sample */
+    ULONG start;		/* The start byte index in the sample */
 
-	UBYTE panning;		/* panning position */
-	UBYTE pansspd;		/* panslide speed */
+    UBYTE panning;		/* panning position */
+    UBYTE pansspd;		/* panslide speed */
 
-	SBYTE volume;		/* amiga volume (0 t/m 64) to play the sample at */
-	UWORD period;		/* period to play the sample at */
+    SBYTE volume;		/* amiga volume (0 t/m 64) to play the sample at */
+    UWORD period;		/* period to play the sample at */
 
-	/* You should not have to use the values
-	   below in the player routine */
+    /* You should not have to use the values
+       below in the player routine */
 
-	SBYTE transpose;
+    SBYTE transpose;
 
-	UBYTE note;			/* */
+    UBYTE note;			/* */
 
-	SWORD ownper;
-	SWORD ownvol;
+    SWORD ownper;
+    SWORD ownvol;
 
-	UBYTE *row;			/* row currently playing on this channel */
+    UBYTE *row;			/* row currently playing on this channel */
 
-	SBYTE retrig;		/* retrig value (0 means don't retrig) */
-	UWORD c2spd;		/* what finetune to use */
+    SBYTE retrig;		/* retrig value (0 means don't retrig) */
+    UWORD c2spd;		/* what finetune to use */
 
-	SBYTE tmpvolume;	/* tmp volume */
+    SBYTE tmpvolume;	/* tmp volume */
 
-	UWORD tmpperiod;	/* tmp period */
-	UWORD wantedperiod;	/* period to slide to (with effect 3 or 5) */
+    UWORD tmpperiod;	/* tmp period */
+    UWORD wantedperiod;	/* period to slide to (with effect 3 or 5) */
 
-	UWORD slidespeed;	/* */
-	UWORD portspeed;	/* noteslide speed (toneportamento) */
+    UWORD slidespeed;	/* */
+    UWORD portspeed;	/* noteslide speed (toneportamento) */
 
-	UBYTE s3mtremor;	/* s3m tremor (effect I) counter */
+    UBYTE s3mtremor;	/* s3m tremor (effect I) counter */
 
-	UBYTE s3mvolslide;	/* last used volslide */
+    UBYTE s3mvolslide;	/* last used volslide */
 
-	UBYTE s3mrtgspeed;	/* last used retrig speed */
-	UBYTE s3mrtgslide;	/* last used retrig slide */
+    UBYTE s3mrtgspeed;	/* last used retrig speed */
+    UBYTE s3mrtgslide;	/* last used retrig slide */
 
-	UBYTE glissando;	/* glissando (0 means off) */
-	UBYTE wavecontrol;	/* */
+    UBYTE glissando;	/* glissando (0 means off) */
+    UBYTE wavecontrol;	/* */
 
-	SBYTE vibpos;		/* current vibrato position */
-	UBYTE vibspd;		/* "" speed */
-	UBYTE vibdepth;		/* "" depth */
+    SBYTE vibpos;		/* current vibrato position */
+    UBYTE vibspd;		/* "" speed */
+    UBYTE vibdepth;		/* "" depth */
 
-	SBYTE trmpos;		/* current tremolo position */
-	UBYTE trmspd;		/* "" speed */
-	UBYTE trmdepth;		/* "" depth */
+    SBYTE trmpos;		/* current tremolo position */
+    UBYTE trmspd;		/* "" speed */
+    UBYTE trmdepth;		/* "" depth */
 
-	UWORD soffset;		/* last used sample-offset (effect 9) */
+    UWORD soffset;		/* last used sample-offset (effect 9) */
 } AUDTMP;
 
 

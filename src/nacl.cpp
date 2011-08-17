@@ -36,43 +36,43 @@
 /// receiving messages from the borwser, and use PostMessage() to send messages
 /// back to the browser.  Note that this interface is entirely asynchronous.
 class V1naclInstance : public pp::Instance {
- public:
-  /// The constructor creates the plugin-side instance.
-  /// @param[in] instance the handle to the browser-side plugin instance.
-  explicit V1naclInstance(PP_Instance instance) : pp::Instance(instance)
-  {}
-  virtual ~V1naclInstance() {}
+public:
+    /// The constructor creates the plugin-side instance.
+    /// @param[in] instance the handle to the browser-side plugin instance.
+    explicit V1naclInstance(PP_Instance instance) : pp::Instance(instance)
+    {}
+    virtual ~V1naclInstance() {}
 
-  /// Handler for messages coming in from the browser via postMessage().  The
-  /// @a var_message can contain anything: a JSON string; a string that encodes
-  /// method names and arguments; etc.  For example, you could use
-  /// JSON.stringify in the browser to create a message that contains a method
-  /// name and some parameters, something like this:
-  ///   var json_message = JSON.stringify({ "myMethod" : "3.14159" });
-  ///   nacl_module.postMessage(json_message);
-  /// On receipt of this message in @a var_message, you could parse the JSON to
-  /// retrieve the method name, match it to a function call, and then call it
-  /// with the parameter.
-  /// @param[in] var_message The message posted by the browser.
-  virtual void HandleMessage(const pp::Var& var_message) {
-    // TODO(sdk_user): 1. Make this function handle the incoming message.
-  }
+    /// Handler for messages coming in from the browser via postMessage().  The
+    /// @a var_message can contain anything: a JSON string; a string that encodes
+    /// method names and arguments; etc.  For example, you could use
+    /// JSON.stringify in the browser to create a message that contains a method
+    /// name and some parameters, something like this:
+    ///   var json_message = JSON.stringify({ "myMethod" : "3.14159" });
+    ///   nacl_module.postMessage(json_message);
+    /// On receipt of this message in @a var_message, you could parse the JSON to
+    /// retrieve the method name, match it to a function call, and then call it
+    /// with the parameter.
+    /// @param[in] var_message The message posted by the browser.
+    virtual void HandleMessage(const pp::Var& var_message) {
+        // TODO(sdk_user): 1. Make this function handle the incoming message.
+    }
 };
 
 /// The Module class.  The browser calls the CreateInstance() method to create
 /// an instance of your NaCl module on the web page.  The browser creates a new
 /// instance for each <embed> tag with type="application/x-nacl".
 class V1naclModule : public pp::Module {
- public:
-  V1naclModule() : pp::Module() {}
-  virtual ~V1naclModule() {}
+public:
+    V1naclModule() : pp::Module() {}
+    virtual ~V1naclModule() {}
 
-  /// Create and return a V1naclInstance object.
-  /// @param[in] instance The browser-side instance.
-  /// @return the plugin-side instance.
-  virtual pp::Instance* CreateInstance(PP_Instance instance) {
-    return new V1naclInstance(instance);
-  }
+    /// Create and return a V1naclInstance object.
+    /// @param[in] instance The browser-side instance.
+    /// @return the plugin-side instance.
+    virtual pp::Instance* CreateInstance(PP_Instance instance) {
+        return new V1naclInstance(instance);
+    }
 };
 
 namespace pp {
@@ -82,6 +82,6 @@ namespace pp {
 /// is one instance per <embed> tag on the page.  This is the main binding
 /// point for your NaCl module with the browser.
 Module* CreateModule() {
-  return new V1naclModule();
+    return new V1naclModule();
 }
 }  // namespace pp

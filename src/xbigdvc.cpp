@@ -1,5 +1,4 @@
-vcwritelayer(int i)
-  {
+vcwritelayer(int i) {
 //   int i;
 //   i=ResolveOperand();
 
@@ -7,4 +6,4 @@ vcwritelayer(int i)
     if(i==2)vcscreen=vcscreen2;
     layervcwrite=i;
     return;
-  }
+}
