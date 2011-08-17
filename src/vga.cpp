@@ -3,13 +3,14 @@
 
 // This source code REALLY needs to be cleaned up. A lot.
 
-#include <dpmi.h>
-#include <sys\nearptr.h>
 #include <stdio.h>
-#include <strings.h>
+#include <stdlib.h>
+#include <string.h>
 #include "control.h"
 #include "render.h"
 #include "timer.h"
+#include "vclib.h"
+#include "main.h"
 
 #include "engine.h" // for valloc()
 
@@ -17,42 +18,25 @@ void err(const char*);
 
 unsigned char pal[768];
 unsigned char pal2[768];
-extern char waitvrt, *speech, fade, cancelfade, *strbuf;
+extern char waitvrt, fade, cancelfade, *strbuf;
 
-char* fnt, *fnt2, *tbox, *n;
+unsigned char* fnt, *fnt2, *tbox, *n;
 short int x1 = 17, y1 = 17;
 
-__dpmi_regs regs;
 unsigned char* screen;
 unsigned char* virscr;
 
-wait() {
-    while (inportb(0x3DA) & 8) {}
-    while (!(inportb(0x3DA) & 8)) {}
+void wait() {
+    // vsync?
 }
 
-set_palette(unsigned char* pall) {
-    unsigned int i;
-
-    if (waitvrt) {
-        wait();
-    }
-    outportb(0x03c8, 0);
-    for (i = 0; i < 768; i++) {
-        outportb(0x03c9, pall[i]);
-    }
+void set_palette(unsigned char* pall) {
 }
 
-get_palette() {
-    unsigned int i;
-
-    outportb(0x03c7, 0);
-    for (i = 0; i < 768; i++) {
-        pal[i] = inportb(0x03c9);
-    }
+void get_palette() {
 }
 
-set_intensity(unsigned int n) {
+void set_intensity(unsigned int n) {
     int i;
     for (i = 767; i >= 0; --i) {
         pal2[i] = (pal[i] * n) >> 6;
@@ -60,38 +44,19 @@ set_intensity(unsigned int n) {
     set_palette(pal2);
 }
 
-initvga() {
-    memset(&regs, 0, sizeof regs);
-    regs.x.ax = 0x13;
-
-    PreCalc_TransparencyFields();
-
-    __dpmi_int(0x10, &regs);
-    virscr = valloc(90000, "virscr");
-    n = valloc(256, "initvga:n");
-    //memset(virscr, 0, 81664);
-    //memset(n, 0, 256);
-    __djgpp_nearptr_enable();
-    screen = 0xa0000 + __djgpp_conventional_base;
+void initvga() {
 }
 
-closevga() {
-    __djgpp_nearptr_disable();
-    regs.x.ax = 0x0003;
-    __dpmi_int(0x10, &regs);
+void closevga() {
 }
 
-quick_killgfx() {
-    regs.x.ax = 0x03;
-    __dpmi_int(0x10, &regs);
+void quick_killgfx() {
 }
 
-quick_restoregfx() {
-    regs.x.ax = 0x013;
-    __dpmi_int(0x10, &regs);
+void quick_restoregfx() {
 }
 
-vgadump() {
+void vgadump() {
     if (waitvrt) {
         wait();
     }
@@ -111,7 +76,7 @@ vgadump() {
         : "esi", "edi", "cc", "eax", "ecx");
 }
 
-setpixel(int x, int y, char c) {
+void setpixel(int x, int y, char c) {
     asm ("movl %1, %%eax                 \n\t"
          "imul $352, %%eax               \n\t"
          "addl %0, %%eax                 \n\t"
@@ -124,7 +89,7 @@ setpixel(int x, int y, char c) {
          : "eax", "edi", "cc" );
 }
 
-vline(int x, int y, int y2, char c) {
+void vline(int x, int y, int y2, char c) {
     int i;
 
     for (i = 0; i < (y2 - y); i++) {
@@ -133,7 +98,7 @@ vline(int x, int y, int y2, char c) {
 
 }
 
-hline(int x, int y, int x2, char c) {
+void hline(int x, int y, int x2, char c) {
     asm ("movl %2, %%ecx                 \n\t"
          "subl %0, %%ecx                 \n\t"
          "movl %1, %%eax                 \n\t"
@@ -149,7 +114,7 @@ hline(int x, int y, int x2, char c) {
          : "eax", "edi", "ecx", "cc" );
 }
 
-box(int x, int y, int x2, int y2, char color) {
+void box(int x, int y, int x2, int y2, char color) {
     int i;
 
     if (x2 < x) {
@@ -169,7 +134,7 @@ box(int x, int y, int x2, int y2, char color) {
 }
 
 /*
-copytile(int x, int y, char *spr)
+void copytile(int x, int y, char *spr)
 { asm("movl $16, %%edx                  \n\t"
       "movl %2, %%esi                   \n\t"
       "movl %1, %%edi                   \n\t"
@@ -190,7 +155,7 @@ copytile(int x, int y, char *spr)
 }
 */
 
-copytile(int x, int y, char* spr) {
+void copytile(int x, int y, char* spr) {
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"
         "movl %1, %%edi                   \n\t"
@@ -223,7 +188,7 @@ copytile(int x, int y, char* spr) {
         : "eax", "ecx", "esi", "edi", "cc" );
 }
 
-copysprite(int x, int y, int width, int height, char* spr) {
+void copysprite(int x, int y, int width, int height, char* spr) {
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "csl0:                                  \n\t"
@@ -247,7 +212,7 @@ copysprite(int x, int y, int width, int height, char* spr) {
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
 }
 
-grabregion(int x, int y, int width, int height, char* spr) {
+void grabregion(int x, int y, int width, int height, char* spr) {
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%edi                   \n\t"
         "grl0:                                  \n\t"
@@ -271,7 +236,7 @@ grabregion(int x, int y, int width, int height, char* spr) {
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
 }
 
-tcopytile(int x, int y, char* spr, char* matte) {
+void tcopytile(int x, int y, char* spr, char* matte) {
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"
         "movl %1, %%edi                   \n\t"
@@ -306,7 +271,7 @@ tcopytile(int x, int y, char* spr, char* matte) {
         : "eax", "ecx", "edx", "esi", "edi", "cc" );
 }
 
-tcopysprite(int x, int y, int width, int height, char* spr) {
+void tcopysprite(int x, int y, int width, int height, unsigned char* spr) {
     asm("movl %3, %%ecx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "tcsl0:                                 \n\t"
@@ -337,7 +302,7 @@ tcopysprite(int x, int y, int width, int height, char* spr) {
         : "eax", "edx", "esi", "edi", "ecx", "cc" );
 }
 
-fin() {
+void fin() {
     int i;
 
     if (!fade) {
@@ -358,7 +323,7 @@ inloop:
     set_intensity(63);
 }
 
-fout() {
+void fout() {
     int i;
 
     if (!fade) {
@@ -412,7 +377,7 @@ unsigned char match(char r, char g, char b) {
     return tabpt;
 }
 
-BuildTable(char r, char g, char b, char* dest) {
+void BuildTable(char r, char g, char b, char* dest) {
     int i;
     unsigned char wr, wg, wb;
 
@@ -445,21 +410,21 @@ void ColorScale(unsigned char* dest, int st, int fn, int inv) {
     }
 }
 
-PreCalc_TransparencyFields() {
+void PreCalc_TransparencyFields() {
     FILE* f;
     int i;
 
     // First read the VERGE palette from verge.pal
 
     f = fopen("VERGE.PAL", "rb");
-    fread(&vergepal, 1, 768, f);
+    fread(vergepal, 1, 768, f);
     fclose(f);
-    transparencytbl = valloc(65536, "transparencytbl");
+    transparencytbl = (unsigned char*)valloc(65536, "transparencytbl");
 
     // Precompute some common translation tables.
 
-    ColorScale(&menuxlatbl, 141, 159, 1);
-    ColorScale(&greyxlatbl, 0, 31, 0);
+    ColorScale(menuxlatbl, 141, 159, 1);
+    ColorScale(greyxlatbl, 0, 31, 0);
 
     // Load in the 64k bitmap-on-bitmap transparency table (precomputed)
 
@@ -468,7 +433,7 @@ PreCalc_TransparencyFields() {
     fclose(f);
 }
 /*
-ColorField(int x1, int y1, int x2, int y2, unsigned char *colortbl)
+void ColorField(int x1, int y1, int x2, int y2, unsigned char *colortbl)
 { int x,y;
   unsigned char c;
 
@@ -489,7 +454,7 @@ ColorField(int x1, int y1, int x2, int y2, unsigned char *colortbl)
 }
 */
 
-ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
+void ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
     asm( "movl %3, %%edx                   \n\t"
          "subl %1, %%edx                   \n\t"   // get height
          "movl %4, %%esi                   \n\t"
@@ -517,7 +482,7 @@ ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
          : "eax", "ebx", "ecx", "edx", "esi", "edi", "cc" );
 }
 
-Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
+void Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
     unsigned int j, i, jz, iz;
     unsigned char c, d;
 
@@ -533,7 +498,7 @@ Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
         }
 }
 
-_Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
+void _Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
     unsigned int j, i, jz, iz;
     unsigned char c, d;
 
@@ -553,12 +518,12 @@ _Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
 
 char oc = 31;
 
-LoadFont() {
+void LoadFont() {
     FILE* f;
 
-    fnt = valloc(6000, "fnt");
-    fnt2 = valloc(14000, "fnt2");
-    tbox = valloc(30000, "tbox");
+    fnt = (unsigned char*)valloc(6000, "fnt");
+    fnt2 = (unsigned char*)valloc(14000, "fnt2");
+    tbox = (unsigned char*)valloc(30000, "tbox");
     if (!(f = fopen("SMALL.FNT", "rb"))) {
         err("FATAL ERROR: Could not open SMALL.FNT.");
     }
@@ -576,13 +541,11 @@ LoadFont() {
     fclose(f);
 }
 
-pchar(int x, int y, char c) {
-    char* img;
-
+void pchar(int x, int y, char c) {
     if ((c < 32) || (c > 126)) {
         return;
     }
-    img = fnt + ((c - 32) * 63);
+    unsigned char* img = fnt + ((c - 32) * 63);
     if ((c == 103) || (c == 106) || (c == 112) || (c == 113) || (c == 121)) {
         tcopysprite(x, y + 2, 7, 9, img);
     } else {
@@ -590,13 +553,11 @@ pchar(int x, int y, char c) {
     }
 }
 
-VCpchar(int x, int y, char c) {
-    char* img;
-
+void VCpchar(int x, int y, char c) {
     if ((c < 32) || (c > 126)) {
         return;
     }
-    img = fnt + ((c - 32) * 63);
+    unsigned char* img = fnt + ((c - 32) * 63);
     if ((c == 103) || (c == 106) || (c == 112) || (c == 113) || (c == 121)) {
         VCtcopysprite(x, y + 2, 7, 9, img);
     } else {
@@ -604,13 +565,11 @@ VCpchar(int x, int y, char c) {
     }
 }
 
-bigpchar(int x, int y, char c) {
-    char* img;
-
+void bigpchar(int x, int y, char c) {
     if ((c < 32) || (c > 126)) {
         return;
     }
-    img = fnt2 + ((c - 32) * 144);
+    unsigned char* img = fnt2 + ((c - 32) * 144);
     if ((c == 103) || (c == 106) || (c == 112) || (c == 113) || (c == 121)) {
         tcopysprite(x, y + 2, 9, 16, img);
     } else {
@@ -618,12 +577,12 @@ bigpchar(int x, int y, char c) {
     }
 }
 
-gotoxy(int x, int y) {
+void gotoxy(int x, int y) {
     x1 = x;
     y1 = y;
 }
 
-printstring(char* str) {
+void printstring(char* str) {
     int i;
     char c;
 
@@ -642,7 +601,7 @@ mainloop:
     }
 }
 
-VCprintstring(int xx, int yy, char* str) {
+void VCprintstring(int xx, int yy, char* str) {
     int i;
     char c;
 
@@ -661,7 +620,7 @@ mainloop:
     }
 }
 
-bigprintstring(char* str) {
+void bigprintstring(char* str) {
     int i;
     char c;
 
@@ -680,14 +639,14 @@ mainloop:
     }
 }
 
-putbox() {
-    ColorField(18, 151, 334, 213, &menuxlatbl);
+void putbox() {
+    ColorField(18, 151, 334, 213, menuxlatbl);
     tcopysprite(16, 149, 320, 66, tbox);
 
     //  border(18,149,333,213);
 }
 
-dec_to_asciiz(int num, char* buf) {
+void dec_to_asciiz(int num, char* buf) {
     asm ("movl $10, %%ebx              \n\t"
          "movl %0, %%eax               \n\t"
          "movl %1, %%edi               \n\t"
@@ -711,7 +670,7 @@ dec_to_asciiz(int num, char* buf) {
          : "eax", "ebx", "edi", "ecx", "cc" );
 }
 
-textwindow(char portrait, char* str1, char* str2, char* str3) {
+void textwindow(char portrait, char* str1, char* str2, char* str3) {
     tcopysprite(20, 114, 32, 32, speech + (portrait * 1024));
     putbox();
     gotoxy(25, 155);
@@ -722,11 +681,10 @@ textwindow(char portrait, char* str1, char* str2, char* str3) {
     bigprintstring(str3);
 }
 
-fontcolor(unsigned char c) {
+void fontcolor(unsigned char c) {
     int i;
-    char* ptr;
 
-    ptr = fnt;
+    unsigned char* ptr = fnt;
     for (i = 0; i < 5985; i++) {
         if (*ptr == oc) {
             *ptr = c;
