@@ -3,11 +3,18 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "control.h"
 #include "engine.h"
 #include "keyboard.h"
 #include "timer.h"
+#include "main.h"
+#include "menu.h"
+#include "menu2.h"
 #include "mikmod.h"
+#include "sound.h"
+#include "render.h"
 #include "vga.h"
 
 #define bgcolor 154
@@ -16,11 +23,11 @@
 #define white 31
 
 unsigned char menuptr[256], charptr[960], itmptr[576];
-extern char* strbuf, qabort, gsimg[512], storeinv[12], killvc;
+extern char qabort, storeinv[12], killvc;
 char menuactive = 1;
 char whoisptr = 0;
 
-border(int x, int y, int x2, int y2) {
+void border(int x, int y, int x2, int y2) {
     vline(x + 1, y + 1, y2 - 1, grey1);
     vline(x + 2, y + 2, y2 - 2, grey2);
     vline(x + 3, y + 2, y2 - 2, grey2);
@@ -40,18 +47,18 @@ border(int x, int y, int x2, int y2) {
     hline(x + 4, y2 - 3, x2 - 3, grey1);
 }
 
-menubox(int x, int y, int x2, int y2) {
+void menubox(int x, int y, int x2, int y2) {
     box(x, y, x2, y2, bgcolor);
     border(x, y, x2, y2);
 }
 
-tmenubox(int x, int y, int x2, int y2) {
-    ColorField(x, y, x2 + 1, y2 + 1, &menuxlatbl);
+void tmenubox(int x, int y, int x2, int y2) {
+    ColorField(x, y, x2 + 1, y2 + 1, menuxlatbl);
     //  box(x,y,x2,y2,bgcolor);
     border(x, y, x2, y2);
 }
 
-DrawPartyStats() {
+void DrawPartyStats() {
     int i, b;
     char c;
     // Draws a box on the right side of the screen that shows the current party
@@ -101,7 +108,7 @@ DrawPartyStats() {
     }
 }
 
-DrawMainMenu(int ptr) {
+void DrawMainMenu(int ptr) {
     tmenubox(20, 20, 120, 85);
     gotoxy(40, 27);
     printstring("Item");
@@ -113,7 +120,7 @@ DrawMainMenu(int ptr) {
     printstring("Status");
     gotoxy(40, 67);
     printstring("Order");
-    tcopysprite(20, 25 + (ptr * 10), 16, 16, &menuptr);
+    tcopysprite(20, 25 + (ptr * 10), 16, 16, menuptr);
 
     tmenubox(210, 185, 330, 205);
     gotoxy(308, 191);
@@ -140,7 +147,7 @@ drawloop:
         gotoxy(40, 117 + (j * 10));
         printstring(pstats[c].name);
     }
-    tcopysprite(20, 115 + (whoisptr * 10), 16, 16, &menuptr);
+    tcopysprite(20, 115 + (whoisptr * 10), 16, 16, menuptr);
     vgadump();
     readcontrols();
 
@@ -167,7 +174,7 @@ drawloop:
     while (b2 || b1) { first = 2; goto drawloop; }
 }
 
-ReOrder(int i) {
+void ReOrder(int i) {
     char cnt1 = 0, cnt2 = 0, mp = 0, t1 = 0, c, j;
     char flash = 0, first = 1;
 
@@ -182,9 +189,9 @@ drawloop:
         gotoxy(40, 117 + (j * 10));
         printstring(pstats[c].name);
     }
-    tcopysprite(20, 115 + (mp * 10), 16, 16, &menuptr);
+    tcopysprite(20, 115 + (mp * 10), 16, 16, menuptr);
     if (t1 && flash) {                         // flashing lastsel pointer
-        tcopysprite(20, 115 + (cnt1 * 10), 16, 16, &menuptr);
+        tcopysprite(20, 115 + (cnt1 * 10), 16, 16, menuptr);
         flash = 0;
     } else { flash++; }
     vgadump();
@@ -246,7 +253,7 @@ drawloop:
     while (b2 || b1) { first = 2; goto drawloop; }
 }
 
-StatusScreen(char cz) {
+void StatusScreen(char cz) {
     char c, first = 1;
     int i;
 
@@ -431,7 +438,7 @@ drawloop:
     while (b4 || b2 || b1) { first = 2; goto drawloop; }
 }
 
-MainMenu() {
+void MainMenu() {
     int first = 1;
     int ptr = 0;
     char c;
@@ -508,7 +515,7 @@ drawloop:
     an = 0;
 }
 
-Volume() {
+void Volume() {
     int first = 1;
 
     // return;
@@ -535,7 +542,7 @@ drawloop:
     if (b2) { first = 2; goto drawloop; }
 }
 
-SystemMenu() {
+void SystemMenu() {
     int first = 1, ptr = 0;
 
     an = 1;
@@ -556,7 +563,7 @@ drawloop:
     printstring("Music volume");
     gotoxy(40, 67);
     printstring("Exit");
-    tcopysprite(20, 25 + (ptr * 10), 16, 16, &menuptr);
+    tcopysprite(20, 25 + (ptr * 10), 16, 16, menuptr);
     vgadump();
 
     readcontrols();
@@ -617,16 +624,16 @@ drawloop:
 
 char bcs = 0;
 
-PutBuySellBox(char p) {
+void PutBuySellBox(char p) {
     tmenubox(20, 20, 116, 48);
     gotoxy(40, 26);
     printstring("Buy");
     gotoxy(40, 36);
     printstring("Sell");
-    tcopysprite(22, 24 + (p * 10), 16, 16, &menuptr);
+    tcopysprite(22, 24 + (p * 10), 16, 16, menuptr);
 }
 
-PutGPBox() {
+void PutGPBox() {
     tmenubox(20, 50, 116, 68);
     gotoxy(96, 56);
     printstring("GP");
@@ -635,7 +642,7 @@ PutGPBox() {
     printstring(strbuf);
 }
 
-PutCharBox(char a, char b, char c, char d, char e, char p) {
+void PutCharBox(char a, char b, char c, char d, char e, char p) {
     char baseaddr;
 
     switch (numchars) {
@@ -658,59 +665,60 @@ PutCharBox(char a, char b, char c, char d, char e, char p) {
 
     tmenubox(20, 70, 116, 115);
     if (!a) {
-        greyscale(16, 32, chrs, &gsimg);
-        tcopysprite(baseaddr, 77, 16, 32, &gsimg);
+        greyscale(16, 32, chrs, gsimg);
+        tcopysprite(baseaddr, 77, 16, 32, gsimg);
     } else { tcopysprite(baseaddr, 77, 16, 32, chrs); }
     if (numchars > 1) {
         if (!b) {
-            greyscale(16, 32, chrs + 15360, &gsimg);
-            tcopysprite(baseaddr + 16, 77, 16, 32, &gsimg);
+            greyscale(16, 32, chrs + 15360, gsimg);
+            tcopysprite(baseaddr + 16, 77, 16, 32, gsimg);
         } else { tcopysprite(baseaddr + 16, 77, 16, 32, chrs + 15360); }
     }
     if (numchars > 2) {
         if (!c) {
-            greyscale(16, 32, chrs + 30720, &gsimg);
-            tcopysprite(baseaddr + 32, 77, 16, 32, &gsimg);
+            greyscale(16, 32, chrs + 30720, gsimg);
+            tcopysprite(baseaddr + 32, 77, 16, 32, gsimg);
         } else { tcopysprite(baseaddr + 32, 77, 16, 32, chrs + 30720); }
     }
     if (numchars > 3) {
         if (!d) {
-            greyscale(16, 32, chrs + 46080, &gsimg);
-            tcopysprite(baseaddr + 48, 77, 16, 32, &gsimg);
+            greyscale(16, 32, chrs + 46080, gsimg);
+            tcopysprite(baseaddr + 48, 77, 16, 32, gsimg);
         } else { tcopysprite(baseaddr + 48, 77, 16, 32, chrs + 46080); }
     }
     if (numchars > 4) {
         if (!e) {
-            greyscale(16, 32, chrs + 61440, &gsimg);
-            tcopysprite(baseaddr + 64, 77, 16, 32, &gsimg);
+            greyscale(16, 32, chrs + 61440, gsimg);
+            tcopysprite(baseaddr + 64, 77, 16, 32, gsimg);
         } else { tcopysprite(baseaddr + 64, 77, 16, 32, chrs + 61440); }
     }
     if (p) {
         p--;
-        tcopysprite(baseaddr + (p * 16) - 5, 73, 24, 40, &charptr);
+        tcopysprite(baseaddr + (p * 16) - 5, 73, 24, 40, charptr);
     }
 }
 
-PutMessageBox(char* str) {
+void PutMessageBox(char* str) {
     tmenubox(118, 20, 330, 38);
     gotoxy(224 - (strlen(str) * 4), 26);
     printstring(str);
 }
 
-PutItemName(char* str) {
+void PutItemName(char* str) {
     tmenubox(118, 40, 330, 58);
     gotoxy(224 - (strlen(str) * 4), 46);
     printstring(str);
 }
 
-PutItemDesc(char* str) {
+void PutItemDesc(char* str) {
     tmenubox(118, 60, 330, 78);
     gotoxy(224 - (strlen(str) * 4), 66);
     printstring(str);
 }
 
-PutEquipBox(char c) {
-    char* img, j, a;
+void PutEquipBox(char c) {
+    char j, a;
+    unsigned char* img;
 
     tmenubox(118, 80, 330, 115);
     for (j = 0; j < 6; j++) {
@@ -720,8 +728,9 @@ PutEquipBox(char c) {
     }
 }
 
-PutItemBox(char l) {
-    char k, j, a, *img;
+void PutItemBox(char l) {
+    char k, j, a;
+    unsigned char* img;
 
     tmenubox(118, 117, 330, 210);
     for (k = 0; k < 3; k++)
@@ -732,7 +741,7 @@ PutItemBox(char l) {
         }
 }
 
-SellMenu() {
+void SellMenu() {
     int first = 1, p = 0;
     char carray[5];
 
@@ -776,13 +785,15 @@ drawloop:
         first = 1;
     }
 
-    if (b1) { SellCharItem(p); }
+    if (b1) {
+        SellCharItem(p);
+    }
 
     while (!b3 && !b2) { goto drawloop; }
     while (b3 || b2) { first = 2; goto drawloop; }
 }
 
-SellCharItem(char c) {
+void SellCharItem(char c) {
     int first = 1, ptr = 0;
     char carray[5], mx = 0, my = 0, a, l;
 
@@ -808,8 +819,8 @@ drawloop:
     PutEquipBox(partyidx[c] - 1);
     PutItemBox(partyidx[c] - 1);
     a = ptr / 6;
-    if (ptr < 6) { tcopysprite(132 + (ptr * 32), 86, 24, 24, &itmptr); }
-    else { tcopysprite(132 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, &itmptr); }
+    if (ptr < 6) { tcopysprite(132 + (ptr * 32), 86, 24, 24, itmptr); }
+    else { tcopysprite(132 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, itmptr); }
 
     vgadump();
 
@@ -855,7 +866,7 @@ drawloop:
     while (b3 || b2) { first = 2; goto drawloop; }
 }
 
-ConfirmSell(char c, char ptr) {
+void ConfirmSell(char c, char ptr) {
     int first = 1, p = 0;
     char carray[5], a, l;
 
@@ -871,7 +882,7 @@ drawloop:
     printstring("Sell");
     gotoxy(40, 36);
     printstring("Cancel");
-    tcopysprite(22, 24 + (p * 10), 16, 16, &menuptr);
+    tcopysprite(22, 24 + (p * 10), 16, 16, menuptr);
 
     PutGPBox();
     PutCharBox(carray[0], carray[1], carray[2], carray[3], carray[4], c + 1);
@@ -882,8 +893,8 @@ drawloop:
     PutEquipBox(partyidx[c] - 1);
     PutItemBox(partyidx[c] - 1);
     a = ptr / 6;
-    if (ptr < 6) { tcopysprite(132 + (ptr * 32), 86, 24, 24, &itmptr); }
-    else { tcopysprite(132 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, &itmptr); }
+    if (ptr < 6) { tcopysprite(132 + (ptr * 32), 86, 24, 24, itmptr); }
+    else { tcopysprite(132 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, itmptr); }
     vgadump();
 
     readcontrols();
@@ -914,8 +925,9 @@ drawloop:
     while (b3 || b2) { first = 2; goto drawloop; }
 }
 
-PutStoreInv() {
-    char k, j, *img;
+void PutStoreInv() {
+    char k, j;
+    unsigned char* img;
 
     tmenubox(118, 80, 330, 140);
     for (k = 0; k < 2; k++)
@@ -925,7 +937,7 @@ PutStoreInv() {
         }
 }
 
-PutBuyCharBox(char ptr, char p) {
+void PutBuyCharBox(char ptr, char p) {
     char carray[5], a;
 
     memset(&carray, 0, 5);
@@ -944,7 +956,7 @@ PutBuyCharBox(char ptr, char p) {
                equip[items[a].equipidx].equipable[partyidx[4] - 1], p);
 }
 
-BuyMenu(char p) {
+void BuyMenu(char p) {
     int first = 1, ptr = 0;
     char mx = 0, my = 0, a;
 
@@ -966,7 +978,7 @@ drawloop:
     PutItemDesc(items[storeinv[ptr]].desc);
     PutStoreInv();
     a = ptr / 6;
-    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, &itmptr);
+    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, itmptr);
     vgadump();
 
     readcontrols();
@@ -1016,7 +1028,7 @@ drawloop:
 
 int atkp, defp, magp, mgrp, hitp, dodp, mblp, ferp, reap;
 
-CalcBuyEquipPreview(int a, int i) {
+void CalcBuyEquipPreview(int a, int i) {
     int c, d;
 
     d = items[i].equipflag - 1;
@@ -1039,7 +1051,7 @@ CalcBuyEquipPreview(int a, int i) {
     UpdateEquipStats();
 }
 
-PutEquipPreview(char c, char ptr) {
+void PutEquipPreview(char c, char ptr) {
     char l;
 
     l = partyidx[c] - 1;
@@ -1158,7 +1170,7 @@ PutEquipPreview(char c, char ptr) {
     }
 }
 
-BuyItem(char ptr) {
+void BuyItem(char ptr) {
     int first = 1, a, l;
 
     playeffect(1);
@@ -1173,7 +1185,7 @@ drawloop:
     PutStoreInv();
     PutEquipPreview(bcs, ptr);
     a = ptr / 6;
-    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, &itmptr);
+    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, itmptr);
     vgadump();
     l = partyidx[bcs] - 1;
 
@@ -1200,10 +1212,15 @@ drawloop:
 
     if (b1) {
         if (pstats[l].invcnt < 24) {
-            if (!items[storeinv[ptr]].equipflag ||
-                    !equip[items[storeinv[ptr]].equipidx].equipable[l])
-            { PurchaseItem(l, storeinv[ptr]); first = 2; }
-            else { BuyOrBuyEquip(bcs, ptr); first = 2; }
+            if (!items[storeinv[ptr]].equipflag
+                || !equip[items[storeinv[ptr]].equipidx].equipable[l]
+            ) {
+                PurchaseItem(l, storeinv[ptr]);
+                first = 2;
+            } else {
+                BuyOrBuyEquip(bcs, ptr);
+                first = 2;
+            }
         } else {
             playeffect(3);
             first = 1;
@@ -1214,14 +1231,14 @@ drawloop:
     while (b3 || b2) { first = 2; goto drawloop; }
 }
 
-PurchaseItem(char c, char i) {
+void PurchaseItem(char c, char i) {
     playeffect(4);
     gp -= items[i].price;
     pstats[c].inv[pstats[c].invcnt] = i;
     pstats[c].invcnt++;
 }
 
-BuyOrBuyEquip(char c, char ptr) {
+void BuyOrBuyEquip(char c, char ptr) {
     int first = 1, p = 0;
     char a, l;
 
@@ -1235,7 +1252,7 @@ drawloop:
     printstring("Yes");
     gotoxy(40, 36);
     printstring("No");
-    tcopysprite(22, 24 + (p * 10), 16, 16, &menuptr);
+    tcopysprite(22, 24 + (p * 10), 16, 16, menuptr);
 
     PutGPBox();
     PutMessageBox("Equip item now?");
@@ -1245,7 +1262,7 @@ drawloop:
     PutStoreInv();
     PutEquipPreview(c, ptr);
     a = ptr / 6;
-    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, &itmptr);
+    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, itmptr);
     vgadump();
 
     readcontrols();
@@ -1280,9 +1297,9 @@ drawloop:
 }
 
 // NEW: MAGIC SHOP ROUTINES
-MPutEquipBox(char c) {
-    char* img, j, a;
-
+void MPutEquipBox(char c) {
+    char j, a;
+    unsigned char* img;
 
     for (j = 0; j < 6; j++) {
         a = pstats[c].maginv[j];
@@ -1291,19 +1308,19 @@ MPutEquipBox(char c) {
     }
 }
 
-PutMagicBox(char l) {
-    char k, j, a, *img;
+void PutMagicBox(char l) {
+    char k, j, a;
 
     tmenubox(118, 93, 330, 210);
     for (k = 0; k < 3; k++)
         for (j = 0; j < 6; j++) {
             a = pstats[l].maginv[((k) * 6) + j];
-            img = magicicons + (magic[a].icon * 256);
+            unsigned char* img = magicicons + (magic[a].icon * 256);
             tcopysprite(136 + (j * 32), 102 + (k * 24), 16, 16, img);
         }
 }
 
-MSellMenu() {
+void MSellMenu() {
     int first = 1, p = 0;
     char carray[5];
 
@@ -1347,13 +1364,15 @@ drawloop:
         first = 1;
     }
 
-    if (b1) { SellCharMagic(p); }
+    if (b1) {
+        SellCharMagic(p);
+    }
 
     while (!b3 && !b2) { goto drawloop; }
     while (b3 || b2) { first = 2; goto drawloop; }
 }
 
-SellCharMagic(char c) {
+void SellCharMagic(char c) {
     int first = 1, ptr = 0;
     char carray[5], mx = 0, my = 0, a, l;
 
@@ -1381,8 +1400,8 @@ drawloop:
 
     PutMagicBox(partyidx[c] - 1);
     a = ptr / 6;
-    if (ptr < 6) { tcopysprite(132 + (ptr * 32), 98, 24, 24, &itmptr); }
-    else { tcopysprite(132 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, &itmptr); }
+    if (ptr < 6) { tcopysprite(132 + (ptr * 32), 98, 24, 24, itmptr); }
+    else { tcopysprite(132 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, itmptr); }
 
     vgadump();
 
@@ -1428,7 +1447,7 @@ drawloop:
     while (b3 || b2) { first = 2; goto drawloop; }
 }
 
-RemoveMagic(char c, char i) {
+void RemoveMagic(char c, char i) {
     char j;
 
     for (j = i; j < pstats[c].magcnt; j++)
@@ -1436,7 +1455,7 @@ RemoveMagic(char c, char i) {
     pstats[c].magcnt--;
 }
 
-MConfirmSell(char c, char ptr) {
+void MConfirmSell(char c, char ptr) {
     int first = 1, p = 0;
     char carray[5], a, l;
 
@@ -1452,7 +1471,7 @@ drawloop:
     printstring("Sell");
     gotoxy(40, 36);
     printstring("Cancel");
-    tcopysprite(22, 24 + (p * 10), 16, 16, &menuptr);
+    tcopysprite(22, 24 + (p * 10), 16, 16, menuptr);
 
     PutGPBox();
     PutCharBox(carray[0], carray[1], carray[2], carray[3], carray[4], c + 1);
@@ -1463,8 +1482,8 @@ drawloop:
     //  PutEquipBox(partyidx[c]-1);
     PutMagicBox(partyidx[c] - 1);
     a = ptr / 6;
-    if (ptr < 6) { tcopysprite(132 + (ptr * 32), 98, 24, 24, &itmptr); }
-    else { tcopysprite(132 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, &itmptr); }
+    if (ptr < 6) { tcopysprite(132 + (ptr * 32), 98, 24, 24, itmptr); }
+    else { tcopysprite(132 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, itmptr); }
     vgadump();
 
     readcontrols();
@@ -1493,18 +1512,18 @@ drawloop:
     while (b3 || b2) { first = 2; goto drawloop; }
 }
 
-MPutStoreInv() {
-    char k, j, *img;
+void MPutStoreInv() {
+    char k, j;
 
     tmenubox(118, 80, 330, 140);
     for (k = 0; k < 2; k++)
         for (j = 0; j < 6; j++) {
-            img = magicicons + (magic[storeinv[(k * 6) + j]].icon * 256);
+            unsigned char* img = magicicons + (magic[storeinv[(k * 6) + j]].icon * 256);
             tcopysprite(136 + (j * 32), 90 + (k * 24), 16, 16, img);
         }
 }
 
-MPutBuyCharBox(char ptr, char p) {
+void MPutBuyCharBox(char ptr, char p) {
     char carray[5], a;
 
     memset(&carray, 0, 5);
@@ -1544,7 +1563,7 @@ drawloop:
     PutItemDesc(magic[storeinv[ptr]].desc);
     MPutStoreInv();
     a = ptr / 6;
-    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, &itmptr);
+    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, itmptr);
     vgadump();
 
     readcontrols();
@@ -1581,8 +1600,11 @@ drawloop:
 
     if (b1)    {
         if (storeinv[ptr]) {
-            if (gp < magic[storeinv[ptr]].cost) { playeffect(3); }
-            else { BuyMagic(ptr); }
+            if (gp < magic[storeinv[ptr]].cost) {
+                playeffect(3);
+            } else {
+                BuyMagic(ptr);
+            }
         }
         first = 1;
     }
@@ -1593,7 +1615,7 @@ drawloop:
 
 
 
-BuyMagic(char ptr) {
+void BuyMagic(char ptr) {
     int first = 1, a, l;
 
     int i, alreadyhave;
@@ -1610,7 +1632,7 @@ drawloop:
     MPutBuyCharBox(ptr, bcs + 1);
     MPutStoreInv();
     a = ptr / 6;
-    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, &itmptr);
+    tcopysprite(132 + ((ptr - (a * 6)) * 32), 86 + (a * 24), 24, 24, itmptr);
     vgadump();
     l = partyidx[bcs] - 1;
 
@@ -1658,7 +1680,7 @@ drawloop:
     while (b3 || b2) { first = 2; goto drawloop; }
 }
 
-PurchaseMagic(char c, char i) {
+void PurchaseMagic(char c, char i) {
     playeffect(4);
     gp -= magic[i].cost;
     pstats[c].maginv[pstats[c].magcnt] = i;

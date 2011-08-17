@@ -6,6 +6,7 @@ void quick_restoregfx();
 void vgadump();
 void setpixel(int x, int y, char c);
 void hline(int x, int y, int dist, char c);
+void vline(int x, int y, int y2, char c);
 void box(int x, int y, int x2, int y2, char color);
 void set_palette(unsigned char* pall);
 void set_intensity(unsigned int n);
