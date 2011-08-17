@@ -78,7 +78,6 @@
 #include "timer.h"
 #include "vga.h"
 #include "mikmod.h"
-#include "ricvc.c"
 
 extern char* strbuf, killvc, *code, *menuptr, *mapvc, menuactive, drawparty, layer1trans, layervctrans, layervc2trans;
 extern char cameratracking, *vcdatabuf, movesuccess, *msbuf, drawentities;
@@ -89,11 +88,7 @@ extern unsigned char mp_volume;
 char fade = 1, cancelfade = 0, stringbuffer[100], keepaz = 0;
 unsigned char storeinv[12];
 
-#include "nichgvc.c"
-#include "xbigdvc.c"
-#include "andyvc.c"
-
-MapSwitch() {
+void MapSwitch() {
     char b;
 
     hookretrace = 0;

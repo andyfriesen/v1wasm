@@ -60,10 +60,18 @@ unsigned int ResolveOperand();
 unsigned char GrabC();
 void GrabString(char* str);
 
+int ProcessOperand();
+void WriteVar0(int var, int value);
+void WriteVar1(int var, int arg1, int value);
+void WriteVar2(int var, int arg1, int arg2, int value);
+int ReadVar0(int var);
+int ReadVar1(int var, int arg1);
+int ReadVar2(int var, int arg1, int arg2);
+
 extern char* code;
 extern char* basevc;
 extern char* effectvc;
 extern char* startupvc;
 extern char* vcdatabuf;
-extern int tvar[26];
+extern unsigned int tvar[26];
 extern unsigned int varl[10];

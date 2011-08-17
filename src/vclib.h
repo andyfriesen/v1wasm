@@ -9,3 +9,5 @@ void VCClear();
 void VCClearRegion();
 
 void VChline(int x, int y, int x2, char c);
+
+void ExecLibFunc(unsigned char func);

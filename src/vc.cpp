@@ -6,6 +6,7 @@
 #include "engine.h"
 #include "keyboard.h"
 #include "vc.h"
+#include "vclib.h"
 
 extern char* strbuf;
 extern int vcbufm;
@@ -28,16 +29,16 @@ unsigned int varl[10];                 // Chain/call pass variables
 unsigned int tvar[26];                 // Temporary/Throwaway variables
 char killvc = 0;                       // abort VC loop;
 
-InitVCMem() {
+void InitVCMem() {
     // -- aen; 31/May/98 -- otf mem allocation
     //mapvc=valloc(mapvcm,"mapvc");
 
-    effectvc = valloc(25000, "effectvc");
-    startupvc = valloc(25000, "startupvc");
-    vcdatabuf = valloc(vcbufm, "vcdatabuf");
+    effectvc = (char*)valloc(25000, "effectvc");
+    startupvc = (char*)valloc(25000, "startupvc");
+    vcdatabuf = (char*)valloc(vcbufm, "vcdatabuf");
 }
 
-LoadVC(FILE* f) {
+void LoadVC(FILE* f) {
     int b, e, mapvcs;
 
     fread(&numscripts, 1, 4, f);
@@ -50,7 +51,7 @@ LoadVC(FILE* f) {
     fseek(f, b, SEEK_SET);  // reset file pos
     mapvcs = e - b + 1;     // calc total map vc code size (in bytes)
     vfree(mapvc);           // free mapvc mem (if necessary)
-    mapvc = valloc(mapvcs, "LoadVC:mapvc"); // allocate necessary mapvc mem
+    mapvc = (char*)valloc(mapvcs, "LoadVC:mapvc"); // allocate necessary mapvc mem
     fread(mapvc, mapvcs, 1, f); // read in the map vc code from disk
 }
 
@@ -67,7 +68,7 @@ unsigned short int GrabW() {
     unsigned short int c;
     unsigned short int* ptr;
 
-    ptr = code;
+    ptr = (unsigned short*)code;
     c = *ptr;
     code += 2;
 
@@ -78,14 +79,14 @@ unsigned int GrabD() {
     unsigned int c;
     unsigned int* ptr;
 
-    ptr = code;
+    ptr = (unsigned int*)code;
     c = *ptr;
     code += 4;
 
     return c;
 }
 
-GrabString(char* str) {
+void GrabString(char* str) {
     int i;
 
     i = 0;
@@ -99,7 +100,7 @@ GrabString(char* str) {
 
 }
 
-ProcessVar0Assign() {
+void ProcessVar0Assign() {
     int t, w;
     unsigned char b;
 
@@ -132,7 +133,7 @@ ProcessVar0Assign() {
     }
 }
 
-ProcessVar1Assign() {
+void ProcessVar1Assign() {
     int t, a, w;
     unsigned char b;
 
@@ -166,7 +167,7 @@ ProcessVar1Assign() {
     }
 }
 
-ProcessVar2Assign() {
+void ProcessVar2Assign() {
     int t, a, c, w;
     unsigned char b;
 
@@ -256,7 +257,7 @@ int ProcessOperand() {
     }
 }
 
-ProcessIf() {
+void ProcessIf() {
     unsigned int elseofs;
     unsigned char numargs, i;
     signed short int arg1, arg2;
@@ -344,10 +345,10 @@ ProcessIf() {
     }
 }
 
-ProcessFor0() {
+void ProcessFor0() {
     unsigned int vidx = 0, min, max, incv, curval, t;
     unsigned char incs, c;
-    unsigned int bptr;
+    char* bptr;
 
     vidx = GrabC();
 
@@ -389,10 +390,11 @@ execloop:
     }
 }
 
-ProcessFor1() {
+void ProcessFor1() {
     unsigned int vidx = 0, min, max, incv, curval, t;
     unsigned char incs, c;
-    unsigned int bptr, varg;
+    unsigned int varg;
+    char* bptr;
 
     vidx = GrabC();
     varg = ResolveOperand();
@@ -435,9 +437,10 @@ execloop:
     }
 }
 
-ProcessSwitch() {
+void ProcessSwitch() {
     int realvalue, compvalue;
-    unsigned char c, *next;
+    unsigned char c;
+    unsigned int next;
 
     realvalue = ResolveOperand();
     c = GrabC();
@@ -445,7 +448,7 @@ ProcessSwitch() {
         compvalue = ResolveOperand();
         next = GrabD();
         if (compvalue != realvalue) {
-            (int) code = (int) basevc + (int) next;
+            code = basevc + (int) next;
             c = GrabC();
             continue;
         }
@@ -454,7 +457,7 @@ ProcessSwitch() {
     }
 }
 
-ExecuteScript(unsigned short int s) {
+void ExecuteScript(unsigned short int s) {
     unsigned char c;
 
     basevc = mapvc;
@@ -463,7 +466,7 @@ ExecuteScript(unsigned short int s) {
     ExecuteBlock();
 }
 
-ExecuteHookedScript(unsigned short int s) {
+void ExecuteHookedScript(unsigned short int s) {
     char* codeb, abortvcb, *basevcb;
 
     codeb = code;
@@ -477,7 +480,7 @@ ExecuteHookedScript(unsigned short int s) {
 
 // NEW: MAGIC
 
-ExecuteMagicEffect(unsigned short int s) {
+void ExecuteMagicEffect(unsigned short int s) {
     unsigned char c;
 
     basevc = magicvc;
@@ -489,7 +492,7 @@ ExecuteMagicEffect(unsigned short int s) {
 
 // END NEW
 
-ExecuteEffect(unsigned short int s) {
+void ExecuteEffect(unsigned short int s) {
     unsigned char c;
 
     basevc = effectvc;
@@ -498,7 +501,7 @@ ExecuteEffect(unsigned short int s) {
     ExecuteBlock();
 }
 
-ExecuteBlock() {
+void ExecuteBlock() {
     unsigned char c;
 
     while (1) {
@@ -549,7 +552,7 @@ ExecuteBlock() {
     }
 }
 
-StartupScript() {
+void StartupScript() {
     basevc = startupvc;
     code = startupvc;
     ExecuteBlock();
