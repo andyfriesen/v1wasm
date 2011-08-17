@@ -424,13 +424,13 @@ void DrawItemMenu(char c, char ptr) {
         }
     a = ptr / 6;
     if (ptr < 6) {
-        tcopysprite(133 + (ptr * 32), 87, 24, 24, &itmptr);
+        tcopysprite(133 + (ptr * 32), 87, 24, 24, itmptr);
     } else {
-        tcopysprite(133 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, &itmptr);
+        tcopysprite(133 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, itmptr);
     }
 }
 
-ItemGive(char c, char p) {
+void ItemGive(char c, char p) {
     int first = 1, ptr = 0, i, j;
     unsigned char l, t1;
 
@@ -447,7 +447,7 @@ drawloop:
         printstring(pstats[l].name);
     }
 
-    tcopysprite(27, 131 + (ptr * 10), 16, 16, &menuptr);
+    tcopysprite(27, 131 + (ptr * 10), 16, 16, menuptr);
     vgadump();
 
     readcontrols();
@@ -507,7 +507,7 @@ drawloop:
     }
 }
 
-ItemUse(char c, char p) {
+void ItemUse(char c, char p) {
     int first = 1, ptr = 0, i, j;
     unsigned char l, t1, a;
 
