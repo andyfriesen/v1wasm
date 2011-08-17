@@ -54,3 +54,9 @@ void ExecuteHookedScript(unsigned short s);
 void ExecuteEffect(unsigned short int s);
 void ExecuteMagicEffect(unsigned short int s);
 void StartupScript();
+
+unsigned int ResolveOperand();
+unsigned char GrabC();
+void GrabString(char* str);
+
+extern char* code;

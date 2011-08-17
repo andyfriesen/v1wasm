@@ -1,3 +1,19 @@
+
+#include <cassert>
+#include <stdlib.h>
+#include <string.h>
+#include "engine.h"
+#include "main.h"
+#include "menu.h"
+#include "vga.h"
+#include "control.h"
+#include "render.h"
+#include "ricvc.h"
+#include "sound.h"
+#include "timer.h"
+#include "vc.h"
+#include "vclib.h"
+
 /* THE FOLLOWING CODE IS MOTHBALLED
 PlayFli()
 {
@@ -64,7 +80,7 @@ int sgn (long a) {
     }
 }
 
-Line2d(int a, int b, int c, int d, int col) {
+void Line2d(int a, int b, int c, int d, int col) {
 
     long u, s, v, d1x, d1y, d2x, d2y, m, n;
     int  i;
@@ -102,7 +118,7 @@ Line2d(int a, int b, int c, int d, int col) {
 
 }
 
-VCLine() {
+void VCLine() {
     int x1, y1, x2, y2, color, slope;
 
     x1 = ResolveOperand();
@@ -115,7 +131,7 @@ VCLine() {
 
 }
 
-Line3d (int x1, int y1, int z1, int x2, int y2, int z2, int color) {
+void Line3d (int x1, int y1, int z1, int x2, int y2, int z2, int color) {
     int x1new, y1new, x2new, y2new;
 
     if (x1 > 2000) {
@@ -159,7 +175,7 @@ Line3d (int x1, int y1, int z1, int x2, int y2, int z2, int color) {
     Line2d (x1new, y1new, x2new, y2new, color);
 }
 
-VCLine3d() {
+void VCLine3d() {
     int x1, y1, z1, x2, y2, z2, color;
 
     x1 = ResolveOperand();
@@ -183,19 +199,19 @@ VCLine3d() {
     Line3d (x1, y1, z1, x2, y2, z2, color);
 }
 
-Exc() {
+void Exc() {
     char* str1, *str2, *str3;
 
     str1 = code;
     GrabString(strbuf);
     str2 = code;
     GrabString(strbuf);
-    execl (str1, str1, str2);
+    assert(!"execl doesn't work in NaCl");//execl (str1, str1, str2);
 }
 
 // NEW (MAGIC)
 
-GetMagic() {
+void GetMagic() {
     short int c, d;
     int i, j;
     int alreadyhave = 0;
@@ -224,7 +240,7 @@ GetMagic() {
 
 }
 
-VCSpellName() { /* -- adapted from ric: ??/???/?? -- */
+void VCSpellName() { /* -- adapted from ric: ??/???/?? -- */
     int x1, y1, i, align;
 
     x1 = ResolveOperand();
@@ -234,7 +250,7 @@ VCSpellName() { /* -- adapted from ric: ??/???/?? -- */
     VCAString(x1, y1, magic[i].name, align);
 }
 
-VCSpellDesc() { /* -- adapted from ric: ??/???/?? --  */
+void VCSpellDesc() { /* -- adapted from ric: ??/???/?? --  */
     int x1, y1, i, align;
 
     x1 = ResolveOperand();
@@ -244,10 +260,10 @@ VCSpellDesc() { /* -- adapted from ric: ??/???/?? --  */
     VCAString(x1, y1, magic[i].desc, align);
 }
 
-VCSpellImage() { /* -- adapted from ric: ??/???/?? -- */
+void VCSpellImage() { /* -- adapted from ric: ??/???/?? -- */
     int x1, y1, i, gf;
     unsigned char gsimg[512];
-    char* img;
+    unsigned char* img;
 
     x1 = ResolveOperand();
     y1 = ResolveOperand();
@@ -255,14 +271,14 @@ VCSpellImage() { /* -- adapted from ric: ??/???/?? -- */
     gf = ResolveOperand();
     img = magicicons + (magic[i].icon << 8);
     if (gf) {
-        grey(16, 16, img, &gsimg);
-        img = &gsimg;
+        grey(16, 16, img, gsimg);
+        img = gsimg;
     }
 
     VCtcopysprite(x1, y1, 16, 16, img);
 }
 
-MagicShop() {
+void MagicShop() {
     int first = 1, nv, p;
 
     // Egad.

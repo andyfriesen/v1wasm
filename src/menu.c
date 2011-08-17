@@ -1297,7 +1297,7 @@ MPutBuyCharBox(char ptr, char p)
              mequip[magic[a].equipidx].equipable[partyidx[4]-1],p);
 }
 
-MBuyMenu(char p)
+void MBuyMenu()
 { int first=1,ptr=0;
   char mx=0,my=0,a;                                   
   playeffect(1);
