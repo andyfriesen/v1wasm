@@ -51,3 +51,4 @@
 #define OP_END 255
 
 void ExecuteHookedScript(unsigned short s);
+void StartupScript();

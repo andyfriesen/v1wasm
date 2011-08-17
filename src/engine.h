@@ -137,3 +137,8 @@ void *valloc(int amount, char * whatfor);
 void vfree(void *thismem);
 void ProcessControls();
 void ExecuteScript(int);
+void UpdateEquipStats();
+
+void addcharacter(int i);
+
+void startmap(char* fname);

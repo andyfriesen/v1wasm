@@ -5,3 +5,4 @@ extern int foregroundlock,xwin1,ywin1;
 
 void animate(int);
 void drawmap();
+void InitRenderSystem();

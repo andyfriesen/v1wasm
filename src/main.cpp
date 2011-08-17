@@ -2,16 +2,25 @@
 // Execution engine / player code.
 // Copyright (C)1997 BJ Eirich
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "control.h"
 #include "engine.h"
 #include "keyboard.h"
+#include "menu.h"
+#include "menu2.h"
 #include "render.h"
 #include "timer.h"
+#include "sound.h"
+#include "mikmod.h"
 #include "vga.h"
+#include "vc.h"
+#include "vclib.h"
+#include "render.h"
 
-unsigned char *strbuf,*speech;
+char* strbuf;
+unsigned char *speech;
 extern unsigned char menuptr[256],qabort,itmptr[576],charptr[960];
 extern char *effectvc,menuactive,*startupvc;
 extern char fade;
@@ -34,8 +43,7 @@ int Exist(char *fname)
   else return 0;
 }
 
-err(char *ermsg)
-{
+void err(const char *ermsg) {
   keyboard_close();
   stopsound();
   MD_Exit();
@@ -45,9 +53,8 @@ err(char *ermsg)
   exit(-1);
 }
 
-MiscSetup()
-{
-  strbuf=valloc(100,"strbuf");
+void MiscSetup() {
+    strbuf = (char*)valloc(100,"strbuf");
   keyboard_init();
   keyboard_chain(0);
   sound_init();
@@ -56,13 +63,13 @@ MiscSetup()
                     /* Removed as already called in sound_init() */
   LoadFont();
   InitRenderSystem();
-  srand(time(NULL));
+  srand(time());
   if (Exist("STARTUP.SCR"))
     printf("Warning: startup.scr found, this file is no longer used \n");
 }
 
-PutOwnerText()
-{ int i;
+void PutOwnerText() {
+  int i;
 
   printf("VERGE - System version 18.May.99\n");
   printf("Copyright (C)1997 vecna\n");
@@ -81,18 +88,18 @@ PutOwnerText()
         delay(10); }
 }
 
-InitPStats()
-{ FILE *pdat,*cdat;
+void InitPStats() {
+  FILE *pdat,*cdat;
   char i;
   pdat=fopen("PARTY.DAT","r");
   if (!pdat) err("Fatal error: PARTY.DAT not found");
   fscanf(pdat,"%s",strbuf);
-  tchars=atoi(strbuf);
+  tchars = atoi((char*)strbuf);
   for (i=0; i<tchars; i++)
       { fscanf(pdat,"%s",&pstats[i].chrfile);
         fscanf(pdat,"%s",strbuf);
         fscanf(pdat,"%s",strbuf);
-        cdat=fopen(strbuf,"r");
+        cdat = fopen(strbuf,"r");
         if (!cdat) err("Could not open character DAT file.");
         fscanf(cdat,"%s",&pstats[i].name);
         fgets(strbuf,99,cdat);
@@ -134,8 +141,8 @@ InitPStats()
   fclose(pdat);
 }
 
-StartNewGame(char *startp)
-{ int i;
+void StartNewGame(char *startp) {
+  int i;
 
   numchars=0;
   InitPStats();
@@ -150,8 +157,8 @@ StartNewGame(char *startp)
   startmap(startp);
 }
 
-LoadGame(char *fn)
-{ FILE *f;
+void LoadGame(char *fn) {
+  FILE *f;
   char i,b;
 
   quake=0; hooktimer=0; hookretrace=0; fade=1;
@@ -174,16 +181,17 @@ LoadGame(char *fn)
   fread(&tchars, 1, 1, f);
   fread(&pstats, 1, sizeof pstats, f);
   fclose(f);
-  for (i=0; i<b; i++)
+  for (i=0; i<b; i++) {
       addcharacter(partyidx[i]);
+  }
   nx=party[0].x/16;
   ny=party[0].y/16;
   usenxy=1;
-  startmap(&mapname);
+  startmap(mapname);
 }
 
-ProcessEquipDat()
-{ FILE *f;
+void ProcessEquipDat() {
+  FILE *f;
   int a,i,t;
   int i2;
 
@@ -263,8 +271,8 @@ ProcessEquipDat()
 // END NEW
 }
 
-InitItems()
-{ FILE *f;
+void InitItems() {
+  FILE *f;
   unsigned char b,i;
   int j;
   f=fopen("ITEMICON.DAT","rb");
@@ -373,8 +381,8 @@ InitItems()
   fclose(f);
 }
 
-StartupMenu()
-{ char cursel=1;
+void StartupMenu() {
+  char cursel=1;
   int i,s;
 
 drawloop:
@@ -386,9 +394,9 @@ drawloop:
   gotoxy(130,123);
   printstring("Exit to DOS");
 
-  if (!cursel) tcopysprite(110,102,16,16,&menuptr);
-  if (cursel==1) tcopysprite(110,112,16,16,&menuptr);
-  if (cursel==2) tcopysprite(110,122,16,16,&menuptr);
+  if (!cursel) tcopysprite(110,102,16,16, menuptr);
+  if (cursel==1) tcopysprite(110,112,16,16, menuptr);
+  if (cursel==2) tcopysprite(110,122,16,16, menuptr);
 
   vgadump();
   while ((down) || (up)) readcontrols();
@@ -417,8 +425,7 @@ fadeloop:          i=(timer_count*64)/s; i=64-i;
                    err(""); }
 }
 
-main()
-{
+int main() {
   MiscSetup();
   PutOwnerText();
   initvga();
@@ -440,4 +447,6 @@ main()
 
     StartupScript();
   }
+
+  return 0;
 }
