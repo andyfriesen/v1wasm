@@ -13,6 +13,7 @@
 #include "main.h"
 #include "menu.h"
 #include "menu2.h"
+#include "vc.h"
 #include "sound.h"
 #include "pcx.h"
 #include "vga.h"
@@ -539,7 +540,7 @@ drawloop:
         printstring(pstats[l].name);
     }
 
-    tcopysprite(27, 131 + (ptr * 10), 16, 16, &menuptr);
+    tcopysprite(27, 131 + (ptr * 10), 16, 16, menuptr);
     vgadump();
 
     readcontrols();
@@ -596,7 +597,7 @@ usesec:
     RemoveItem(c, p);
 }
 
-ItemActionSelect(char c, char p) {
+void ItemActionSelect(char c, char p) {
     int first = 1, ptr = 0, i;
     unsigned char l, a;
 
@@ -613,7 +614,7 @@ drawloop:
     printstring("Give");
     gotoxy(45, 143);
     printstring("Drop");
-    tcopysprite(26, 121 + (ptr * 10), 16, 16, &menuptr);
+    tcopysprite(26, 121 + (ptr * 10), 16, 16, menuptr);
     vgadump();
 
     readcontrols();
@@ -692,7 +693,7 @@ drawloop:
     }
 }
 
-ItemMenu(char c) {
+void ItemMenu(char c) {
     int first = 1;
     unsigned char l, ptr = 6, mx = 0, my = 1;
 
@@ -766,7 +767,7 @@ drawloop:
 
 int atkp, defp, magp, mgrp, hitp, dodp, mblp, ferp, reap;
 
-CalcEquipPreview(int a, int i, int p) {
+void CalcEquipPreview(int a, int i, int p) {
     int c, d;
 
     d = items[pstats[a].inv[p]].equipflag - 1;
@@ -800,7 +801,7 @@ CalcEquipPreview(int a, int i, int p) {
     UpdateEquipStats();
 }
 
-DrawEquipMenu(char c, char ptr) {
+void DrawEquipMenu(char c, char ptr) {
     unsigned char l, i, a, *img;
     int j, k;
 
@@ -999,20 +1000,20 @@ DrawEquipMenu(char c, char ptr) {
             a = pstats[l].inv[((k + 1) * 6) + j];
             img = itemicons + (items[a].icon * 256);
             if (!items[a].equipflag || !equip[items[a].equipidx].equipable[l]) {
-                greyscale(16, 16, img, &gsimg);
-                img = &gsimg;
+                greyscale(16, 16, img, gsimg);
+                img = gsimg;
             }
             tcopysprite(137 + (j * 32), 130 + (k * 24), 16, 16, img);
         }
     a = ptr / 6;
     if (ptr < 6) {
-        tcopysprite(133 + (ptr * 32), 87, 24, 24, &itmptr);
+        tcopysprite(133 + (ptr * 32), 87, 24, 24, itmptr);
     } else {
-        tcopysprite(133 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, &itmptr);
+        tcopysprite(133 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, itmptr);
     }
 }
 
-Equip(char c, char ptr) {
+void Equip(char c, char ptr) {
     unsigned char a, l, b;
 
     l = partyidx[c] - 1;
@@ -1036,7 +1037,7 @@ Equip(char c, char ptr) {
     }
 }
 
-DeEquip(char c, char ptr) {
+void DeEquip(char c, char ptr) {
     unsigned char a, l, b;
 
     l = partyidx[c] - 1;
@@ -1057,7 +1058,7 @@ DeEquip(char c, char ptr) {
     }
 }
 
-EquipMenu(char c) {
+void EquipMenu(char c) {
     int first = 1, a;
     unsigned char l, ptr = 6, mx = 0, my = 1;
 
@@ -1152,7 +1153,7 @@ drawloop:
 
 // Magic Menu? NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW NEW
 
-DrawMagicMenu(char c, char ptr) {
+void DrawMagicMenu(char c, char ptr) {
     unsigned char l, i, a, *img, z;
     int j, k;
 
@@ -1220,15 +1221,15 @@ DrawMagicMenu(char c, char ptr) {
         }
     a = ptr / 6;
     if (ptr < 6) {
-        tcopysprite(133 + (ptr * 32), 98, 24, 24, &itmptr);
+        tcopysprite(133 + (ptr * 32), 98, 24, 24, itmptr);
     } else {
-        tcopysprite(133 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, &itmptr);
+        tcopysprite(133 + ((ptr - (a * 6)) * 32), 102 + (a * 24), 24, 24, itmptr);
     }
 }
 
 
 
-MagicUse(char c, char p) {
+void MagicUse(char c, char p) {
     int first = 1, ptr = 0, i, j;
     unsigned char l, t1, a;
     int timer_count, an;
@@ -1265,7 +1266,7 @@ drawloop:
         printstring(pstats[l].name);
     }
 
-    tcopysprite(27, 131 + (ptr * 10), 16, 16, &menuptr);
+    tcopysprite(27, 131 + (ptr * 10), 16, 16, menuptr);
     vgadump();
 
     readcontrols();
@@ -1367,7 +1368,7 @@ drawloop2:
     // RemoveItem(c,p);
 }
 
-MagicActionSelect(char c, char p) {
+void MagicActionSelect(char c, char p) {
     int first = 1, ptr = 0, i;
     unsigned char l, a;
     int t1;
@@ -1390,7 +1391,7 @@ drawloop:
     dec_to_asciiz(magic[t1].price, strbuf);
     printstring(strbuf);
 
-    tcopysprite(26, 121 + (ptr * 10), 16, 16, &menuptr);
+    tcopysprite(26, 121 + (ptr * 10), 16, 16, menuptr);
     vgadump();
 
     readcontrols();
@@ -1464,7 +1465,7 @@ drawloop:
     }
 }
 
-MagicMenu(char c) {
+void MagicMenu(char c) {
     int first = 1;
     unsigned char l, ptr = 0, mx = 0, my = 0;
 

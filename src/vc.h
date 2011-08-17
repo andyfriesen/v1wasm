@@ -51,4 +51,6 @@
 #define OP_END 255
 
 void ExecuteHookedScript(unsigned short s);
+void ExecuteEffect(unsigned short int s);
+void ExecuteMagicEffect(unsigned short int s);
 void StartupScript();
