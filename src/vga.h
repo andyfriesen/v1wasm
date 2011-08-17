@@ -25,6 +25,7 @@ void _Tcopysprite(int x, int y, int width, int height, unsigned char* spr);
 void grabregion(int x, int y, int width, int height, unsigned char* spr);
 void fontcolor(unsigned char c);
 void ColorField(int x, int y, int x2, int y2, unsigned char* tbl);
+void VCprintstring(int xx, int yy, char* str);
 
 void dec_to_asciiz(int num, char* buf);
 

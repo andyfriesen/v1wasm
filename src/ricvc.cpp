@@ -1,3 +1,18 @@
+
+#include <string.h>
+#include "render.h"
+#include "vc.h"
+#include "vclib.h"
+#include "sound.h"
+#include "timer.h"
+#include "menu.h"
+#include "menu2.h"
+#include "main.h"
+#include "control.h"
+#include "ricvc.h"
+#include "engine.h"
+#include "vga.h"
+
 /*  -- Ric's extensions to VCLIB.C --
  * Copyright (C)1998 Richard Lau
  *
@@ -45,12 +60,8 @@
 #define grey1 14
 #define grey2 26
 extern unsigned char oc;
-extern char* speech;
-extern char* strbuf;
 extern unsigned int effectofstbl[1024];
 extern unsigned int startupofstbl[1024];
-extern tvar[26], varl[10];
-extern char* code, *basevc, *startupvc, *menuptr;
 
 void grey(int width, int height, unsigned char* src, unsigned char* dest)
 /* -- ric: 24/Apr/98 -- */
@@ -147,11 +158,11 @@ void VCBox() { /* -- ric: 21/Apr/98 -- */
 
     //  for (i=y1; i<=y2; i++)
     //      VChline(x1,i,x2+1,bgcolor);
-    VCColorField(x1, y1, x2 + 1, y2 + 1, &menuxlatbl);
+    VCColorField(x1, y1, x2 + 1, y2 + 1, menuxlatbl);
     VCborder(x1, y1, x2, y2);
 }
 
-VCAString(int x1, int y1, char* strng, int align)
+void VCAString(int x1, int y1, char* strng, int align)
 /* -- ric: 30/Apr/98 -- */
 {
     if (align == 1) {
@@ -196,7 +207,7 @@ void VCItemDesc() { /* -- ric: 21/Apr/98 -- */
 void VCItemImage() { /* -- ric: 22/Apr/98 -- */
     int x1, y1, i, gf;
     unsigned char gsimg[512];
-    char* img;
+    unsigned char* img;
 
     x1 = ResolveOperand();
     y1 = ResolveOperand();
@@ -204,8 +215,8 @@ void VCItemImage() { /* -- ric: 22/Apr/98 -- */
     gf = ResolveOperand();
     img = itemicons + (items[i].icon << 8);
     if (gf) {
-        grey(16, 16, img, &gsimg);
-        img = &gsimg;
+        grey(16, 16, img, gsimg);
+        img = gsimg;
     }
 
     VCtcopysprite(x1, y1, 16, 16, img);
@@ -222,22 +233,22 @@ void VCATextNum() { /* -- ric: 24/Apr/98 -- */
     align = ResolveOperand();
     // ANDY
     if (i < 0) {
-        strcpy(&stringbuf, "-");
-        dec_to_asciiz(-i, &a);
-        strcat(&stringbuf, &a);
+        strcpy(stringbuf, "-");
+        dec_to_asciiz(-i, a);
+        strcat(stringbuf, a);
     }
     if (i >= 0)
         // END OF ANDY'S CHANGED STUFF
     {
-        dec_to_asciiz(i, &stringbuf);
+        dec_to_asciiz(i, stringbuf);
     }
-    VCAString(x1, y1, &stringbuf, align);
+    VCAString(x1, y1, stringbuf, align);
 }
 
 void VCSpc() { /* -- ric: 24/Apr/98 -- */
     int x1, y1, i, gf;
     unsigned char gsimg[1024];
-    char* img;
+    unsigned char* img;
 
     x1 = ResolveOperand();
     y1 = ResolveOperand();
@@ -245,8 +256,8 @@ void VCSpc() { /* -- ric: 24/Apr/98 -- */
     gf = ResolveOperand();
     img = speech + (1024 * i);
     if (gf) {
-        grey(32, 32, img, &gsimg);
-        img = &gsimg;
+        grey(32, 32, img, gsimg);
+        img = gsimg;
     }
 
     VCtcopysprite(x1, y1, 32, 32, img);
@@ -273,7 +284,7 @@ void CallEffect () { /* -- ric: 24/Apr/98 -- */
     basevc = basebuf;
 }
 
-ExecuteStartUpScript(unsigned short int s) { /* -- ric: 25/Apr/98 -- */
+void ExecuteStartUpScript(unsigned short int s) { /* -- ric: 25/Apr/98 -- */
     basevc = startupvc;
     code = startupvc + startupofstbl[s];
 
@@ -349,7 +360,7 @@ drawloop:
     }
     buf2 = code;
     code = buf1;
-    tcopysprite(23 + x1, 21 + y1 + (ptr * 10), 16, 16, &menuptr);
+    tcopysprite(23 + x1, 21 + y1 + (ptr * 10), 16, 16, menuptr);
     vgadump();
     readcontrols();
     if (first == 2) if (b1 || b2 || b4) {
@@ -432,7 +443,7 @@ void statusScreen() { /* -- ric: 03/May/98 -- */
 void VCCr2() {     /* -- ric: 03/May/98 -- */
     int x1, y1, i, gf;
     unsigned char gsimg[9216];
-    char* img;
+    unsigned char* img;
 
     x1 = ResolveOperand();
     y1 = ResolveOperand();
@@ -440,8 +451,8 @@ void VCCr2() {     /* -- ric: 03/May/98 -- */
     gf = ResolveOperand();
     img = chr2 + (9216 * (i - 1));
     if (gf) {
-        grey(96, 96, img, &gsimg);
-        img = &gsimg;
+        grey(96, 96, img, gsimg);
+        img = gsimg;
     }
 
     VCtcopysprite(x1, y1, 96, 96, img);
@@ -469,7 +480,7 @@ void VCTextBox() {   /* -- ric: 04/May/98 -- */
     buf2 = code;
     code = buf1;
 
-    VCColorField(x1, y1, x1 + 51 + (width * 8), y1 + 13 + (nv * 10), &menuxlatbl);
+    VCColorField(x1, y1, x1 + 51 + (width * 8), y1 + 13 + (nv * 10), menuxlatbl);
     VCborder(x1, y1, x1 + 50 + (width * 8), y1 + 12 + (nv * 10));
 
     for (p = 0; p < nv; p++) {
@@ -478,7 +489,7 @@ void VCTextBox() {   /* -- ric: 04/May/98 -- */
         VCprintstring(x1 + 25, y1 + 7 + (p * 10), opt);
     }
     if (ptr) {
-        VCtcopysprite(7 + x1, 5 + y1 + ((ptr - 1) * 10), 16, 16, &menuptr);
+        VCtcopysprite(7 + x1, 5 + y1 + ((ptr - 1) * 10), 16, 16, menuptr);
     }
 }
 
@@ -501,7 +512,7 @@ drawloop:
         printstring(pstats[l].name);
     }
 
-    tcopysprite(x1 + 23, y1 + 20 + (ptr * 10), 16, 16, &menuptr);
+    tcopysprite(x1 + 23, y1 + 20 + (ptr * 10), 16, 16, menuptr);
     vgadump();
 
     readcontrols();

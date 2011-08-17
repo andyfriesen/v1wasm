@@ -33,7 +33,6 @@ struct menu {
 struct menu menus[4];
 unsigned char itmptr[576], gsimg[512], iuflag = 0;
 extern unsigned char menuptr[256];
-extern short int varl[10];
 
 void greyscale(int width, int height, unsigned char* src, unsigned char* dest) {
     int i, j;

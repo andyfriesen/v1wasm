@@ -53,6 +53,7 @@
 void ExecuteHookedScript(unsigned short s);
 void ExecuteEffect(unsigned short int s);
 void ExecuteMagicEffect(unsigned short int s);
+void ExecuteBlock();
 void StartupScript();
 
 unsigned int ResolveOperand();
@@ -60,4 +61,9 @@ unsigned char GrabC();
 void GrabString(char* str);
 
 extern char* code;
+extern char* basevc;
+extern char* effectvc;
+extern char* startupvc;
 extern char* vcdatabuf;
+extern int tvar[26];
+extern unsigned int varl[10];
