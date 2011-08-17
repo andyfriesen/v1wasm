@@ -3,7 +3,7 @@ struct chrrec {
 };
 
 struct entitydata {
-    int x,y;                               // starting/current location
+    int x, y;                              // starting/current location
     unsigned char chrindex, movecode;      // CHR index / movement pattern code
     unsigned char activmode, obsmode;      // activation mode, obstruction mode
     unsigned int actscript, movescript;    // script references
@@ -17,5 +17,5 @@ extern struct chrrec chrlist[100];           // CHR list
 extern struct entitydata entity[100];        // Entity data
 extern int entities;                         // number of active entities
 
-int EntityAt(int ex,int ey);
+int EntityAt(int ex, int ey);
 void ProcessSpeedAdjEntity(int i);

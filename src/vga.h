@@ -7,7 +7,7 @@ void vgadump();
 void setpixel(int x, int y, char c);
 void hline(int x, int y, int dist, char c);
 void box(int x, int y, int x2, int y2, char color);
-void set_palette(unsigned char *pall);
+void set_palette(unsigned char* pall);
 void set_intensity(unsigned int n);
 void fin();
 void fout();
@@ -25,4 +25,4 @@ extern unsigned char* screen;
 extern unsigned char* virscr;
 extern unsigned char pal[768];
 
-extern char menuxlatbl[256],greyxlatbl[256],scrnxlatbl[256],*transparencytbl;
+extern char menuxlatbl[256], greyxlatbl[256], scrnxlatbl[256], *transparencytbl;

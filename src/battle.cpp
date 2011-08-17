@@ -11,102 +11,112 @@
 #include "vga.h"
 
 extern char* strbuf;
-FILE *d;
+FILE* d;
 void UpdateEquipStats();
 
 char whotoattack() {
-    unsigned char t1,t2;
+    unsigned char t1, t2;
 
-    if (numchars==1) return partyidx[0]-1;
+    if (numchars == 1) {
+        return partyidx[0] - 1;
+    }
 
 tryagain:
-    t1=rand();
-    t2=(255/numchars)+1;
-    t1=(t1/t2);
-    if (t1==numchars) goto tryagain;
-    if (pstats[partyidx[t1]].status==1) goto tryagain;
+    t1 = rand();
+    t2 = (255 / numchars) + 1;
+    t1 = (t1 / t2);
+    if (t1 == numchars) {
+        goto tryagain;
+    }
+    if (pstats[partyidx[t1]].status == 1) {
+        goto tryagain;
+    }
 
-    return partyidx[t1]-1;
+    return partyidx[t1] - 1;
 }
 
 int random(int min, int max) {
     int i;
 
 rnd1:
-    if (min>max) {
-        i=min;
-        min=max;
-        max=i;
+    if (min > max) {
+        i = min;
+        min = max;
+        max = i;
     }
-    i=(rand() % (max+1));
-    if ((i>=min) && (i<=max)) return i;
-    else goto rnd1;
+    i = (rand() % (max + 1));
+    if ((i >= min) && (i <= max)) {
+        return i;
+    } else {
+        goto rnd1;
+    }
 }
 
 int getnum() {
-    int i,tmin,tmax;
+    int i, tmin, tmax;
 
-    fscanf(d,"%d",&tmin);
-    fscanf(d,"%d",&tmax);
-    i=random(tmin,tmax);
+    fscanf(d, "%d", &tmin);
+    fscanf(d, "%d", &tmax);
+    i = random(tmin, tmax);
     return i;
 }
 
 int getsnum() {
-    int i,tmin;
+    int i, tmin;
 
-    fscanf(d,"%d",&tmin);
-    i=tmin;
+    fscanf(d, "%d", &tmin);
+    i = tmin;
     return i;
 }
 
 void levelup (int chr) {
-    int i,i2,i3,tmin,tmax,j;
+    int i, i2, i3, tmin, tmax, j;
     int alreadyhave;
-    char *img;
+    char* img;
 
-    d=fopen("PARTY.DAT","r");
-    fscanf(d,"%s",strbuf);
-    for (i=0; i<=chr; i++) {
-        fscanf(d,"%s",strbuf);
-        fscanf(d,"%s",strbuf);
-        fscanf(d,"%s",strbuf);
+    d = fopen("PARTY.DAT", "r");
+    fscanf(d, "%s", strbuf);
+    for (i = 0; i <= chr; i++) {
+        fscanf(d, "%s", strbuf);
+        fscanf(d, "%s", strbuf);
+        fscanf(d, "%s", strbuf);
     }
     fclose(d);
 
-    d=fopen(strbuf,"r");
-    fgets(strbuf,99,d);
-    fgets(strbuf,99,d);
+    d = fopen(strbuf, "r");
+    fgets(strbuf, 99, d);
+    fgets(strbuf, 99, d);
 
     pstats[chr].lv++;
-    for (i=0; i<pstats[chr].lv; i++)
-        fgets(strbuf,99,d);
+    for (i = 0; i < pstats[chr].lv; i++) {
+        fgets(strbuf, 99, d);
+    }
 
-    fscanf(d,"%d",&pstats[chr].nxt);
-    i=getnum();
-    pstats[chr].maxhp+=i;
-    pstats[chr].curhp+=i;
-    i=getnum();
-    pstats[chr].maxmp+=i;
-    pstats[chr].curmp+=i;
-    i=getnum();
-    pstats[chr].str+=i;
-    i=getnum();
-    pstats[chr].end+=i;
-    i=getnum();
-    pstats[chr].mag+=i;
-    i=getnum();
-    pstats[chr].mgr+=i;
-    i=getnum();
-    pstats[chr].hit+=i;
-    i=getnum();
-    pstats[chr].dod+=i;
-    i=getnum();
-    pstats[chr].mbl+=i;
-    i=getnum();
-    pstats[chr].fer+=i;
-    i=getnum();
-    pstats[chr].rea+=i;
+    fscanf(d, "%d", &pstats[chr].nxt);
+    i = getnum();
+    pstats[chr].maxhp += i;
+    pstats[chr].curhp += i;
+    i = getnum();
+    pstats[chr].maxmp += i;
+    pstats[chr].curmp += i;
+    i = getnum();
+    pstats[chr].str += i;
+    i = getnum();
+    pstats[chr].end += i;
+    i = getnum();
+    pstats[chr].mag += i;
+    i = getnum();
+    pstats[chr].mgr += i;
+    i = getnum();
+    pstats[chr].hit += i;
+    i = getnum();
+    pstats[chr].dod += i;
+    i = getnum();
+    pstats[chr].mbl += i;
+    i = getnum();
+    pstats[chr].fer += i;
+    i = getnum();
+    pstats[chr].rea += i;
 
     i = getsnum();
 
@@ -114,7 +124,9 @@ void levelup (int chr) {
     i3 = 0;
 
     while (i3 < 24) {
-        if (i == pstats[chr].maginv[i3]) alreadyhave = 1;
+        if (i == pstats[chr].maginv[i3]) {
+            alreadyhave = 1;
+        }
         i3++;
     }
 
@@ -133,11 +145,13 @@ void levelup (int chr) {
                readcontrols();
              }
         */    // note: Andy did this because it pissed him off
-        j=pstats[chr].magcnt;
-        if (j!=24) {
-            pstats[chr].maginv[j]=i;
+        j = pstats[chr].magcnt;
+        if (j != 24) {
+            pstats[chr].maginv[j] = i;
             pstats[chr].magcnt++;
-        } else pstats[chr].maginv[j-1]=i;
+        } else {
+            pstats[chr].maginv[j - 1] = i;
+        }
     }
 
     fclose(d);
@@ -148,16 +162,20 @@ void levelup (int chr) {
 void battle() {
     unsigned char t1;
 
-    t1=whotoattack();
+    t1 = whotoattack();
 
-    if (pstats[t1].curhp<=2)
-        pstats[t1].curhp=0;
-    else {
-        pstats[t1].curhp-=2;
-        pstats[t1].exp+=2;
+    if (pstats[t1].curhp <= 2) {
+        pstats[t1].curhp = 0;
+    } else {
+        pstats[t1].curhp -= 2;
+        pstats[t1].exp += 2;
     }
 
-    gp+=5;
-    if (pstats[t1].curhp<1) pstats[t1].status=1;
-    if (pstats[t1].nxt<=pstats[t1].exp) levelup(t1);
+    gp += 5;
+    if (pstats[t1].curhp < 1) {
+        pstats[t1].status = 1;
+    }
+    if (pstats[t1].nxt <= pstats[t1].exp) {
+        levelup(t1);
+    }
 }

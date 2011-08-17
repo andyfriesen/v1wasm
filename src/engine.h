@@ -15,13 +15,13 @@ struct r_entity {                      // on-screen entities (chars)
     unsigned short step, delay,          // Misc data entries
              data1, data2,         // More misc data
              data3, data4,         // yet more crappy misc data.
-             delayct,adjactv;      // yet more internal crap
-    unsigned short x1,y1,x2,y2;          // bounding box coordinates
+             delayct, adjactv;     // yet more internal crap
+    unsigned short x1, y1, x2, y2;       // bounding box coordinates
     unsigned char curcmd, cmdarg;        // Script commands/arguments
-    unsigned char *scriptofs;            // offset in script parsing
-    unsigned char face,chasing,          // face player when activated | chasing
+    unsigned char* scriptofs;            // offset in script parsing
+    unsigned char face, chasing,         // face player when activated | chasing
              chasespeed, chasedist; // chasing variables
-    unsigned short cx,cy;                // current-tile pos (moving adjusted)
+    unsigned short cx, cy;               // current-tile pos (moving adjusted)
     int expand1;                         // always room for improvement
     char entitydesc[20];                 // Editing description
 };
@@ -85,8 +85,8 @@ struct magicdesc {
 // END NEW
 
 struct equipstruc {
-    int str,end,mag,mgr,hit,dod;
-    int mbl,fer,rea;
+    int str, end, mag, mgr, hit, dod;
+    int mbl, fer, rea;
     char equipable[30];
     char onequip, ondeequip;
 };
@@ -99,9 +99,9 @@ struct vspanim {
 };          // animation mode
 
 extern struct vspanim va0[100];
-extern char mapname[13],vsp0name[13];
+extern char mapname[13], vsp0name[13];
 extern char musname[13];
-extern char numchars,tchars;
+extern char numchars, tchars;
 extern char lastmoves[6];
 extern char usenxy;
 extern struct r_entity party[101];
@@ -117,25 +117,25 @@ struct mequipstruc {
 };
 
 extern struct magicdesc magic[255];
-extern unsigned char *magicicons;
+extern unsigned char* magicicons;
 extern struct mequipstruc mequip[255];
 
 // END NEW
 
 extern struct equipstruc equip[255];
-extern unsigned short int nx,ny;
-extern short int flags[8000],numtiles;
+extern unsigned short int nx, ny;
+extern short int flags[8000], numtiles;
 
 
 extern char partyidx[5];
-extern unsigned char *itemicons,*chrs,*chr2;
-extern int gp,xwin,ywin,xtc,ytc,xofs,yofs;
-extern unsigned short int *map0, *map1,xsize,ysize,vadelay[100];
-extern unsigned char *mapp,layerc,pmultx,pdivx,pmulty,pdivy,saveflag;
-extern unsigned char *vsp0, autoent;
+extern unsigned char* itemicons, *chrs, *chr2;
+extern int gp, xwin, ywin, xtc, ytc, xofs, yofs;
+extern unsigned short int* map0, *map1, xsize, ysize, vadelay[100];
+extern unsigned char* mapp, layerc, pmultx, pdivx, pmulty, pdivy, saveflag;
+extern unsigned char* vsp0, autoent;
 
-void *valloc(int amount, char * whatfor);
-void vfree(void *thismem);
+void* valloc(int amount, char* whatfor);
+void vfree(void* thismem);
 void ProcessControls();
 void ExecuteScript(int);
 void UpdateEquipStats();

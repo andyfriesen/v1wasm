@@ -55,18 +55,22 @@ vcscreen[(ynew*320)+xnew] = color;
 
 
 int sgn (long a) {
-    if (a > 0) return +1;
-    else if (a < 0) return -1;
-    else return 0;
+    if (a > 0) {
+        return +1;
+    } else if (a < 0) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 Line2d(int a, int b, int c, int d, int col) {
 
-    long u,s,v,d1x,d1y,d2x,d2y,m,n;
+    long u, s, v, d1x, d1y, d2x, d2y, m, n;
     int  i;
 
-    u   = c-a;
-    v   = d-b;
+    u   = c - a;
+    v   = d - b;
     d1x = sgn(u);
     d1y = sgn(v);
     d2x = sgn(u);
@@ -74,7 +78,7 @@ Line2d(int a, int b, int c, int d, int col) {
     m   = abs(u);
     n   = abs(v);
 
-    if (m<=n) {
+    if (m <= n) {
         d2x = 0;
         d2y = sgn(v);
         m   = abs(v);
@@ -83,8 +87,8 @@ Line2d(int a, int b, int c, int d, int col) {
 
     s = (int)(m / 2);
 
-    for (i=0; i<(int)(m); i++) {
-        vcscreen[(b*320)+a] = col;
+    for (i = 0; i < (int)(m); i++) {
+        vcscreen[(b * 320) + a] = col;
         s += n;
         if (s >= m) {
             s -= m;
@@ -115,38 +119,42 @@ Line3d (int x1, int y1, int z1, int x2, int y2, int z2, int color) {
     int x1new, y1new, x2new, y2new;
 
     if (x1 > 2000) {
-        x1 = -1*(4000-x1);
+        x1 = -1 * (4000 - x1);
     }
 
     if (y1 > 2000) {
-        y1 = -1*(4000-y1);
+        y1 = -1 * (4000 - y1);
     }
 
     if (z1 > 2000) {
-        z1 = -1*(4000-z1);
+        z1 = -1 * (4000 - z1);
     }
 
     if (x2 > 2000) {
-        x2 = -1*(4000-x2);
+        x2 = -1 * (4000 - x2);
     }
 
     if (y2 > 2000) {
-        y2 = -1*(4000-y2);
+        y2 = -1 * (4000 - y2);
     }
 
     if (z2 > 2000) {
-        z2 = -1*(4000-z2);
+        z2 = -1 * (4000 - z2);
     }
 
-    if (z1 == 0) z1++;
+    if (z1 == 0) {
+        z1++;
+    }
 
-    x1new = x1+160+(x1/(z1/256));
-    y1new = y1+100+(y1/(z1/256));
+    x1new = x1 + 160 + (x1 / (z1 / 256));
+    y1new = y1 + 100 + (y1 / (z1 / 256));
 
-    if (z2 == 0) z2++;
+    if (z2 == 0) {
+        z2++;
+    }
 
-    x2new = x2+160+(x2/(z2*256));
-    y2new = y2+100+(y2/(z2*256));
+    x2new = x2 + 160 + (x2 / (z2 * 256));
+    y2new = y2 + 100 + (y2 / (z2 * 256));
 
     Line2d (x1new, y1new, x2new, y2new, color);
 }
@@ -176,123 +184,138 @@ VCLine3d() {
 }
 
 Exc() {
-    char *str1, *str2, *str3;
+    char* str1, *str2, *str3;
 
-    str1=code;
+    str1 = code;
     GrabString(strbuf);
-    str2=code;
+    str2 = code;
     GrabString(strbuf);
-    execl (str1,str1, str2);
+    execl (str1, str1, str2);
 }
 
 // NEW (MAGIC)
 
 GetMagic() {
-    short int c,d;
-    int i,j;
-    int alreadyhave=0;
+    short int c, d;
+    int i, j;
+    int alreadyhave = 0;
 
-    c=ResolveOperand()-1;
-    d=ResolveOperand();
+    c = ResolveOperand() - 1;
+    d = ResolveOperand();
 
-    i=0;
+    i = 0;
 
     while (i < 24) {
-        if (d == pstats[c].maginv[i]) alreadyhave = 1;
+        if (d == pstats[c].maginv[i]) {
+            alreadyhave = 1;
+        }
         i++;
     }
 
-    j=pstats[c].magcnt;
+    j = pstats[c].magcnt;
     if (!alreadyhave) {
-        if (j!=24) {
-            pstats[c].maginv[j]=d;
+        if (j != 24) {
+            pstats[c].maginv[j] = d;
             pstats[c].magcnt++;
-        } else pstats[c].maginv[j-1]=d;
+        } else {
+            pstats[c].maginv[j - 1] = d;
+        }
     }
 
 }
 
 VCSpellName() { /* -- adapted from ric: ??/???/?? -- */
-    int x1,y1,i,align;
+    int x1, y1, i, align;
 
-    x1=ResolveOperand();
-    y1=ResolveOperand();
-    i=ResolveOperand();
-    align=ResolveOperand();
-    VCAString(x1,y1,magic[i].name,align);
+    x1 = ResolveOperand();
+    y1 = ResolveOperand();
+    i = ResolveOperand();
+    align = ResolveOperand();
+    VCAString(x1, y1, magic[i].name, align);
 }
 
 VCSpellDesc() { /* -- adapted from ric: ??/???/?? --  */
-    int x1,y1,i,align;
+    int x1, y1, i, align;
 
-    x1=ResolveOperand();
-    y1=ResolveOperand();
-    i=ResolveOperand();
-    align=ResolveOperand();
-    VCAString(x1,y1,magic[i].desc,align);
+    x1 = ResolveOperand();
+    y1 = ResolveOperand();
+    i = ResolveOperand();
+    align = ResolveOperand();
+    VCAString(x1, y1, magic[i].desc, align);
 }
 
 VCSpellImage() { /* -- adapted from ric: ??/???/?? -- */
-    int x1,y1,i,gf;
+    int x1, y1, i, gf;
     unsigned char gsimg[512];
-    char *img;
+    char* img;
 
-    x1=ResolveOperand();
-    y1=ResolveOperand();
-    i=ResolveOperand();
-    gf=ResolveOperand();
-    img=magicicons+(magic[i].icon<<8);
+    x1 = ResolveOperand();
+    y1 = ResolveOperand();
+    i = ResolveOperand();
+    gf = ResolveOperand();
+    img = magicicons + (magic[i].icon << 8);
     if (gf) {
-        grey(16,16,img,&gsimg);
-        img=&gsimg;
+        grey(16, 16, img, &gsimg);
+        img = &gsimg;
     }
 
-    VCtcopysprite(x1,y1,16,16,img);
+    VCtcopysprite(x1, y1, 16, 16, img);
 }
 
 MagicShop() {
-    int first=1,nv,p;
+    int first = 1, nv, p;
 
     // Egad.
     playeffect(1);
-    an=1;
-    nv=GrabC();
-    memset(&storeinv,0,12);
-    for (p=0; p<nv; p++)
-        storeinv[p]=ResolveOperand();
-    p=0;
+    an = 1;
+    nv = GrabC();
+    memset(&storeinv, 0, 12);
+    for (p = 0; p < nv; p++) {
+        storeinv[p] = ResolveOperand();
+    }
+    p = 0;
 drawloop:
     drawmap();
     PutBuySellBox(p);
     PutGPBox();
-    PutCharBox(0,0,0,0,0,0);
+    PutCharBox(0, 0, 0, 0, 0, 0);
     vgadump();
 
     readcontrols();
 
-    if (first==2) if (b2 || b3) goto drawloop;
-        else {
-            an=0;
-            timer_count=0;
+    if (first == 2) if (b2 || b3) {
+            goto drawloop;
+        } else {
+            an = 0;
+            timer_count = 0;
             return;
         }
-    if (first && !b1 && !b3 && !down && !up) first=0;
-    else if (first) goto drawloop;
+    if (first && !b1 && !b3 && !down && !up) {
+        first = 0;
+    } else if (first) {
+        goto drawloop;
+    }
 
     if (down || up) {
-        p=p^1;
+        p = p ^ 1;
         playeffect(0);
-        first=1;
+        first = 1;
     }
 
     if (b1) {
-        if (!p) MBuyMenu();
-        if (p) MSellMenu();
+        if (!p) {
+            MBuyMenu();
+        }
+        if (p) {
+            MSellMenu();
+        }
     }
 
-    while (!b3 && !b2) goto drawloop;
+    while (!b3 && !b2) {
+        goto drawloop;
+    }
     while (b3 || b2) {
-        first=2;
+        first = 2;
         goto drawloop;
     }
 }
@@ -300,9 +323,9 @@ drawloop:
 // Play VAS?
 PlayVAS() {
     int i, i2, frames, speed, ansave, sizex, sizey, sizeoff, wherex, wherey;
-// play_fli (&stringbuffer);
-    ansave=an;
-    an=1;
+    // play_fli (&stringbuffer);
+    ansave = an;
+    an = 1;
 
     GrabString(&stringbuffer);
     speed = ResolveOperand();
@@ -314,21 +337,21 @@ PlayVAS() {
     LoadPCXHeaderNP(&stringbuffer);
 
 
-    frames = depth/sizey;
+    frames = depth / sizey;
     i = 0;
 
-    sizeoff = sizex*sizey; //calc offset vals
+    sizeoff = sizex * sizey; //calc offset vals
 
-    for (i2=0; i2<depth; i2++) {
-        vidoffset=(i2*width);
+    for (i2 = 0; i2 < depth; i2++) {
+        vidoffset = (i2 * width);
         ReadPCXLine(vcdatabuf);
     }
     fclose(pcxf);
 
-    timer_count=0;
+    timer_count = 0;
     while (i < frames) {
-        memset(vcscreen,0,64000);
-        VCtcopysprite(wherex,wherey,sizex,sizey,vcdatabuf+(i*sizeoff));
+        memset(vcscreen, 0, 64000);
+        VCtcopysprite(wherex, wherey, sizex, sizey, vcdatabuf + (i * sizeoff));
         drawmap();
         vgadump();
 
@@ -338,11 +361,11 @@ PlayVAS() {
             i2++;
             i2--;
         }
-        timer_count=0;
+        timer_count = 0;
         i++;
     }
-    timer_count=0;
-    an=ansave;
+    timer_count = 0;
+    an = ansave;
 
 }
 

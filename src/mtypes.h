@@ -9,8 +9,8 @@
 
 
 /*
-	MikMod atomic types:
-	====================
+    MikMod atomic types:
+    ====================
 */
 
 typedef char            SBYTE;          /* has to be 1 byte signed */
@@ -18,7 +18,7 @@ typedef unsigned char   UBYTE;          /* has to be 1 byte unsigned */
 typedef short           SWORD;          /* has to be 2 bytes signed */
 typedef unsigned short  UWORD;          /* has to be 2 bytes unsigned */
 typedef long            SLONG;          /* has to be 4 bytes signed */
-typedef unsigned long   ULONG;			/* has to be 4 bytes unsigned */
+typedef unsigned long   ULONG;          /* has to be 4 bytes unsigned */
 typedef int             BOOL;           /* doesn't matter.. 0=FALSE, <>0 true */
 
 

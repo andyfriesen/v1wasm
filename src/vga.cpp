@@ -17,57 +17,62 @@ void err(const char*);
 
 unsigned char pal[768];
 unsigned char pal2[768];
-extern char waitvrt,*speech,fade,cancelfade,*strbuf;
+extern char waitvrt, *speech, fade, cancelfade, *strbuf;
 
-char *fnt,*fnt2,*tbox,*n;
-short int x1=17,y1=17;
+char* fnt, *fnt2, *tbox, *n;
+short int x1 = 17, y1 = 17;
 
 __dpmi_regs regs;
-unsigned char *screen;
-unsigned char *virscr;
+unsigned char* screen;
+unsigned char* virscr;
 
 wait() {
     while (inportb(0x3DA) & 8) {}
     while (!(inportb(0x3DA) & 8)) {}
 }
 
-set_palette(unsigned char *pall) {
+set_palette(unsigned char* pall) {
     unsigned int i;
 
-    if (waitvrt) wait();
+    if (waitvrt) {
+        wait();
+    }
     outportb(0x03c8, 0);
-    for (i=0; i<768; i++)
+    for (i = 0; i < 768; i++) {
         outportb(0x03c9, pall[i]);
+    }
 }
 
 get_palette() {
     unsigned int i;
 
     outportb(0x03c7, 0);
-    for (i=0; i<768; i++)
-        pal[i]=inportb(0x03c9);
+    for (i = 0; i < 768; i++) {
+        pal[i] = inportb(0x03c9);
+    }
 }
 
 set_intensity(unsigned int n) {
     int i;
-    for (i=767; i>=0; --i)
+    for (i = 767; i >= 0; --i) {
         pal2[i] = (pal[i] * n) >> 6;
+    }
     set_palette(pal2);
 }
 
 initvga() {
     memset(&regs, 0, sizeof regs);
-    regs.x.ax=0x13;
+    regs.x.ax = 0x13;
 
     PreCalc_TransparencyFields();
 
     __dpmi_int(0x10, &regs);
-    virscr=valloc(90000,"virscr");
-    n=valloc(256,"initvga:n");
+    virscr = valloc(90000, "virscr");
+    n = valloc(256, "initvga:n");
     //memset(virscr, 0, 81664);
     //memset(n, 0, 256);
     __djgpp_nearptr_enable();
-    screen=0xa0000 + __djgpp_conventional_base;
+    screen = 0xa0000 + __djgpp_conventional_base;
 }
 
 closevga() {
@@ -77,17 +82,19 @@ closevga() {
 }
 
 quick_killgfx() {
-    regs.x.ax=0x03;
+    regs.x.ax = 0x03;
     __dpmi_int(0x10, &regs);
 }
 
 quick_restoregfx() {
-    regs.x.ax=0x013;
+    regs.x.ax = 0x013;
     __dpmi_int(0x10, &regs);
 }
 
 vgadump() {
-    if (waitvrt) wait();
+    if (waitvrt) {
+        wait();
+    }
     asm("movl _virscr, %%esi              \n\t"
         "addl $5648, %%esi                \n\t"
         "movl _screen, %%edi              \n\t"
@@ -114,14 +121,15 @@ setpixel(int x, int y, char c) {
          "stosb                          \n\t"
          :
          :"m" (x), "m" (y), "m" (c)
-         : "eax","edi","cc" );
+         : "eax", "edi", "cc" );
 }
 
 vline(int x, int y, int y2, char c) {
     int i;
 
-    for (i=0; i<(y2-y); i++)
-        setpixel(x,(y+i),c);
+    for (i = 0; i < (y2 - y); i++) {
+        setpixel(x, (y + i), c);
+    }
 
 }
 
@@ -138,25 +146,25 @@ hline(int x, int y, int x2, char c) {
          "stosb                          \n\t"
          :
          : "m" (x), "m" (y), "m" (x2), "m" (c)
-         : "eax","edi","ecx","cc" );
+         : "eax", "edi", "ecx", "cc" );
 }
 
 box(int x, int y, int x2, int y2, char color) {
     int i;
 
-    if (x2<x) {
-        i=x2;
-        x2=x;
-        x=i;
+    if (x2 < x) {
+        i = x2;
+        x2 = x;
+        x = i;
     }
-    if (y2<y) {
-        i=y2;
-        y2=y;
-        y=i;
+    if (y2 < y) {
+        i = y2;
+        y2 = y;
+        y = i;
     }
 
-    for (i=0; i<=(y2-y); i++) {
-        hline(x,(y+i),x2+1,color);
+    for (i = 0; i <= (y2 - y); i++) {
+        hline(x, (y + i), x2 + 1, color);
     }
 }
 
@@ -182,7 +190,7 @@ copytile(int x, int y, char *spr)
 }
 */
 
-copytile(int x, int y, char *spr) {
+copytile(int x, int y, char* spr) {
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"
         "movl %1, %%edi                   \n\t"
@@ -212,10 +220,10 @@ copytile(int x, int y, char *spr) {
         "jnz ctl0                         \n\t"
         :
         : "m" (x), "m" (y), "m" (spr)
-        : "eax","ecx","esi","edi","cc" );
+        : "eax", "ecx", "esi", "edi", "cc" );
 }
 
-copysprite(int x, int y, int width, int height, char *spr) {
+copysprite(int x, int y, int width, int height, char* spr) {
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "csl0:                                  \n\t"
@@ -236,10 +244,10 @@ copysprite(int x, int y, int width, int height, char *spr) {
         "jnz csl0                         \n\t"
         :
         : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
-        : "eax","edx","esi","edi","ecx","cc" );
+        : "eax", "edx", "esi", "edi", "ecx", "cc" );
 }
 
-grabregion(int x, int y, int width, int height, char *spr) {
+grabregion(int x, int y, int width, int height, char* spr) {
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%edi                   \n\t"
         "grl0:                                  \n\t"
@@ -260,10 +268,10 @@ grabregion(int x, int y, int width, int height, char *spr) {
         "jnz grl0                         \n\t"
         :
         : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
-        : "eax","edx","esi","edi","ecx","cc" );
+        : "eax", "edx", "esi", "edi", "ecx", "cc" );
 }
 
-tcopytile(int x, int y, char *spr, char *matte) {
+tcopytile(int x, int y, char* spr, char* matte) {
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"
         "movl %1, %%edi                   \n\t"
@@ -295,10 +303,10 @@ tcopytile(int x, int y, char *spr, char *matte) {
         "jnz tctl0                        \n\t"
         :
         : "m" (x), "m" (y), "m" (spr), "m" (matte)
-        : "eax","ecx","edx","esi","edi","cc" );
+        : "eax", "ecx", "edx", "esi", "edi", "cc" );
 }
 
-tcopysprite(int x, int y, int width, int height, char *spr) {
+tcopysprite(int x, int y, int width, int height, char* spr) {
     asm("movl %3, %%ecx                   \n\t"
         "movl %4, %%esi                   \n\t"
         "tcsl0:                                 \n\t"
@@ -326,41 +334,49 @@ tcopysprite(int x, int y, int width, int height, char *spr) {
         "jnz tcsl0                        \n\t"
         :
         : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
-        : "eax","edx","esi","edi","ecx","cc" );
+        : "eax", "edx", "esi", "edi", "ecx", "cc" );
 }
 
 fin() {
     int i;
 
-    if (!fade) return;
+    if (!fade) {
+        return;
+    }
     if (cancelfade) {
         cancelfade--;
         return;
     }
 
-    timer_count=0;
+    timer_count = 0;
 inloop:
-    i=(timer_count*64)/30;
+    i = (timer_count * 64) / 30;
     set_intensity(i);
-    if (timer_count<30) goto inloop;
+    if (timer_count < 30) {
+        goto inloop;
+    }
     set_intensity(63);
 }
 
 fout() {
     int i;
 
-    if (!fade) return;
+    if (!fade) {
+        return;
+    }
     if (cancelfade) {
         cancelfade--;
         return;
     }
 
-    timer_count=0;
+    timer_count = 0;
 outloop:
-    i=(timer_count*64)/30;
-    i=64-i;
+    i = (timer_count * 64) / 30;
+    i = 64 - i;
     set_intensity(i);
-    if (timer_count<30) goto outloop;
+    if (timer_count < 30) {
+        goto outloop;
+    }
     set_intensity(0);
 }
 
@@ -370,81 +386,84 @@ unsigned char vergepal[768];          // VERGE main palette
 unsigned char menuxlatbl[256];        // Menu transparencyfield (blue)
 unsigned char greyxlatbl[256];        // Grey transparencyfield
 unsigned char scrnxlatbl[256];        // screen transparencyfield
-unsigned char *transparencytbl;       // full transparency table (64k)
+unsigned char* transparencytbl;       // full transparency table (64k)
 
 unsigned char match(char r, char g, char b) {
     int vr, vg, vb, tab, tabpt, i, thistab;
     // This routine provides the color matching to the VERGE palette.
 
-    tab=255;
-    tabpt=1;
+    tab = 255;
+    tabpt = 1;
 
-    for (i=1; i<255; i++) {
-        vr=vergepal[i*3];
-        vg=vergepal[(i*3)+1];
-        vb=vergepal[(i*3)+2];
+    for (i = 1; i < 255; i++) {
+        vr = vergepal[i * 3];
+        vg = vergepal[(i * 3) + 1];
+        vb = vergepal[(i * 3) + 2];
 
-        thistab=abs(vr-r);
-        thistab+=abs(vg-g);
-        thistab+=abs(vb-b);
-        if (thistab<tab) {
-            tab=thistab;
-            tabpt=i;
+        thistab = abs(vr - r);
+        thistab += abs(vg - g);
+        thistab += abs(vb - b);
+        if (thistab < tab) {
+            tab = thistab;
+            tabpt = i;
         }
     }
 
     return tabpt;
 }
 
-BuildTable(char r, char g, char b, char *dest) {
+BuildTable(char r, char g, char b, char* dest) {
     int i;
-    unsigned char wr,wg,wb;
+    unsigned char wr, wg, wb;
 
-    for (i=0; i<256; i++) {
-        wr=vergepal[(i*3)];             // set wr,wg,wb with source colors
-        wg=vergepal[(i*3)+1];
-        wb=vergepal[(i*3)+2];
+    for (i = 0; i < 256; i++) {
+        wr = vergepal[(i * 3)];         // set wr,wg,wb with source colors
+        wg = vergepal[(i * 3) + 1];
+        wb = vergepal[(i * 3) + 2];
 
-        wr=(wr+r)/2;                    // average values to compute final RGB
-        wg=(wg+g)/2;
-        wb=(wb+b)/2;
+        wr = (wr + r) / 2;              // average values to compute final RGB
+        wg = (wg + g) / 2;
+        wb = (wb + b) / 2;
 
-        dest[i]=match(wr,wg,wb);        // find closest match
+        dest[i] = match(wr, wg, wb);    // find closest match
     }
 }
 
-ColorScale(char *dest,int st,int fn,int inv) {
+ColorScale(char* dest, int st, int fn, int inv) {
     int i, intensity;
 
-    for (i=0; i<256; i++) {
-        intensity=vergepal[(i*3)];
-        intensity+=vergepal[(i*3)+1];
-        intensity+=vergepal[(i*3)+2];
-        intensity=intensity*(fn-st)/192;
-        if (inv) dest[i]=fn-intensity;
-        else dest[i]=st+intensity;
+    for (i = 0; i < 256; i++) {
+        intensity = vergepal[(i * 3)];
+        intensity += vergepal[(i * 3) + 1];
+        intensity += vergepal[(i * 3) + 2];
+        intensity = intensity * (fn - st) / 192;
+        if (inv) {
+            dest[i] = fn - intensity;
+        } else {
+            dest[i] = st + intensity;
+        }
     }
 }
 
 PreCalc_TransparencyFields() {
-    FILE *f;
+    FILE* f;
     int i;
 
     // First read the VERGE palette from verge.pal
 
-    f=fopen("VERGE.PAL","rb");
+    f = fopen("VERGE.PAL", "rb");
     fread(&vergepal, 1, 768, f);
     fclose(f);
-    transparencytbl=valloc(65536,"transparencytbl");
+    transparencytbl = valloc(65536, "transparencytbl");
 
     // Precompute some common translation tables.
 
-    ColorScale(&menuxlatbl,141,159,1);
-    ColorScale(&greyxlatbl,0,31,0);
+    ColorScale(&menuxlatbl, 141, 159, 1);
+    ColorScale(&greyxlatbl, 0, 31, 0);
 
     // Load in the 64k bitmap-on-bitmap transparency table (precomputed)
 
-    f=fopen("TRANS.TBL","rb");
+    f = fopen("TRANS.TBL", "rb");
     fread(transparencytbl, 1, 65535, f);
     fclose(f);
 }
@@ -470,7 +489,7 @@ ColorField(int x1, int y1, int x2, int y2, unsigned char *colortbl)
 }
 */
 
-ColorField(int x, int y, int x2, int y2, unsigned char *tbl) {
+ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
     asm( "movl %3, %%edx                   \n\t"
          "subl %1, %%edx                   \n\t"   // get height
          "movl %4, %%esi                   \n\t"
@@ -495,146 +514,180 @@ ColorField(int x, int y, int x2, int y2, unsigned char *tbl) {
          "jnz acf0                         \n\t"
          :
          : "m" (x), "m" (y), "m" (x2), "m" (y2), "m" (tbl)
-         : "eax","ebx","ecx","edx","esi","edi","cc" );
+         : "eax", "ebx", "ecx", "edx", "esi", "edi", "cc" );
 }
 
-Tcopysprite(int x1, int y1, int width, int height, unsigned char *src) {
-    unsigned int j,i,jz,iz;
-    unsigned char c,d;
+Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
+    unsigned int j, i, jz, iz;
+    unsigned char c, d;
 
-    for (j=0; j<height; j++)
-        for (i=0; i<width; i++) {
-            jz=j+y1;
-            iz=i+x1;
-            c=virscr[(jz*352)+iz];
-            d=src[(j*width)+i];
-            if (d) virscr[(jz*352)+iz]=transparencytbl[(d*256)+c];
+    for (j = 0; j < height; j++)
+        for (i = 0; i < width; i++) {
+            jz = j + y1;
+            iz = i + x1;
+            c = virscr[(jz * 352) + iz];
+            d = src[(j * width) + i];
+            if (d) {
+                virscr[(jz * 352) + iz] = transparencytbl[(d * 256) + c];
+            }
         }
 }
 
-_Tcopysprite(int x1, int y1, int width, int height, unsigned char *src) {
-    unsigned int j,i,jz,iz;
-    unsigned char c,d;
+_Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
+    unsigned int j, i, jz, iz;
+    unsigned char c, d;
 
-    for (j=0; j<height; j++)
-        for (i=0; i<width; i++) {
-            jz=j+y1;
-            iz=i+x1;
-            c=virscr[(jz*352)+iz];
-            d=src[(j*width)+i];
-            if (d) virscr[(jz*352)+iz]=transparencytbl[(c*256)+d];
+    for (j = 0; j < height; j++)
+        for (i = 0; i < width; i++) {
+            jz = j + y1;
+            iz = i + x1;
+            c = virscr[(jz * 352) + iz];
+            d = src[(j * width) + i];
+            if (d) {
+                virscr[(jz * 352) + iz] = transparencytbl[(c * 256) + d];
+            }
         }
 }
 
 // Font routines
 
-char oc=31;
+char oc = 31;
 
 LoadFont() {
-    FILE *f;
+    FILE* f;
 
-    fnt=valloc(6000,"fnt");
-    fnt2=valloc(14000,"fnt2");
-    tbox=valloc(30000,"tbox");
-    if (!(f=fopen("SMALL.FNT","rb"))) err("FATAL ERROR: Could not open SMALL.FNT.");
+    fnt = valloc(6000, "fnt");
+    fnt2 = valloc(14000, "fnt2");
+    tbox = valloc(30000, "tbox");
+    if (!(f = fopen("SMALL.FNT", "rb"))) {
+        err("FATAL ERROR: Could not open SMALL.FNT.");
+    }
     fread(fnt, 63, 95, f);
     fclose(f);
-    if (!(f=fopen("MAIN.FNT","rb"))) err("FATAL ERROR: Could not open MAIN.FNT.");
+    if (!(f = fopen("MAIN.FNT", "rb"))) {
+        err("FATAL ERROR: Could not open MAIN.FNT.");
+    }
     fread(fnt2, 144, 95, f);
     fclose(f);
-    if (!(f=fopen("BOX.RAW","rb"))) err("FATAL ERROR: Could not open BOX.RAW.");
+    if (!(f = fopen("BOX.RAW", "rb"))) {
+        err("FATAL ERROR: Could not open BOX.RAW.");
+    }
     fread(tbox, 320, 66, f);
     fclose(f);
 }
 
 pchar(int x, int y, char c) {
-    char *img;
+    char* img;
 
-    if ((c<32) || (c>126)) return;
-    img=fnt+((c-32)*63);
-    if ((c==103) || (c==106) || (c==112) || (c==113) || (c==121))
-        tcopysprite(x,y+2,7,9,img);
-    else tcopysprite(x,y,7,9,img);
+    if ((c < 32) || (c > 126)) {
+        return;
+    }
+    img = fnt + ((c - 32) * 63);
+    if ((c == 103) || (c == 106) || (c == 112) || (c == 113) || (c == 121)) {
+        tcopysprite(x, y + 2, 7, 9, img);
+    } else {
+        tcopysprite(x, y, 7, 9, img);
+    }
 }
 
 VCpchar(int x, int y, char c) {
-    char *img;
+    char* img;
 
-    if ((c<32) || (c>126)) return;
-    img=fnt+((c-32)*63);
-    if ((c==103) || (c==106) || (c==112) || (c==113) || (c==121))
-        VCtcopysprite(x,y+2,7,9,img);
-    else VCtcopysprite(x,y,7,9,img);
+    if ((c < 32) || (c > 126)) {
+        return;
+    }
+    img = fnt + ((c - 32) * 63);
+    if ((c == 103) || (c == 106) || (c == 112) || (c == 113) || (c == 121)) {
+        VCtcopysprite(x, y + 2, 7, 9, img);
+    } else {
+        VCtcopysprite(x, y, 7, 9, img);
+    }
 }
 
 bigpchar(int x, int y, char c) {
-    char *img;
+    char* img;
 
-    if ((c<32) || (c>126)) return;
-    img=fnt2+((c-32)*144);
-    if ((c==103) || (c==106) || (c==112) || (c==113) || (c==121))
-        tcopysprite(x,y+2,9,16,img);
-    else tcopysprite(x,y,9,16,img);
+    if ((c < 32) || (c > 126)) {
+        return;
+    }
+    img = fnt2 + ((c - 32) * 144);
+    if ((c == 103) || (c == 106) || (c == 112) || (c == 113) || (c == 121)) {
+        tcopysprite(x, y + 2, 9, 16, img);
+    } else {
+        tcopysprite(x, y, 9, 16, img);
+    }
 }
 
 gotoxy(int x, int y) {
-    x1=x;
-    y1=y;
+    x1 = x;
+    y1 = y;
 }
 
-printstring(char *str) {
+printstring(char* str) {
     int i;
     char c;
 
-    i=0;
-    if (!str[0]) return;
+    i = 0;
+    if (!str[0]) {
+        return;
+    }
 
 mainloop:
-    c=str[i];
-    pchar(x1,y1,c);
-    x1=x1+8;
+    c = str[i];
+    pchar(x1, y1, c);
+    x1 = x1 + 8;
     i++;
-    if (str[i]!=0) goto mainloop;
+    if (str[i] != 0) {
+        goto mainloop;
+    }
 }
 
-VCprintstring(int xx, int yy, char *str) {
+VCprintstring(int xx, int yy, char* str) {
     int i;
     char c;
 
-    i=0;
-    if (!str[0]) return;
+    i = 0;
+    if (!str[0]) {
+        return;
+    }
 
 mainloop:
-    c=str[i];
-    VCpchar(xx,yy,c);
-    xx=xx+8;
+    c = str[i];
+    VCpchar(xx, yy, c);
+    xx = xx + 8;
     i++;
-    if (str[i]!=0) goto mainloop;
+    if (str[i] != 0) {
+        goto mainloop;
+    }
 }
 
-bigprintstring(char *str) {
+bigprintstring(char* str) {
     int i;
     char c;
 
-    i=0;
-    if (!str[0]) return;
+    i = 0;
+    if (!str[0]) {
+        return;
+    }
 
 mainloop:
-    c=str[i];
-    bigpchar(x1,y1,c);
-    x1=x1+10;
+    c = str[i];
+    bigpchar(x1, y1, c);
+    x1 = x1 + 10;
     i++;
-    if (str[i]!=0) goto mainloop;
+    if (str[i] != 0) {
+        goto mainloop;
+    }
 }
 
 putbox() {
-    ColorField(18,151,334,213,&menuxlatbl);
-    tcopysprite(16,149,320,66,tbox);
+    ColorField(18, 151, 334, 213, &menuxlatbl);
+    tcopysprite(16, 149, 320, 66, tbox);
 
-//  border(18,149,333,213);
+    //  border(18,149,333,213);
 }
 
-dec_to_asciiz(int num, char *buf) {
+dec_to_asciiz(int num, char* buf) {
     asm ("movl $10, %%ebx              \n\t"
          "movl %0, %%eax               \n\t"
          "movl %1, %%edi               \n\t"
@@ -655,28 +708,30 @@ dec_to_asciiz(int num, char *buf) {
          "stosb                        \n\t"
          :
          : "m" (num), "m" (buf)
-         : "eax","ebx","edi","ecx","cc" );
+         : "eax", "ebx", "edi", "ecx", "cc" );
 }
 
-textwindow(char portrait, char *str1, char *str2, char *str3) {
-    tcopysprite(20,114,32,32,speech+(portrait*1024));
+textwindow(char portrait, char* str1, char* str2, char* str3) {
+    tcopysprite(20, 114, 32, 32, speech + (portrait * 1024));
     putbox();
-    gotoxy(25,155);
+    gotoxy(25, 155);
     bigprintstring(str1);
-    gotoxy(25,174);
+    gotoxy(25, 174);
     bigprintstring(str2);
-    gotoxy(25,193);
+    gotoxy(25, 193);
     bigprintstring(str3);
 }
 
 fontcolor(unsigned char c) {
     int i;
-    char *ptr;
+    char* ptr;
 
-    ptr=fnt;
-    for (i=0; i<5985; i++) {
-        if (*ptr==oc) *ptr=c;
+    ptr = fnt;
+    for (i = 0; i < 5985; i++) {
+        if (*ptr == oc) {
+            *ptr = c;
+        }
         ptr++;
     }
-    oc=c;
+    oc = c;
 }
