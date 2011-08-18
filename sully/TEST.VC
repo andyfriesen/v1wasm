@@ -1,0 +1,65 @@
+event /* 0 */
+{
+ EnforceAnimation();
+ flags[54]=2;
+}
+
+event /* 1 */
+{
+ mapswitch("ISLAND.MAP",0,0,0);
+}
+
+event /* 2 */
+{
+ mapswitch("UNDERSEA.MAP",13,20,0);
+}
+
+event /* 3 */
+{
+ if(facing(0))
+ {
+  mapswitch("COTTAGE.MAP",41,2,0);
+ }
+ mapswitch("COTTAGE.MAP",0,0,0);
+}
+
+event /* 4 */
+{
+ mapswitch("MOUNTAIN.MAP",0,0,0);
+}
+
+event /* 5 */
+{
+ if(facing(1))
+ {
+  mapswitch("CHASM.MAP",97,40,0);
+ }
+ mapswitch("CHASM.MAP",0,0,0);
+}
+
+event /* 6 */
+{
+ mapswitch("VILLAGE.MAP",0,0,0);
+}
+
+event /* 7 */
+{
+ mapswitch("VILLAGE.MAP",98,5,0);
+}
+
+event /* 8 */
+{
+ mapswitch("SHACK.MAP",1,29,0);
+}
+
+event /* 9 */
+{
+ mapswitch("CASTLE.MAP",0,0,0);
+}
+
+
+event /* 10 */
+{
+ SoundEffect(8);
+ FakeBattle();
+}

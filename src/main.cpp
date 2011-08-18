@@ -549,6 +549,7 @@ fadeloop:
     }
 }
 
+#if 0
 int main() {
     MiscSetup();
     PutOwnerText();
@@ -573,3 +574,4 @@ int main() {
 
     return 0;
 }
+#endif

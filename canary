@@ -1,0 +1,3 @@
+#!/bin/zsh
+cd /Applications/Google\ Chrome\ Canary.app/Contents
+NACL_ENABLE_PPAPI_DEV=1 MacOS/Google\ Chrome\ Canary --args --enable-accelerated-plugins

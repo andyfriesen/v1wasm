@@ -1,0 +1,9 @@
+Changelog from 6/5/97 to 6/16/97:
+ - Added operand combination to VergeC. (All old VCs will need to be recompiled)
+ - Took a 4 day vacation to kentucky.
+ - Got revamped maps from Hahn. (Probably the "major" deal of this version)
+ - Fixed up a stupid control bug in the Status Screen making the left arrow
+   work as if it were the right arrow.
+ - Added a GP window to the main menu.
+ - Fixed up the Banner command to keep the tile animations going while it's
+   in control.

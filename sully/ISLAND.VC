@@ -1,0 +1,125 @@
+event /* 0 */                                           
+{
+ EnforceAnimation();
+ if(flags[1])
+ {
+  AlterBTile(9,13,0,0);
+  AlterFTile(9,12,0,0);
+ }
+ if(flags[51])
+ {
+  AlterBTile(15,5,23,2);
+ }
+}
+
+event /* 1 */
+{
+ if(!flags[50])
+ {
+  text(0,"Hey, Darin! What's shaking",
+         "today?","");
+  text(1,"Oh, hi Sully. I guess I'm off",
+         "to save the world again.","");
+  text(0,"Sounds sensational! What kind",
+         "of show do you have in store",
+         "for us tonight?");
+  text(1,"Well, nothing much to look at,",
+         "except there are one or two",
+         "functional items this time.");
+  text(1,"Also look for some new and",
+         "improved stuff in the dungeons",
+         "to show off VergeC innovations.");
+  text(1,"Then we'll wrap it all up with",
+         "our musical guest, Oingo",
+         "Boingo!");
+ }
+ if(!flags[1])
+ {
+  text(0,"Say, isn't that your chickie",
+       "poo over there looking all",
+       "forlorn and introspective?");
+ }
+ if(!flags[50])
+ {
+  return;
+ }
+ if(flags[51])
+ {
+  text(0,"Please leave me be. I'm just a",
+         "silly little clam. I have no",
+         "objects of value for you!");
+  return;
+ }
+ text(0,"Hi! My name is Sully Clam. I",
+        "welcome you back to Paradise",
+        "Isle.");
+ text(5,"Enough small talk, clam. Tell",
+        "us where to find the Pearl of",
+        "Truth before I rough you up!");
+ text(2,"I thought Pearls came from",
+        "oysters, not clams.","");
+ text(4,"Sully, is there something you",
+        "haven't told us?","");
+ text(0,"Alright, I give up! The",
+        "ancient race of cyclops once",
+        "lived on this island.");
+ text(0,"There's a sacred hall beneath",
+        "here that holds the Pearl of",
+        "Truth.");
+ text(5,"Grand! Show us the entrance or",
+        "I'll teach you a whole new",
+        "meaning of shellfish abuse!");
+ text(0,"Okee dokee. Let me just try",
+        "to remember the location...","");
+ text(5,"Stop stalling, clam! I need to",
+        "get back inside the Castle",
+        "Heck right away!");
+ AlterBTile(15,5,23,2);
+ text(0,"There it is. Have fun!","","");
+ text(1,"Thanks, Sully. We owe ya one!","","");
+ flags[51]=1;
+}
+
+event /* 2 */
+{
+ if(!flags[1])
+ {
+  AlterBTile(9,13,5,0);
+  AlterFTile(9,12,7,0);
+  text(4,"Darin... Hello. How are you",
+       "today? I needed to talk to",
+       "you about something...");
+  text(4,"I... I've been thinking and",
+       "I've decided we need to leave",
+       "Paradise Island.");
+  text(1,"But Crystal! What's wrong?",
+       "I kinda like this blue lagoon",
+       "thing we have going on.");
+  text(4,"No... it has to be this way.",
+       "We'll go insane if we don't",
+       "have some adventure soon.");
+  text(1,"I suppose you're right. I'd",
+       "like to go exploring some",
+       "caves and stuff.");
+  text(4,"I'm glad you understand. I",
+       "suppose we can use the",
+       "undersea passage. Let's go!");
+  addcharacter(4);
+  AlterBTile(9,13,0,0);
+  AlterFTile(9,12,0,0);
+  flags[1]=1;
+ }
+}
+
+event /* 3 */
+{
+ mapswitch("UNDERSEA.MAP",0,0,0);
+}
+
+event /* 4 */
+{
+ if(flags[51])
+ {
+  mapswitch("UNDERSEA.MAP",47,21,0);
+ }
+}

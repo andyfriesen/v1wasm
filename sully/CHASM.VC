@@ -1,0 +1,65 @@
+event /* 0 */
+{
+ EnforceAnimation();
+ if(flags[31])
+ {
+  AlterFTile(41,29,182,0);
+ }
+}
+
+event /* 1 */
+{
+ mapswitch("TEST.MAP",21,18,0);
+}
+
+event /* 2 */
+{
+ mapswitch("TEST.MAP",21,20,0);
+}
+
+event /* 3 */
+{
+ text(0,"Welcome to Raven Gulch! It is",
+        "said that he who leaps over the",
+        "edge will fall to his death!");
+ text(0,"The forest village of Rodne is",
+        "to the south and Mount Jujube",
+        "is to the northeast.");
+}
+
+event /* 4 */
+{
+ if(!flags[29])
+ {
+  text(0,"Sorry. Nobody can cross the",
+         "bridge to Rodne unless I say",
+         "so. Now get outta here, kid!");
+  return;
+ }
+ if(flags[31])
+ {
+  text(0,"You can cross anytime you wish",
+         "now. Have fun, kid!","");
+  return;
+ }
+ text(0,"This is the Raven Gulch Bridge",
+        "that leads to Rodne. Do you",
+        "have authorization to cross?");
+ text(3,"It's me, old friend. Darin and",
+        "I need to cross in order to",
+        "save the world from doom.");
+ text(0,"Hi, Dexter. Well, you really",
+        "should have a passport or",
+        "something, but you can cross.");
+ text(0,"I shall remove the rock from",
+        "trail here. Stay out of",
+        "trouble now, ya hear?");
+ AlterFTile(41,29,182,0);
+ flags[31]=1;
+}
+
+event /* 5 */
+{
+ SoundEffect(8);
+ FakeBattle();
+}

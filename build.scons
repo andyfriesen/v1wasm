@@ -9,6 +9,7 @@ import nacl_utils
 import os
 
 nacl_env = make_nacl_env.NaClEnvironment(use_c_plus_plus_libs=True)
+nacl_env.Append(CXXFLAGS='-std=gnu++0x')
 
 sources = Split("""
 andyvc.cpp  engine.cpp  menu.cpp    nichgvc.cpp ricvc.cpp   vc.cpp      xbigdvc.cpp

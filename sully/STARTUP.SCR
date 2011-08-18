@@ -1,0 +1,6 @@
+playmusic AURORA.MOD
+showpcx verge320.pcx 45
+wait 91
+fadeout 45
+showpcx verge1.pcx 45
+end

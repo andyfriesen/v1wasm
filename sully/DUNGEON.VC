@@ -1,0 +1,446 @@
+event /* 0 */
+{
+ EnforceAnimation();
+ if(flags[34])
+ {
+  AlterFTile(25,39,195,0);
+  AlterBTile(25,40,273,0);
+  AlterBTile(25,41,273,0);
+ }
+ if(flags[42])
+ {
+  AlterFTile(25,15,195,0);
+  AlterBTile(25,16,273,0);
+ }
+ CallEvent(11,38,43,3);
+ CallEvent(11,39,45,3);
+ CallEvent(11,40,21,45);
+ CallEvent(11,41,29,45);
+ if(flags[43])
+ {
+  AlterParallax(1,1,1);
+  AlterFTile(15,26,0,0);
+  AlterFTile(35,26,0,0);
+  AlterFTile(11,24,0,1);
+  AlterFTile(11,25,0,1);
+  AlterFTile(12,23,0,1);
+  AlterFTile(13,23,0,1);
+  AlterFTile(14,24,0,1);
+  AlterFTile(15,24,0,1);
+  AlterFTile(16,24,0,1);
+  AlterFTile(17,23,0,1);
+  AlterFTile(18,23,0,1);
+  AlterFTile(19,23,0,1);
+  AlterFTile(20,23,0,1);
+  AlterFTile(21,23,0,1);
+  AlterFTile(23,23,0,1);
+  AlterFTile(24,23,0,1);
+  AlterFTile(25,23,0,1);
+  AlterFTile(26,23,0,1);
+  AlterFTile(27,23,0,1);
+  AlterFTile(29,23,0,1);
+  AlterFTile(30,23,0,1);
+  AlterFTile(31,23,0,1);
+  AlterFTile(32,23,0,1);
+  AlterFTile(33,23,0,1);
+  AlterFTile(34,24,0,1);
+  AlterFTile(35,24,0,1);
+  AlterFTile(36,24,0,1);
+  AlterFTile(37,23,0,1);
+  AlterFTile(38,23,0,1);
+  AlterFTIle(39,23,0,1);
+  AlterFTile(39,24,0,1);
+  AlterFTile(39,25,0,1);
+  AlterFTile(25,26,352,1);
+  AlterFTile(12,25,153,0);
+  AlterFTile(13,25,153,0);
+  AlterFTile(17,25,153,0);
+  AlterFTile(18,25,153,0);
+  AlterFTile(19,25,153,0);
+  AlterFTile(20,25,153,0);
+  AlterFTile(21,25,153,0);
+  AlterFTile(29,25,153,0);
+  AlterFTile(30,25,153,0);
+  AlterFTile(31,25,153,0);
+  AlterFTile(32,25,153,0);
+  AlterFTile(33,25,153,0);
+  AlterFTile(37,25,153,0);
+  AlterFTile(38,25,153,0);
+  AlterFTile(23,25,153,0);
+  AlterFTile(24,25,153,0);
+  AlterFTile(26,25,153,0);
+  AlterFTile(27,25,153,0);
+  AlterFTile(22,24,153,0);
+  AlterFTile(28,24,153,0);
+ }
+}
+
+event /* 1 */
+{
+ mapswitch("SHACK.MAP",71,5,0);
+}
+
+event /* 2 */
+{
+ if(!flags[34])
+ {
+  AlterBTile(25,40,371,2);
+  AlterBTile(25,41,369,2);
+  text(2,"Huh? Who are you? Oh, don't",
+         "tell me you fell into that",
+         "leaf patch trap as well!");
+  text(1,"Yep. What a nasty trick!",
+         "Who are you and where are",
+         "we?");
+  text(2,"My name is Sara, from the",
+         "town of Rodne. We are",
+         "beneath the love shack.");
+  text(1,"Sara! We've been looking for",
+         "you. We need you to help us",
+         "melt a crystal in Mt. Jujube.");
+  text(3,"Might you, by any chance,",
+         "have access to a Thermal",
+         "Activator, Sara?");
+  text(2,"Yes, I have one stored in my",
+         "basement behind a secret",
+         "passage.");
+  text(1,"Splendid! Can you help us,",
+         "then? I will gladly pay you",
+         "all that I have and more!");
+  text(2,"Keep your money. The Thermal",
+         "Activator is yours if you can",
+         "just get me out of here!");
+  text(3,"Is Big Daddy Bubba in that",
+         "small dwelling above us?","");
+  text(2,"Yes, it's horrible. He comes",
+         "down here each night and",
+         "drags me up to the cabin.");
+  text(2,"I have to wear a leather",
+         "thong and dance to Barry",
+         "White music! It's torture!");
+  text(1,"Then it's time we teach him",
+         "a thing or two about justice!","");
+  text(3,"But how can we get out of",
+         "this cell? Those bars look",
+         "thick and sturdy.");
+  text(2,"I can almost break them, but",
+         "with two people, I bet I",
+         "could do it!");
+  text(3,"Two people? But I can help",
+         "too! Just watch me!","");
+  text(1,"Step aside, wizard boy. This",
+         "is a job for me!","");
+  AlterBTile(25,40,370,2);
+  AlterBTile(25,41,368,2);
+  text(2,"Hieeeee-yah!","","");
+  text(1,"Sho-Ryu-Ken!","","");
+  soundeffect(3);
+  AddCharacter(2);
+  AlterFTile(25,39,195,0);
+  AlterBTile(25,40,273,0);
+  AlterBTile(25,41,273,0);
+  text(2,"All right! We did it. Now",
+         "let's escape from this",
+         "terrible place.");
+  flags[34]=1;
+ }
+}
+
+event /* 3 */
+{
+ if(flags[42])
+ {
+  return;
+ }
+ if(!flags[38])
+ {
+  text(partyindex(1)+1,"Oh pooh. This gate is locked.","","");
+  return;
+ }
+ soundeffect(3);
+ AlterFTile(25,15,195,0);
+ AlterBTile(25,16,273,0);
+ text(partyindex(1)+1,"The Bronze Key fits. Let's go.","","");
+ DestroyItem(23,0);
+ flags[42]=1;
+}
+
+event /* 4 */
+{
+ ChainEvent(10,38,43,3,23);
+}
+
+event /* 5 */
+{
+ ChainEvent(10,39,45,3,2);
+}
+
+event /* 6 */
+{
+ ChainEvent(10,40,21,45,2);
+}
+
+event /* 7 */
+{
+ ChainEvent(10,41,29,45,2);
+}
+
+event /* 8 */
+{
+ AlterParallax(1,1,1);
+ AlterFTile(15,26,0,0);
+ AlterFTile(35,26,0,0);
+ AlterFTile(11,24,0,1);
+ AlterFTile(11,25,0,1);
+ AlterFTile(12,23,0,1);
+ AlterFTile(13,23,0,1);
+ AlterFTile(14,24,0,1);
+ AlterFTile(15,24,0,1);
+ AlterFTile(16,24,0,1);
+ AlterFTile(17,23,0,1);
+ AlterFTile(18,23,0,1);
+ AlterFTile(19,23,0,1);
+ AlterFTile(20,23,0,1);
+ AlterFTile(21,23,0,1);
+ AlterFTile(23,23,0,1);
+ AlterFTile(24,23,0,1);
+ AlterFTile(25,23,0,1);
+ AlterFTile(26,23,0,1);
+ AlterFTile(27,23,0,1);
+ AlterFTile(29,23,0,1);
+ AlterFTile(30,23,0,1);
+ AlterFTile(31,23,0,1);
+ AlterFTile(32,23,0,1);
+ AlterFTile(33,23,0,1);
+ AlterFTile(34,24,0,1);
+ AlterFTile(35,24,0,1);
+ AlterFTile(36,24,0,1);
+ AlterFTile(37,23,0,1);
+ AlterFTile(38,23,0,1);
+ AlterFTIle(39,23,0,1);
+ AlterFTile(39,24,0,1);
+ AlterFTile(39,25,0,1);
+ AlterFTile(25,26,352,1);
+ AlterFTile(12,25,153,0);
+ AlterFTile(13,25,153,0);
+ AlterFTile(17,25,153,0);
+ AlterFTile(18,25,153,0);
+ AlterFTile(19,25,153,0);
+ AlterFTile(20,25,153,0);
+ AlterFTile(21,25,153,0);
+ AlterFTile(29,25,153,0);
+ AlterFTile(30,25,153,0);
+ AlterFTile(31,25,153,0);
+ AlterFTile(32,25,153,0);
+ AlterFTile(33,25,153,0);
+ AlterFTile(37,25,153,0);
+ AlterFTile(38,25,153,0);
+ AlterFTile(23,25,153,0);
+ AlterFTile(24,25,153,0);
+ AlterFTile(26,25,153,0);
+ AlterFTile(27,25,153,0);
+ AlterFTile(22,24,153,0);
+ AlterFTile(28,24,153,0);
+ flags[43]=1;
+}
+
+event /* 9 */
+{
+ AlterParallax(0,1,1);
+ AlterFTile(15,26,0,1);
+ AlterFTile(35,26,0,1);
+ AlterFTile(11,24,0,0);
+ AlterFTile(11,25,0,0);
+ AlterFTile(12,23,0,0);
+ AlterFTile(13,23,0,0);
+ AlterFTile(14,24,0,0);
+ AlterFTile(15,24,0,0);
+ AlterFTile(16,24,0,0);
+ AlterFTile(17,23,0,0);
+ AlterFTile(18,23,0,0);
+ AlterFTile(19,23,0,0);
+ AlterFTile(20,23,0,0);
+ AlterFTile(21,23,0,0);
+ AlterFTile(23,23,0,0);
+ AlterFTile(24,23,0,0);
+ AlterFTile(25,23,0,0);
+ AlterFTile(26,23,0,0);
+ AlterFTile(27,23,0,0);
+ AlterFTile(29,23,0,0);
+ AlterFTile(30,23,0,0);
+ AlterFTile(31,23,0,0);
+ AlterFTile(32,23,0,0);
+ AlterFTile(33,23,0,0);
+ AlterFTile(34,24,0,0);
+ AlterFTile(35,24,0,0);
+ AlterFTile(36,24,0,0);
+ AlterFTile(37,23,0,0);
+ AlterFTile(38,23,0,0);
+ AlterFTIle(39,23,0,0);
+ AlterFTile(39,24,0,0);
+ AlterFTile(39,25,0,0);
+ AlterFTile(25,26,352,0);
+ AlterFTile(12,25,153,1);
+ AlterFTile(13,25,153,1);
+ AlterFTile(17,25,153,1);
+ AlterFTile(18,25,153,1);
+ AlterFTile(19,25,153,1);
+ AlterFTile(20,25,153,1);
+ AlterFTile(21,25,153,1);
+ AlterFTile(29,25,153,1);
+ AlterFTile(30,25,153,1);
+ AlterFTile(31,25,153,1);
+ AlterFTile(32,25,153,1);
+ AlterFTile(33,25,153,1);
+ AlterFTile(37,25,153,1);
+ AlterFTile(38,25,153,1);
+ AlterFTile(23,25,153,1);
+ AlterFTile(24,25,153,1);
+ AlterFTile(26,25,153,1);
+ AlterFTile(27,25,153,1);
+ AlterFTile(22,24,153,1);
+ AlterFTile(28,24,153,1);
+ flags[43]=0;
+}
+
+event /* 10 */                                  // Master Chest Script
+{
+ if(!flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),367,2);
+  SoundEffect(3);
+  GiveItem(var(3));
+  flags[var(0)]=1;
+ }
+}
+
+event /* 11 */                                  // Master Chest Auto-Exec
+{
+ if(flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),367,2);
+ }
+}
+
+event /* 12 */
+{
+ soundeffect(8);
+ FakeBattle();
+}
+
+event /* 13 */
+{
+ soundeffect(7);
+ Banner("Save Point",3);
+ EnableSave();
+}
+
+event /* 14 */
+{
+ DisableSave();
+}
+
+event /* 15 */
+{
+ if(!flags[93])
+ {
+  if(flags[90]=4 AND flags[91]=2 AND flags[92]=7)
+  {
+   SoundEffect(3);
+   AlterBTile(35,17,518,2);
+   AlterBTile(36,16,273,0);
+   AlterFTile(36,15,0,0);
+   flags[93]=1;
+   return;
+  }
+  soundeffect(13);
+  text(partyindex(1)+1,"The lever is stuck.","","");
+ }
+}
+
+event /* 16 */
+{
+ ChainEvent(19,90,40);
+}
+
+event /* 17 */
+{
+ ChainEvent(19,91,41);
+}
+
+event /* 18 */
+{
+ ChainEvent(19,92,42);
+}
+
+event /* 19 */
+{
+ prompt(partyindex(1)+1,"The red button decreases.",
+        "The green button increases.","",94,"Red","Green");
+ if(flags[94])
+ {
+  if(flags[var(0)]=9)
+  {
+   Soundeffect(13);
+   return;
+  }
+  flags[var(0)]+=1;
+  AlterFTile(var(1),15,flags[var(0)]+507,2);
+  SoundEffect(5);
+  return;
+ }
+ if(!flags[var(0)])
+ {
+  Soundeffect(13);
+  return;
+ }
+ flags[var(0)]-=1;
+ AlterFTile(var(1),15,flags[var(0)]+507,2);
+ Soundeffect(5);
+}
+
+event /* 20 */
+{
+ text(0,"You fell into Big Daddy Bubba's",
+        "trap! Ha ha!","");
+}
+
+event /* 21 */
+{
+ text(0,"Please don't leave this cell.",
+        "We're so bored and lonely!","");
+}
+
+event /* 22 */
+{
+ text(0,"Don't look at me. I'm just a",
+        "dumb skull!","");
+}
+
+event /* 23 */
+{
+ text(0,"The sum of the numbers is 13.","","");
+}
+
+event /* 24 */
+{
+ text(0,"The second number is not odd.","","");
+}
+
+event /* 25 */
+{
+ text(0,"The first number is greater",
+        "than 3.","");
+}
+
+event /* 26 */
+{
+ text(0,"The first and second numbers",
+        "are not the same.","");
+}
+
+event /* 27 */
+{
+ text(0,"The third number is greater",
+        "than the sum of the first two.","");
+}
