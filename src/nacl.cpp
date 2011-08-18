@@ -2,13 +2,15 @@
 #include <cstdio>
 #include <string>
 #include <memory>
+#include "ppapi/c/ppb_file_io.h"
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/completion_callback.h"
 #include "ppapi/cpp/file_system.h"
+#include "ppapi/cpp/file_ref.h"
+#include "ppapi/cpp/file_io.h"
 #include "ppapi/cpp/url_request_info.h"
 #include "ppapi/cpp/url_loader.h"
-#include "ppapi/cpp/file_io.h"
 #include "ppapi/cpp/var.h"
 
 void MiscSetup();
@@ -103,9 +105,10 @@ private:
 };
 
 struct GameDownloader {
-    GameDownloader(pp::Instance* instance)
+    GameDownloader(pp::Instance* instance, pp::FileSystem* fs)
         : instance(instance)
         , ccFactory(this)
+        , fileSystem(fs)
     { }
 
     void start() {
@@ -154,25 +157,54 @@ struct GameDownloader {
         printf("next asset is '%s'\n", next.c_str());
         manifest.pop_back();
         auto url = "http://localhost:5013/v1/sully/" + next;
-        auto cc = ccFactory.NewCallback(&GameDownloader::gotFile);
+        auto cc = ccFactory.NewCallback(&GameDownloader::gotFile, next);
         downloader.reset(new Downloader(instance));
         downloader->get(url, cc);
     }
 
-    void gotFile(int32_t result) {
+    void gotFile(int32_t result, std::string currentFile) {
         if (result != PP_OK) {
             printf("Failed ;_;\n");
             return;
         }
 
-        printf("GameDownloader::gotFile OK\n");
+        printf("GameDownloader::gotFile '%s' OK\n", currentFile.c_str());
+
+        auto fr = pp::FileRef(*fileSystem, ("/" + currentFile).c_str());
+        fio.reset(new pp::FileIO(instance));
+
+        auto cb = ccFactory.NewCallback(&GameDownloader::openedFile, currentFile);
+        fio->Open(fr, PP_FILEOPENFLAG_CREATE | PP_FILEOPENFLAG_WRITE | PP_FILEOPENFLAG_TRUNCATE, cb);
+    }
+
+    void openedFile(int32_t result, std::string currentFile) {
+        if (result != PP_OK) {
+            printf("FileIO::Open failed %i\n", result);
+            return;
+        }
+
+        auto cb = ccFactory.NewCallback(&GameDownloader::fileWriteComplete, currentFile);
+        fio->Write(0, downloader->getData(), downloader->getLength(), cb);
+    }
+
+    void fileWriteComplete(int32_t writeResult, std::string currentFile) {
+        if (writeResult < 0) {
+            printf("FileIO::Write failed result=%i\n", writeResult);
+            return;
+        }
+
+        auto bytesWritten = writeResult;
+        printf("GameDownloader::Wrote %i bytes to %s OK\n", bytesWritten, currentFile.c_str());
+
         getNextFile();
     }
 
 private:
     pp::Instance* instance;
     pp::CompletionCallbackFactory<GameDownloader> ccFactory;
+    pp::FileSystem* fileSystem;
     std::shared_ptr<Downloader> downloader;
+    std::shared_ptr<pp::FileIO> fio;
     std::vector<std::string> manifest;
 };
 
@@ -180,7 +212,8 @@ struct V1naclInstance : public pp::Instance {
     explicit V1naclInstance(PP_Instance instance)
         : pp::Instance(instance)
         , ccfactory(this)
-        , gameDownloader(this)
+        , fileSystem(this, PP_FILESYSTEMTYPE_LOCALTEMPORARY)
+        , gameDownloader(this, &fileSystem)
     {}
 
     virtual ~V1naclInstance() {
@@ -196,9 +229,18 @@ struct V1naclInstance : public pp::Instance {
         /*auto cb = ccfactory.NewCallback(&V1naclInstance::download);
         downloader.get("http://localhost:5013/v1/sully/manifest.txt", cb);
         printf("Dispatched ok\n");*/
-        gameDownloader.start();
 
+        auto cb = ccfactory.NewCallback(&V1naclInstance::fileSystemIsOpen);
+        fileSystem.Open(5000, cb);
         return true;
+    }
+
+    void fileSystemIsOpen(int32_t result) {
+        if (result != 0) {
+            printf("FileSystem::Open failed %i\n", result);
+            return;
+        }
+        gameDownloader.start();
     }
 
     virtual void HandleMessage(const pp::Var& var_message) {
@@ -215,6 +257,7 @@ struct V1naclInstance : public pp::Instance {
 
 private:
     pp::CompletionCallbackFactory<V1naclInstance> ccfactory;
+    pp::FileSystem fileSystem;
     GameDownloader gameDownloader;
 };
 
