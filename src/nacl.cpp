@@ -1,6 +1,7 @@
 
 #include <cstdio>
 #include <string>
+#include <memory>
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/completion_callback.h"
@@ -18,7 +19,6 @@ void InitItems();
 struct Downloader {
     explicit Downloader(pp::Instance* instance)
         : instance(instance)
-          //, url(url)
         , urlRequestInfo(instance)
         , ccFactory(this)
         , urlLoader(instance)
@@ -31,6 +31,7 @@ struct Downloader {
     }
 
     int32_t get(const std::string& url, pp::CompletionCallback cb) {
+        data.resize(0);
         this->url = url;
         onComplete = cb;
         urlRequestInfo.SetURL(url);
@@ -66,6 +67,7 @@ struct Downloader {
             onError(result);
             return;
         } else if (result == 0) {
+            urlLoader.Close();
             onComplete.Run(PP_OK);
         } else {
             auto bytes = result < bufferSize ? result : bufferSize;
@@ -77,6 +79,7 @@ struct Downloader {
 
     void onError(int32_t result) {
         printf("Downloader::onError(%s) result = %i\n", url.c_str(), result);
+        onComplete.Run(result);
     }
 
     const char* getData() const {
@@ -99,11 +102,85 @@ private:
     std::vector<char> data;
 };
 
+struct GameDownloader {
+    GameDownloader(pp::Instance* instance)
+        : instance(instance)
+        , ccFactory(this)
+    { }
+
+    void start() {
+        printf("Fetching manifest\n");
+        downloader.reset(new Downloader(instance));
+        auto cc = ccFactory.NewCallback(&GameDownloader::gotManifest);
+        downloader->get("http://localhost:5013/v1/sully/manifest.txt", cc);
+    }
+
+    void gotManifest(int32_t result) {
+        if (result != PP_OK) {
+            printf("Failed to get manifest :( result=%i\n", result);
+            return;
+        }
+
+        auto data = std::string(downloader->getData(), downloader->getLength());
+        do {
+            auto p = data.find('\n');
+            if (p == std::string::npos) {
+                appendToManifest(data);
+                break;
+            }
+
+            auto file = data.substr(0, p);
+            appendToManifest(file);
+            data.erase(0, p + 1);
+        } while (true);
+
+        getNextFile();
+    }
+
+    void appendToManifest(const std::string& s) {
+        if (s.length() > 0) {
+            printf("manifest\t'%s'\n", s.c_str());
+            manifest.push_back(s);
+        }
+    }
+
+    void getNextFile() {
+        if (manifest.size() == 0) {
+            printf("Complete!\n");
+            return;
+        }
+
+        auto next = manifest.back();
+        printf("next asset is '%s'\n", next.c_str());
+        manifest.pop_back();
+        auto url = "http://localhost:5013/v1/sully/" + next;
+        auto cc = ccFactory.NewCallback(&GameDownloader::gotFile);
+        downloader.reset(new Downloader(instance));
+        downloader->get(url, cc);
+    }
+
+    void gotFile(int32_t result) {
+        if (result != PP_OK) {
+            printf("Failed ;_;\n");
+            return;
+        }
+
+        printf("GameDownloader::gotFile OK\n");
+        getNextFile();
+    }
+
+private:
+    pp::Instance* instance;
+    pp::CompletionCallbackFactory<GameDownloader> ccFactory;
+    std::shared_ptr<Downloader> downloader;
+    std::vector<std::string> manifest;
+};
+
 struct V1naclInstance : public pp::Instance {
     explicit V1naclInstance(PP_Instance instance)
         : pp::Instance(instance)
         , ccfactory(this)
-        , downloader(this)
+        , gameDownloader(this)
     {}
 
     virtual ~V1naclInstance() {
@@ -116,9 +193,10 @@ struct V1naclInstance : public pp::Instance {
         InitItems();*/
 
         printf("Init\n");
-        auto cb = ccfactory.NewCallback(&V1naclInstance::download);
-        downloader.get("http://localhost:5013/v1/sully/SETUP.CFG", cb);
-        printf("Dispatched ok\n");
+        /*auto cb = ccfactory.NewCallback(&V1naclInstance::download);
+        downloader.get("http://localhost:5013/v1/sully/manifest.txt", cb);
+        printf("Dispatched ok\n");*/
+        gameDownloader.start();
 
         return true;
     }
@@ -127,18 +205,17 @@ struct V1naclInstance : public pp::Instance {
     }
 
     void download(int32_t result) {
-        if (result == PP_OK) {
-            printf("OK! :D\n");
+/*        if (result == PP_OK) {
             auto d = std::string(downloader.getData(), downloader.getLength());
-            printf("Data: %s", d.c_str());
+            printf("V1naclInstance::download succeeded.  Data:\n%s\n", d.c_str());
         } else {
             printf("V1naclInstance::download fail :( result=%i\n", result);
-        }
+            }*/
     }
 
 private:
     pp::CompletionCallbackFactory<V1naclInstance> ccfactory;
-    Downloader downloader;
+    GameDownloader gameDownloader;
 };
 
 class V1naclModule : public pp::Module {
