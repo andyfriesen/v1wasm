@@ -13,6 +13,9 @@
 #include "sound.h"
 #include "timer.h"
 #include "render.h"
+#include "fs.h"
+
+using namespace verge;
 
 char numfx;
 char curch;
@@ -35,13 +38,15 @@ signed short mp_sngpos;
 void tickhandler() {
 }
 
-int ParseSetup() {
-    FILE* s;
+void ParseSetup() {
+    char strbuf[256];
 
-    if (!(s = fopen("SETUP.CFG", "r"))) {
+    auto s = vopen("SETUP.CFG", "r");
+
+    if (!s) {
         printf("Could not open SETUP.CFG - Using defaults.\n");
         delay(2000);
-        return 0;
+        return;
     }
 
 parseloop:
@@ -50,9 +55,9 @@ parseloop:
         err("Exiting: CTRL-ALT-DEL pressed.");
     }
 
-    fscanf(s, "%s", strbuf);
+    vscanf(s, "%s", strbuf);
     if (!strcmp(strbuf, "waitvrt")) {
-        fscanf(s, "%s", strbuf);
+        vscanf(s, "%s", strbuf);
         waitvrt = atoi(strbuf);
         goto parseloop;
     }
@@ -69,7 +74,7 @@ parseloop:
     //       mapvcm=atoi(strbuf);
     //       goto parseloop; }
     if (!strcmp(strbuf, "vcbuf")) {
-        fscanf(s, "%s", strbuf);
+        vscanf(s, "%s", strbuf);
         vcbufm = atoi(strbuf);
         goto parseloop;
     }
@@ -87,55 +92,71 @@ parseloop:
     }
 
     if (!strcmp(strbuf, "joystick")) {
-        fscanf(s, "%s", strbuf);
+        vscanf(s, "%s", strbuf);
         jf = atoi(strbuf);
         goto parseloop;
     }
     if (!strcmp(strbuf, "kb1")) {
-        fscanf(s, "%u", &kb1);
+        int q;
+        vscanf(s, "%u", &q);
+        kb1 = q;
         goto parseloop;
     }
     if (!strcmp(strbuf, "kb2")) {
-        fscanf(s, "%u", &kb2);
+        int q;
+        vscanf(s, "%u", &q);
+        kb2 = q;
         goto parseloop;
     }
     if (!strcmp(strbuf, "kb3")) {
-        fscanf(s, "%u", &kb3);
+        int q;
+        vscanf(s, "%u", &q);
+        kb3 = q;
         goto parseloop;
     }
     if (!strcmp(strbuf, "kb4")) {
-        fscanf(s, "%u", &kb4);
+        int q;
+        vscanf(s, "%u", &q);
+        kb4 = q;
         goto parseloop;
     }
     if (!strcmp(strbuf, "jb1")) {
-        fscanf(s, "%u", &jb1);
+        int q;
+        vscanf(s, "%u", &q);
+        jb1 = q;
         goto parseloop;
     }
     if (!strcmp(strbuf, "jb2")) {
-        fscanf(s, "%u", &jb2);
+        int q;
+        vscanf(s, "%u", &q);
+        jb2 = q;
         goto parseloop;
     }
     if (!strcmp(strbuf, "jb3")) {
-        fscanf(s, "%u", &jb3);
+        int q;
+        vscanf(s, "%u", &q);
+        jb3 = q;
         goto parseloop;
     }
     if (!strcmp(strbuf, "jb4")) {
-        fscanf(s, "%u", &jb4);
+        int q;
+        vscanf(s, "%u", &q);
+        jb4 = q;
         goto parseloop;
     }
 
     if (!strcmp(strbuf, "sounddevice")) {
-        fscanf(s, "%s", strbuf);
+        vscanf(s, "%s", strbuf);
         //md_device = atoi(strbuf);
         goto parseloop;
     }
     if (!strcmp(strbuf, "mixrate")) {
-        fscanf(s, "%s", strbuf);
+        vscanf(s, "%s", strbuf);
         //md_mixfreq = atoi(strbuf);
         goto parseloop;
     }
     if (!strcmp(strbuf, "dmabufsize")) {
-        fscanf(s, "%s", strbuf);
+        vscanf(s, "%s", strbuf);
         //md_dmabufsize = atoi(strbuf);
         goto parseloop;
     }
@@ -152,12 +173,12 @@ parseloop:
         goto parseloop;
     }
     if (!strcmp(strbuf, "volume")) {
-        fscanf(s, "%s", strbuf);
+        vscanf(s, "%s", strbuf);
         //mp_volume = atoi(strbuf);
         goto parseloop;
     }
 
-    fclose(s);
+    vclose(s);
 }
 
 int lastvol;
@@ -166,8 +187,6 @@ void sound_init()
 // Incidently, sound_init() also initializes the control interface, since
 // they both use SETUP.CFG.
 {
-    char t;
-
     vspm = 256000;
     //mapvcm=50000; // -- aen; 31/May/09 -- no longer used; see LoadVC().
     vcbufm = 250000;

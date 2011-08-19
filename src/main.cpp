@@ -17,6 +17,8 @@
 #include "vc.h"
 #include "vclib.h"
 #include "render.h"
+#include "fs.h"
+using namespace verge;
 
 char* strbuf;
 unsigned char* speech;
@@ -31,11 +33,11 @@ extern char* magicvc;
 extern unsigned int effectofstbl[1024], startupofstbl[1024], magicofstbl[1024];
 
 int Exist(char* fname) {
-    FILE* tempf;
+    VFILE* tempf;
 
-    tempf = fopen(fname, "rb");
+    tempf = vopen(fname, "rb");
     if (tempf) {
-        fclose(tempf);
+        vclose(tempf);
         return 1;
     } else {
         return 0;
@@ -89,60 +91,60 @@ void PutOwnerText() {
 }
 
 void InitPStats() {
-    FILE* pdat, *cdat;
+    VFILE* pdat, *cdat;
     char i;
-    pdat = fopen("PARTY.DAT", "r");
+    pdat = vopen("PARTY.DAT", "r");
     if (!pdat) {
         err("Fatal error: PARTY.DAT not found");
     }
-    fscanf(pdat, "%s", strbuf);
+    vscanf(pdat, "%s", strbuf);
     tchars = atoi((char*)strbuf);
     for (i = 0; i < tchars; i++) {
-        fscanf(pdat, "%s", &pstats[i].chrfile);
-        fscanf(pdat, "%s", strbuf);
-        fscanf(pdat, "%s", strbuf);
-        cdat = fopen(strbuf, "r");
+        vscanf(pdat, "%s", &pstats[i].chrfile);
+        vscanf(pdat, "%s", strbuf);
+        vscanf(pdat, "%s", strbuf);
+        cdat = vopen(strbuf, "r");
         if (!cdat) {
             err("Could not open character DAT file.");
         }
-        fscanf(cdat, "%s", &pstats[i].name);
-        fgets(strbuf, 99, cdat);
-        fgets(strbuf, 99, cdat);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", &pstats[i].name);
+        vgets(strbuf, 99, cdat);
+        vgets(strbuf, 99, cdat);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].exp = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].curhp = atoi(strbuf);
         pstats[i].maxhp = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].curmp = atoi(strbuf);
         pstats[i].maxmp = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].str = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].end = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].mag = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].mgr = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].hit = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].dod = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].mbl = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].fer = atoi(strbuf);
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].rea = atoi(strbuf);
         pstats[i].lv = 1;
-        fscanf(cdat, "%s", strbuf);
+        vscanf(cdat, "%s", strbuf);
         pstats[i].nxt = atoi(strbuf);
         pstats[i].status = 0;
         pstats[i].invcnt = 6;
         memset(&pstats[i].inv, 0, 512);
-        fclose(cdat);
+        vclose(cdat);
     }
-    fclose(pdat);
+    vclose(pdat);
 }
 
 void StartNewGame(char* startp) {
@@ -176,7 +178,7 @@ void StartNewGame(char* startp) {
 }
 
 void LoadGame(char* fn) {
-    FILE* f;
+    VFILE* f;
     char i, b;
 
     quake = 0;
@@ -193,22 +195,22 @@ void LoadGame(char* fn) {
     drawentities = 1;
     cameratracking = 1;
     numchars = 0;
-    f = fopen(fn, "rb");
-    fread(strbuf, 1, 51, f);
-    fread(&gp, 1, 4, f);
-    fread(&hr, 1, 1, f);
-    fread(&min, 1, 1, f);
-    fread(&sec, 1, 1, f);
-    fread(&b, 1, 1, f);
-    fread(&menuactive, 1, 1, f);
-    fread(virscr, 1, 2560, f);
-    fread(&mapname, 1, 13, f);
-    fread(&party, 1, sizeof party, f);
-    fread(&partyidx, 1, 5, f);
-    fread(&flags, 1, 32000, f);
-    fread(&tchars, 1, 1, f);
-    fread(&pstats, 1, sizeof pstats, f);
-    fclose(f);
+    f = vopen(fn, "rb");
+    vread(strbuf, 1, 51, f);
+    vread(&gp, 1, 4, f);
+    vread(&hr, 1, 1, f);
+    vread(&min, 1, 1, f);
+    vread(&sec, 1, 1, f);
+    vread(&b, 1, 1, f);
+    vread(&menuactive, 1, 1, f);
+    vread(virscr, 1, 2560, f);
+    vread(&mapname, 1, 13, f);
+    vread(&party, 1, sizeof party, f);
+    vread(&partyidx, 1, 5, f);
+    vread(&flags, 1, 32000, f);
+    vread(&tchars, 1, 1, f);
+    vread(&pstats, 1, sizeof pstats, f);
+    vclose(f);
     for (i = 0; i < b; i++) {
         addcharacter(partyidx[i]);
     }
@@ -219,7 +221,7 @@ void LoadGame(char* fn) {
 }
 
 void ProcessEquipDat() {
-    FILE* f;
+    VFILE* f;
     int a, i, t;
     int i2;
 
@@ -227,77 +229,77 @@ void ProcessEquipDat() {
     // It's pretty long as it has to have a processing section for each possible
     // stat, plus some other stuff. :P
 
-    f = fopen("EQUIP.DAT", "r");
+    f = vopen("EQUIP.DAT", "r");
     if (!f) {
         err("Could not open EQUIP.DAT.");
     }
-    fscanf(f, "%d", &a);
+    vscanf(f, "%d", &a);
     for (i = 1; i <= a; i++) {
 pl1:
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         strupr(strbuf);
         if (!strcmp(strbuf, "//")) {
-            fgets(strbuf, 99, f);
+            vgets(strbuf, 99, f);
             goto pl1;
         }
         if (!strcmp(strbuf, "ATK")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].str = atoi(strbuf);
             goto pl1;
         }
         if (!strcmp(strbuf, "DEF")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].end = atoi(strbuf);
             goto pl1;
         }
         if (!strcmp(strbuf, "MAG")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].mag = atoi(strbuf);
             goto pl1;
         }
         if (!strcmp(strbuf, "MGR")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].mgr = atoi(strbuf);
             goto pl1;
         }
         if (!strcmp(strbuf, "HIT")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].hit = atoi(strbuf);
             goto pl1;
         }
         if (!strcmp(strbuf, "DOD")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].dod = atoi(strbuf);
             goto pl1;
         }
         if (!strcmp(strbuf, "MBL")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].mbl = atoi(strbuf);
             goto pl1;
         }
         if (!strcmp(strbuf, "FER")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].fer = atoi(strbuf);
             goto pl1;
         }
         if (!strcmp(strbuf, "REA")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].rea = atoi(strbuf);
             goto pl1;
         }
         if (!strcmp(strbuf, "ONEQUIP")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].onequip = atoi(strbuf) + 1;
             goto pl1;
         }
         if (!strcmp(strbuf, "ONDEEQUIP")) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             equip[i].ondeequip = atoi(strbuf) + 1;
             goto pl1;
         }
         if (!strcmp(strbuf, "EQABLE")) {
 eqloop:
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             if (!strcmp(strbuf, "-")) {
                 continue;
             }
@@ -307,23 +309,23 @@ eqloop:
     }
     // FOLLOWING IS NEW, AND NEEDS TRIMMING
 
-    f = fopen("MAGICEQ.DAT", "r");
+    f = vopen("MAGICEQ.DAT", "r");
     if (!f) {
         err("Could not open MAGICEQ.DAT.");
     }
-    fscanf(f, "%d", &a);
+    vscanf(f, "%d", &a);
     for (i = 1; i <= a; i++) {
 mpl1:
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         strupr(strbuf);
         if (!strcmp(strbuf, "//")) {
-            fgets(strbuf, 99, f);
+            vgets(strbuf, 99, f);
             goto mpl1;
         }
 
         if (!strcmp(strbuf, "EQABLE")) {
 meqloop:
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             if (!strcmp(strbuf, "-")) {
                 continue;
             }
@@ -332,7 +334,7 @@ meqloop:
         }
         if (!strcmp(strbuf, "LEVEL")) {
 mlevloop:
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             if (!strcmp(strbuf, "-")) {
                 continue;
             }
@@ -346,133 +348,132 @@ mlevloop:
 }
 
 void InitItems() {
-    FILE* f;
     unsigned char b, i;
     int j;
-    f = fopen("ITEMICON.DAT", "rb");
+    auto f = vopen("ITEMICON.DAT", "rb");
     if (!f) {
         err("Could not open ITEMICON.DAT.");
     }
-    fread(&b, 1, 1, f);
-    fread(itemicons + 256, 256, b, f);
-    fclose(f);
+    vread(&b, 1, 1, f);
+    vread(itemicons + 256, 256, b, f);
+    vclose(f);
 
-    f = fopen("ITEMS.DAT", "r");
+    f = vopen("ITEMS.DAT", "r");
     if (!f) {
         err("Could not open ITEMS.DAT.");
     }
-    fscanf(f, "%s", strbuf);
+    vscanf(f, "%s", strbuf);
     b = atoi(strbuf);
     for (i = 1; i < b + 1; i++) {
-        fscanf(f, "%s", items[i].name);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", items[i].name);
+        vscanf(f, "%s", strbuf);
         items[i].icon = atoi(strbuf) + 1;
-        fscanf(f, "%s", items[i].desc);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", items[i].desc);
+        vscanf(f, "%s", strbuf);
         items[i].useflag = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         items[i].useeffect = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         items[i].itemtype = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         items[i].equipflag = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         items[i].equipidx = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         items[i].itmprv = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         items[i].price = atoi(strbuf);
     }
-    fclose(f);
+    vclose(f);
 
     // *** NEW ***  MAGIC INIT
 
-    f = fopen("MAGICON.DAT", "rb");
+    f = vopen("MAGICON.DAT", "rb");
     if (!f) {
         err("Could not open MAGICON.DAT.");
     }
-    fread(&b, 1, 1, f);
-    fread(magicicons + 256, 256, b, f);
-    fclose(f);
+    vread(&b, 1, 1, f);
+    vread(magicicons + 256, 256, b, f);
+    vclose(f);
 
-    f = fopen("MAGIC.DAT", "r");
+    f = vopen("MAGIC.DAT", "r");
     if (!f) {
         err("Could not open MAGIC.DAT.");
     }
-    fscanf(f, "%s", strbuf);
+    vscanf(f, "%s", strbuf);
     b = atoi(strbuf);
     for (i = 1; i < b + 1; i++) {
-        fscanf(f, "%s", magic[i].name);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", magic[i].name);
+        vscanf(f, "%s", strbuf);
         magic[i].icon = atoi(strbuf) + 1;
-        fscanf(f, "%s", magic[i].desc);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", magic[i].desc);
+        vscanf(f, "%s", strbuf);
         magic[i].useflag = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         magic[i].useeffect = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         magic[i].itemtype = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         magic[i].equipflag = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         magic[i].equipidx = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         magic[i].itmprv = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         magic[i].price = atoi(strbuf);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         magic[i].cost = atoi(strbuf);
     }
-    fclose(f);
+    vclose(f);
 
-    f = fopen("MAGIC.VCS", "rb");
+    f = vopen("MAGIC.VCS", "rb");
     if (!f) {
         err("Could not open MAGIC.VCS");
     }
-    fread(&j, 1, 4, f);
-    fread(&magicofstbl, 4, j, f);
-    fread(magicvc, 1, 50000, f);
-    fclose(f);
+    vread(&j, 1, 4, f);
+    vread(&magicofstbl, 4, j, f);
+    vread(magicvc, 1, 50000, f);
+    vclose(f);
 
     // END NEW
 
     ProcessEquipDat();
 
-    f = fopen("MISCICON.DAT", "rb");
+    f = vopen("MISCICON.DAT", "rb");
     if (!f) {
         err("Could not open MISCICON.DAT.");
     }
-    fread(&b, 1, 1, f);
-    fread(&menuptr, 1, 256, f);
-    fread(&itmptr, 1, 576, f);
-    fread(&charptr, 1, 960, f);
-    fclose(f);
+    vread(&b, 1, 1, f);
+    vread(&menuptr, 1, 256, f);
+    vread(&itmptr, 1, 576, f);
+    vread(&charptr, 1, 960, f);
+    vclose(f);
 
-    f = fopen("SPEECH.SPC", "rb");
+    f = vopen("SPEECH.SPC", "rb");
     if (!f) {
         err("Could not open SPEECH.SPC");
     }
-    fread(&b, 1, 1, f);
-    fread(speech, b, 1024, f);
-    fclose(f);
+    vread(&b, 1, 1, f);
+    vread(speech, b, 1024, f);
+    vclose(f);
 
-    f = fopen("EFFECTS.VCS", "rb");
+    f = vopen("EFFECTS.VCS", "rb");
     if (!f) {
         err("Could not open EFFECTS.VCS");
     }
-    fread(&j, 1, 4, f);
-    fread(&effectofstbl, 4, j, f);
-    fread(effectvc, 1, 50000, f);
-    fclose(f);
+    vread(&j, 1, 4, f);
+    vread(&effectofstbl, 4, j, f);
+    vread(effectvc, 1, 50000, f);
+    vclose(f);
 
-    f = fopen("STARTUP.VCS", "rb");
+    f = vopen("STARTUP.VCS", "rb");
     if (!f) {
         err("Could not open STARTUP.VCS");
     }
-    fread(&j, 1, 4, f);
-    fread(&startupofstbl, 4, j, f);
-    fread(startupvc, 1, 50000, f);
-    fclose(f);
+    vread(&j, 1, 4, f);
+    vread(&startupofstbl, 4, j, f);
+    vread(startupvc, 1, 50000, f);
+    vclose(f);
 }
 
 void StartupMenu() {

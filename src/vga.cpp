@@ -11,6 +11,9 @@
 #include "timer.h"
 #include "vclib.h"
 #include "main.h"
+#include "fs.h"
+
+using namespace verge;
 
 #include "engine.h" // for valloc()
 
@@ -427,14 +430,13 @@ void ColorScale(unsigned char* dest, int st, int fn, int inv) {
 }
 
 void PreCalc_TransparencyFields() {
-    FILE* f;
     int i;
 
     // First read the VERGE palette from verge.pal
 
-    f = fopen("VERGE.PAL", "rb");
-    fread(vergepal, 1, 768, f);
-    fclose(f);
+    auto f = vopen("VERGE.PAL", "rb");
+    vread(vergepal, 1, 768, f);
+    vclose(f);
     transparencytbl = (unsigned char*)valloc(65536, "transparencytbl");
 
     // Precompute some common translation tables.
@@ -444,9 +446,9 @@ void PreCalc_TransparencyFields() {
 
     // Load in the 64k bitmap-on-bitmap transparency table (precomputed)
 
-    f = fopen("TRANS.TBL", "rb");
-    fread(transparencytbl, 1, 65535, f);
-    fclose(f);
+    f = vopen("TRANS.TBL", "rb");
+    vread(transparencytbl, 1, 65535, f);
+    vclose(f);
 }
 /*
 void ColorField(int x1, int y1, int x2, int y2, unsigned char *colortbl)
@@ -537,26 +539,26 @@ void _Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
 char oc = 31;
 
 void LoadFont() {
-    FILE* f;
+    VFILE* f;
 
     fnt = (unsigned char*)valloc(6000, "fnt");
     fnt2 = (unsigned char*)valloc(14000, "fnt2");
     tbox = (unsigned char*)valloc(30000, "tbox");
-    if (!(f = fopen("SMALL.FNT", "rb"))) {
+    if (!(f = vopen("SMALL.FNT", "rb"))) {
         err("FATAL ERROR: Could not open SMALL.FNT.");
     }
-    fread(fnt, 63, 95, f);
-    fclose(f);
-    if (!(f = fopen("MAIN.FNT", "rb"))) {
+    vread(fnt, 63, 95, f);
+    vclose(f);
+    if (!(f = vopen("MAIN.FNT", "rb"))) {
         err("FATAL ERROR: Could not open MAIN.FNT.");
     }
-    fread(fnt2, 144, 95, f);
-    fclose(f);
-    if (!(f = fopen("BOX.RAW", "rb"))) {
+    vread(fnt2, 144, 95, f);
+    vclose(f);
+    if (!(f = vopen("BOX.RAW", "rb"))) {
         err("FATAL ERROR: Could not open BOX.RAW.");
     }
-    fread(tbox, 320, 66, f);
-    fclose(f);
+    vread(tbox, 320, 66, f);
+    vclose(f);
 }
 
 void pchar(int x, int y, char c) {

@@ -13,6 +13,8 @@
 #include "ppapi/cpp/url_loader.h"
 #include "ppapi/cpp/var.h"
 
+#include "fs.h"
+
 void MiscSetup();
 void PutOwnerText();
 void initvga();
@@ -111,7 +113,8 @@ struct GameDownloader {
         , fileSystem(fs)
     { }
 
-    void start() {
+    void start(pp::CompletionCallback oc) {
+        onComplete = oc;
         printf("Fetching manifest\n");
         downloader.reset(new Downloader(instance));
         auto cc = ccFactory.NewCallback(&GameDownloader::gotManifest);
@@ -149,7 +152,7 @@ struct GameDownloader {
 
     void getNextFile() {
         if (manifest.size() == 0) {
-            printf("Complete!\n");
+            onComplete.Run(PP_OK);
             return;
         }
 
@@ -170,11 +173,18 @@ struct GameDownloader {
 
         printf("GameDownloader::gotFile '%s' OK\n", currentFile.c_str());
 
+        auto d = downloader->getData();
+        auto l = downloader->getLength();
+        verge::vset(currentFile, verge::DataVec(d, d + l));
+        getNextFile();
+
+        /*
         auto fr = pp::FileRef(*fileSystem, ("/" + currentFile).c_str());
         fio.reset(new pp::FileIO(instance));
 
         auto cb = ccFactory.NewCallback(&GameDownloader::openedFile, currentFile);
         fio->Open(fr, PP_FILEOPENFLAG_CREATE | PP_FILEOPENFLAG_WRITE | PP_FILEOPENFLAG_TRUNCATE, cb);
+        */
     }
 
     void openedFile(int32_t result, std::string currentFile) {
@@ -206,6 +216,7 @@ private:
     std::shared_ptr<Downloader> downloader;
     std::shared_ptr<pp::FileIO> fio;
     std::vector<std::string> manifest;
+    pp::CompletionCallback onComplete;
 };
 
 struct V1naclInstance : public pp::Instance {
@@ -240,19 +251,25 @@ struct V1naclInstance : public pp::Instance {
             printf("FileSystem::Open failed %i\n", result);
             return;
         }
-        gameDownloader.start();
+
+        auto cb = ccfactory.NewCallback(&V1naclInstance::downloadComplete);
+        gameDownloader.start(cb);
     }
 
     virtual void HandleMessage(const pp::Var& var_message) {
     }
 
-    void download(int32_t result) {
-/*        if (result == PP_OK) {
-            auto d = std::string(downloader.getData(), downloader.getLength());
-            printf("V1naclInstance::download succeeded.  Data:\n%s\n", d.c_str());
-        } else {
-            printf("V1naclInstance::download fail :( result=%i\n", result);
-            }*/
+    void downloadComplete(int32_t result) {
+        if (result != PP_OK) {
+            printf("Download failed :(\n");
+            return;
+        }
+        printf("Download complete!  Starting...\n");
+
+        MiscSetup();
+        PutOwnerText();
+        initvga();
+        InitItems();
     }
 
 private:

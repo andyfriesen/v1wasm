@@ -14,7 +14,9 @@ nacl_env.Append(CXXFLAGS='-std=gnu++0x')
 sources = Split("""
 andyvc.cpp  engine.cpp  menu.cpp    nichgvc.cpp ricvc.cpp   vc.cpp      xbigdvc.cpp
 battle.cpp  entity.cpp  menu2.cpp   pcx.cpp     sound.cpp   vclib.cpp
-control.cpp main.cpp    nacl.cpp    render.cpp  timer.cpp   vga.cpp
+control.cpp main.cpp    render.cpp  timer.cpp   vga.cpp
+
+fs.cpp      nacl.cpp
 """)
 
 sources = ['src/' + s for s in sources]
