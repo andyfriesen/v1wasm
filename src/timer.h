@@ -6,4 +6,5 @@ extern unsigned int timer_count, timer, hooktimer;
 extern unsigned char an, tickctr, sec, min, hr;
 
 void setTimerCount(int value);
+void decTimerCount();
 int getTimerCount();

@@ -797,7 +797,7 @@ drawloop:
             }
             break;
         }
-        timer_count--;
+        decTimerCount();
     }
 
     drawmap();
@@ -849,7 +849,7 @@ void Wait() {
     ct2 = 0;
 main_loop:
     while (timer_count != 0) {
-        timer_count--;
+        decTimerCount();
         ct2++;
         check_tileanimation();
         process_entities();
@@ -1550,7 +1550,7 @@ void PartyMove() {
 
 main_loop:
     while (timer_count != 0) {
-        timer_count--;
+        decTimerCount();
         check_tileanimation();
         process_entities();
         MoveParty();

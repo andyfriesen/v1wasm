@@ -905,7 +905,7 @@ void startmap(char* fname) {
 
 main_loop:
     while (timer_count != 0) {
-        timer_count--;
+        decTimerCount();
         game_ai();
     }
 

@@ -49,6 +49,10 @@ void setTimerCount(int offset) {
     timer_count_offset = offset;
 }
 
+void decTimerCount() {
+    timer_count_offset++;
+}
+
 int getTimerCount() {
     return time() - timer_count_offset;
 }
