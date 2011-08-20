@@ -1,25 +1,15 @@
-13
-Cure       0  Restores_HP               2 1 1 0 1  0  5 60
-Fire       1  Burns_Victim              6 0 3 0 0  0  3 80
-Ice        2  Freeze_Enemy              6 0 3 0 0  0  3 80
-Bolt       3  Electrocute_Enemy         6 0 3 0 0  0  3 80
-Haste      0  Increse_Speed             6 0 1 0 0  0  5 100
-Slow       0  Decrease_Speed            6 0 3 0 0  0  5 100
-Drop_Kick  5  Occasionally_stuns_target 6 0 3 0 0  0  4 0
-Eye_Poke   6  Damages_and_blinds_target 6 0 3 0 0  0  4 0
-AtkUp      0  Increases_ATK             6 0 1 0 0  0 10 200
-DefUp      0  Increases_DEF             6 0 1 0 0  0 10 200
-AtkDn      0  Decreases_ATK             6 0 3 0 0  0 15 300
-DefDn      0  Decreases_DEF             6 0 3 0 0  0 15 300
+5
+Cure_1 0 Cures_20_to_50_HP  2 1 1 1 1 0 5 60
+Fire_1 1 Fire_Attack  2 2 1 1 2 0 3 80
+Ice_1 2 Ice_Attack   2 3 1 1 3 0 3 80
+Lit_1 3 Lightning_Attack   2 4 1 1 4 0 3 80  
+Warp 4 Warps_to_Town  2 5 1 1 5 0 4 130
 
+Item_Name <#icon> Item_Description <use> <useeffect> <type> <equipflag> <equipidx> <mp cost> <price>
 
-Stuff      3  Asdfasdf                  6 0 0 0 0  0  0 0
-
-Name <#icon> Desc <use> <useeffect> <type> <equipflag> <equipidx> <itmprv> <mp cost> <price>
-
-<use>: 2 for usable either in or out of combat
-       4 for usable only OUTSIDE combat
-       6 for usable only IN combat
+<use>: 2 for usable an infinite number of times.
+       4 for usable ONLY camped, infinitely
+       6 for usable in combat only, indefinetly.
 <useeffect>: an index to MAGIC.VC
 <type>: one of the following
         0 for OS. (Own Self)
@@ -27,9 +17,8 @@ Name <#icon> Desc <use> <useeffect> <type> <equipflag> <equipidx> <itmprv> <mp c
         2 for AA. (All Allies)
         3 for 1E. (One Enemy)
         4 for AE. (All Enemy)
-<equipflag>: This is vestigal data.
+<equipflag>: This is vestigal data.                                                                      
 <equipidx> is a pointer to MAGICEQ.DAT when necessary.
-<itmprv>: Magic Preview Code? (doesn't actually do anything -- make it zero)
 <mp cost>: This is the cost in mp for the spell
 <price>: This is the cost in stores for the spell
 

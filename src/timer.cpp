@@ -37,5 +37,6 @@ void delay(int ms) {
 }
 
 int time() {
-    return 8;
+    static int t = 0;
+    return ++t;
 }

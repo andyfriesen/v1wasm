@@ -23,12 +23,8 @@ using namespace verge;
 char* strbuf;
 unsigned char* speech;
 extern unsigned char menuptr[256], qabort, itmptr[576], charptr[960];
-extern char* effectvc, menuactive, *startupvc;
+extern char menuactive;
 extern char fade;
-
-// NEW: MAGIC
-extern char* magicvc;
-// END NEW
 
 extern unsigned int effectofstbl[1024], startupofstbl[1024], magicofstbl[1024];
 
@@ -79,7 +75,7 @@ void PutOwnerText() {
     printf("--\n");
     printf("vecna, hahn, zeromus, McGrue, Locke, aen, Ric, NichG, xBig_D\n");
     printf("--\n");
-    printf("Additional modifications by Andy\n");
+    printf("Additional modifications by andy\n");
 
     delay(500);
 
@@ -348,6 +344,7 @@ mlevloop:
 }
 
 void InitItems() {
+    printf("initItems\n");
     unsigned char b, i;
     int j;
     auto f = vopen("ITEMICON.DAT", "rb");
@@ -357,6 +354,7 @@ void InitItems() {
     vread(&b, 1, 1, f);
     vread(itemicons + 256, 256, b, f);
     vclose(f);
+    printf("itemicons read ok\n");
 
     f = vopen("ITEMS.DAT", "r");
     if (!f) {
@@ -385,7 +383,6 @@ void InitItems() {
         items[i].price = atoi(strbuf);
     }
     vclose(f);
-
     // *** NEW ***  MAGIC INIT
 
     f = vopen("MAGICON.DAT", "rb");
@@ -425,15 +422,20 @@ void InitItems() {
         magic[i].cost = atoi(strbuf);
     }
     vclose(f);
+    printf("magic.dat read ok\n");
 
     f = vopen("MAGIC.VCS", "rb");
     if (!f) {
         err("Could not open MAGIC.VCS");
     }
     vread(&j, 1, 4, f);
+    printf("j = %i\n", j);
     vread(&magicofstbl, 4, j, f);
+    printf("magicofstbl\n");
     vread(magicvc, 1, 50000, f);
+    printf("magicvc\n");
     vclose(f);
+    printf("magic.vcs read ok\n");
 
     // END NEW
 
@@ -448,6 +450,7 @@ void InitItems() {
     vread(&itmptr, 1, 576, f);
     vread(&charptr, 1, 960, f);
     vclose(f);
+    printf("miscicon read ok\n");
 
     f = vopen("SPEECH.SPC", "rb");
     if (!f) {
@@ -456,6 +459,7 @@ void InitItems() {
     vread(&b, 1, 1, f);
     vread(speech, b, 1024, f);
     vclose(f);
+    printf("speech.spc read ok\n");
 
     f = vopen("EFFECTS.VCS", "rb");
     if (!f) {
@@ -465,6 +469,7 @@ void InitItems() {
     vread(&effectofstbl, 4, j, f);
     vread(effectvc, 1, 50000, f);
     vclose(f);
+    printf("effects.vcs read ok\n");
 
     f = vopen("STARTUP.VCS", "rb");
     if (!f) {
@@ -474,6 +479,7 @@ void InitItems() {
     vread(&startupofstbl, 4, j, f);
     vread(startupvc, 1, 50000, f);
     vclose(f);
+    printf("startup.vcs read ok\n");
 }
 
 void StartupMenu() {

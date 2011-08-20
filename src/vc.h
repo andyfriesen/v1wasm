@@ -70,8 +70,11 @@ int ReadVar2(int var, int arg1, int arg2);
 
 extern char* code;
 extern char* basevc;
-extern char* effectvc;
-extern char* startupvc;
+//extern char* effectvc;
+//extern char* startupvc;
+extern char effectvc[];
+extern char startupvc[];
+extern char magicvc[];
 extern char* vcdatabuf;
 extern unsigned int tvar[26];
 extern unsigned int varl[10];

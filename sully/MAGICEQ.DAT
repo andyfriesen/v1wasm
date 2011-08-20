@@ -1,42 +1,21 @@
-12
+5
 // Cure 1
 
-EQABLE 1 2 3 4 5
+EQABLE 3 4
 
 - // Fire 1
 
-EQABLE 1 2 3 4 5
+EQABLE 3 4
 
 - // Lit 1
 
-EQABLE 1 2 3 4 5
+EQABLE 3 4
 
 - // Ice 1
 
-EQABLE 1 2 3 4 5
+EQABLE 3 4
 
-- // Haste
+- // Warp
 
-EQABLE 1 2 3 4 5
-
-- // Slow
-
-EQABLE 1 2 3 4 5
-
-- // AtkUp
-
-EQABLE 1 2 3 4 5
-
-- // DefUp
-
-EQABLE 1 2 3 4 5
-
-- // AtkDn
-
-EQABLE 1 2 3 4 5
-
-- // DefDn
-
-EQABLE 1 2 3 4 5
-
+EQABLE 1 3 4
 -

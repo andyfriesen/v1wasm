@@ -1,0 +1,109 @@
+33
+// Dagger
+ATK +5
+EQABLE 1 2 3 4 5
+- // Short Sword
+ATK +22
+EQABLE 1 5
+- // Wand
+ATK +3
+MAG +5
+EQABLE 3 4
+- // Staff
+ATK +9
+MAG +2
+EQABLE 1 2 3 4 5
+- // Sting Whip
+ATK +18
+HIT +5
+EQABLE 4
+- // Brass Pipe
+ATK +10
+EQABLE 1 2 5
+- // Lead Wrench
+ATK +21
+EQABLE 2
+- // Spear
+ATK +15
+EQABLE 5
+- // Steel Lance
+ATK +28
+EQABLE 5
+- // Garment
+DEF +2
+EQABLE 1 2 3 4 5
+- // Cloak
+DEF +4
+MGR +4
+EQABLE 1 2 3 4 5
+- // Robe
+DEF +7
+MGR +2
+EQABLE 2 4
+- // Leather Vest
+DEF +8
+EQABLE 1 2 5
+- // Titanium Suit
+DEF +11
+EQABLE 1 2 5
+- // Bronze Armor
+DEF +16
+MBL -1
+EQABLE 1 5
+- // Headband
+DEF +1
+EQABLE 1 2 3 4 5
+- // Hood
+DEF +2
+MAG +2
+EQABLE 3 4
+- // Cap
+DEF +4
+EQABLE 1 2 5
+- // Tiara
+DEF +6
+MAG +2
+EQABLE 2 4
+- // Head Brace
+DEF +7
+EQABLE 2
+- // Gold Helmet
+DEF +8
+EQABLE 1 5
+- // Bracer
+DEF +4
+EQABLE 1 2 3 4 5
+- // Silver Brace
+DEF +5
+MGR +2
+EQABLE 2 4
+- // Buckler
+DEF +6
+EQABLE 1 2 5
+- // Laser Shield
+ATK +3
+DEF +10
+EQABLE 2
+- // Tower Shield
+DEF +13
+EQABLE 1 5
+- // Blur Ring
+DOD +10
+EQABLE 1 2 3 4 5
+- // Fury Ring
+FER +5
+EQABLE 1 2 3 4 5
+- // Running Boots
+MBL +2
+EQABLE 1 2 3 4 5
+- // Protect Locket
+MGR +15
+EQABLE 1 2 3 4 5
+- // Carrot Blade
+ATK +30
+EQABLE 1
+- // Pharaoh Sceptre
+ATK +15
+MAG +10
+EQABLE 3
+-

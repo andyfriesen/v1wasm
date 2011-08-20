@@ -11,12 +11,11 @@
 extern char* strbuf;
 extern int vcbufm;
 
-// NEW: MAGIC
-char* magicvc;
-// END NEW
-
 char* mapvc;                           // MAP VC code buffer
-char* effectvc, *startupvc;            // Effect VC code buffer / Startup.vcs
+//char* effectvc, *startupvc;            // Effect VC code buffer / Startup.vcs
+char startupvc[50000];
+char effectvc[50000];
+char magicvc[50000];
 
 char* vcdatabuf;                       // The data buffer for VC use
 char* code, *basevc;                   // current code data ptr
@@ -30,12 +29,14 @@ unsigned int tvar[26];                 // Temporary/Throwaway variables
 char killvc = 0;                       // abort VC loop;
 
 void InitVCMem() {
+    printf("InitVCMem\n");
     // -- aen; 31/May/98 -- otf mem allocation
     //mapvc=valloc(mapvcm,"mapvc");
 
-    effectvc = (char*)valloc(25000, "effectvc");
-    startupvc = (char*)valloc(25000, "startupvc");
+    //effectvc = (char*)valloc(50000, "effectvc");
+    //startupvc = (char*)valloc(50000, "startupvc");
     vcdatabuf = (char*)valloc(vcbufm, "vcdatabuf");
+    //magicvc = (char*)valloc(50000, "magicvc");
 }
 
 void LoadVC(FILE* f) {

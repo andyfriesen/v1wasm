@@ -1,38 +1,38 @@
 31
-Starlight 0 Restores_50_MP      1 0 1 0 200
-Herb 1 Restores_50_HP           1 0 1 0 50
-Speed_Boots 2 +3_REA,_+1_MBL    0 0 0 1 300
-Dark_Sword 3 ATK_+20,_*darkness 4 0 0 1 2000
-Short_Sword 4 ATK+6             0 0 0 1 500
-Leather_Vest 5 DEF+5            0 0 0 1 500
-Cap 6 DEF+2                     0 0 0 1 250
-Buckler 7 DEF+6                 0 0 0 1 650
-Staff 8 ATK+4                   0 0 0 1 400
-Pooh 0 Pooh!                    0 0 0 0 0
-Cloak 9 DEF+3                   0 0 0 1 300
-Hood 10 DEF+1                   0 0 0 1 150
-Bracer 11 DEF+4                 0 0 0 1 450
-Sting_Whip 12 ATK+5             0 0 0 1 500
-Robe 13 DEF+4                   0 0 0 1 400
-Tiara 14 DEF+3                  0 0 0 1 300
-Silver_Brace 15 DEF+3           0 0 0 1 300
-Lead_Wrench 16 ATK+7            0 0 0 1 700
-Titanium_Suit 17 DEF+7          0 0 0 1 700
-Head_Brace 18 DEF+3             0 0 0 1 300
-Laser_Shield 19 DEF+8           0 0 0 1 800
-Thermal_Activator 20 Starts_crystal_machine 0 0 0 0 0
-Bronze_Key 21 Key_to_the_love_shack 0 0 0 0 0
-Pearl_of_Truth 22 Opens_castle_gate 0 0 0 0 0
-Steel_Lance 23 ATK+8            0 0 0 1 800
-Bronze_Armor 24 DEF+9           0 0 0 1 900
-Gold_Helmet 25 DEF+4            0 0 0 1 400
-Tower_Shield 26 DEF+10          0 0 0 1 1000
-West_Tower_Key 21 Key_to_West_Tower 0 0 1 0 0
-East_Tower_Key 21 Key_to_East_Tower 0 0 1 0 0
-Spire_Key 21 Key_to_Central_Spire   0 0 1 0 0
+Starlight 0 Restores_50_MP      1 7 1 8 9 6 200
+Herb 1 Restores_50_HP           1 0 1 0 0 0 50
+Speed_Boots 2 +3_REA,_+1_MBL    0 0 0 1 0 0 300
+Dark_Sword 3 ATK_+20,_*darkness 4 0 0 1 0 0 2000
+Short_Sword 4 ATK+6             0 0 0 1 0 0 500
+Leather_Vest 5 DEF+5            0 0 0 1 0 0 500
+Cap 6 DEF+2                     0 0 0 1 0 0 250
+Buckler 7 DEF+6                 0 0 0 1 0 0 650
+Staff 8 ATK+4                   0 0 0 1 0 0 400
+Pooh 0 Pooh!                    0 0 0 0 0 0 0
+Cloak 9 DEF+3                   0 0 0 1 0 0 300
+Hood 10 DEF+1                   0 0 0 1 0 0 150
+Bracer 11 DEF+4                 0 0 0 1 0 0 450
+Sting_Whip 12 ATK+5             0 0 0 1 0 0 500
+Robe 13 DEF+4                   0 0 0 1 0 0 400
+Tiara 14 DEF+3                  0 0 0 1 0 0 300
+Silver_Brace 15 DEF+3           0 0 0 1 0 0 300
+Lead_Wrench 16 ATK+7            0 0 0 1 0 0 700
+Titanium_Suit 17 DEF+7          0 0 0 1 0 0 700
+Head_Brace 18 DEF+3             0 0 0 1 0 0 300
+Laser_Shield 19 DEF+8           0 0 0 1 0 0 800
+Thermal_Activator 20 Starts_crystal_machine 0 0 0 0 0 0 0
+Bronze_Key 21 Key_to_the_love_shack 0 0 0 0 0 0 0
+Pearl_of_Truth 22 Opens_castle_gate 0 0 0 0 0 0 0
+Steel_Lance 23 ATK+8            0 0 0 1 0 0 800
+Bronze_Armor 24 DEF+9           0 0 0 1 0 0 900
+Gold_Helmet 25 DEF+4            0 0 0 1 0 0 400
+Tower_Shield 26 DEF+10          0 0 0 1 0 0 1000
+West_Tower_Key 21 Key_to_West_Tower 0 0 1 0 0 0 0
+East_Tower_Key 21 Key_to_East_Tower 0 0 1 0 0 0 0
+Spire_Key 21 Key_to_Central_Spire   0 0 1 0 0 0 0
 
 
-Item_Name #icon Item_Description <use> <useeffect> <type> <equipflag> <price>
+Item_Name #icon Item_Description <use> <useeffect> <type> <equipflag> <equipidx> <dummy> <price>
 
 <use>: 0 for nonusable.
        1 for usable once, then it goes away.

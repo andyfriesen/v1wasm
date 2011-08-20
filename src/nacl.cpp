@@ -231,16 +231,6 @@ struct V1naclInstance : public pp::Instance {
     }
 
     virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
-        /*MiscSetup();
-        PutOwnerText();
-        initvga();
-        InitItems();*/
-
-        printf("Init\n");
-        /*auto cb = ccfactory.NewCallback(&V1naclInstance::download);
-        downloader.get("http://localhost:5013/v1/sully/manifest.txt", cb);
-        printf("Dispatched ok\n");*/
-
         auto cb = ccfactory.NewCallback(&V1naclInstance::fileSystemIsOpen);
         fileSystem.Open(5000, cb);
         return true;

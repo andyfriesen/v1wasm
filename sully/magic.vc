@@ -1,0 +1,78 @@
+/* =======================================================================
+   = magic.vc =
+   ==============    There are a few differences between MAGIC.VC and
+                     ordinary MAP-based VCs. First, you'll notice that
+"effect" denotes the beginning of a script, not "event". VCC handles it
+differently, it recognizes it simply by filename and compiles to
+MAGIC.VCS instead of appending the compiled code to the MAP.  Upon entering
+a script, var(0) contains the pointer to whoever was selected to receive
+the effect. If you have an AA or AE effect, however, you will need to cycle
+through the characters individually. For an AA effect, use this example:
+
+for (x, 1, numchars(0), 1)
+{
+  Heal(partyindex(x), 50);
+}
+
+Obviously, AE effects are not yet implemented.
+The valid effect commands currently are:
+
+Heal(character,amount);
+RestoreMP(character,amount);
+ReviveChar(character);
+
+========================================================================== */
+
+effect /* 0 */
+{
+}
+
+effect /* Cure 1 */
+{
+a = random(20,50);
+Heal (var(0), a);
+SoundEffect (4);
+}
+
+effect /* Fire 1 */
+{
+SoundEffect(13);
+}
+
+effect /* Ice 1 */
+{
+SoundEffect(13);
+}
+
+effect /* Lit 1 */
+{
+SoundEffect(13);
+}
+
+effect /* Warp */
+{
+Text (0, "Warp is not yet enabled.", "Sorry.", "");
+}
+
+effect                             // Sprig
+{
+  Heal(var(0),20);
+  soundeffect(10);
+}
+
+effect                             // Potion
+{
+  Heal(var(0),50);
+  soundeffect(10);
+}
+
+effect                             // Antidote
+{
+  Text (0, "Conditions not implemented.", "", "");
+}
+
+effect                             // Life Potion
+{
+  ReviveChar(var(0));
+  soundeffect(10);
+}
