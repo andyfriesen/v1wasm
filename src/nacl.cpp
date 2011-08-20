@@ -11,13 +11,19 @@
 #include "ppapi/cpp/file_io.h"
 #include "ppapi/cpp/url_request_info.h"
 #include "ppapi/cpp/url_loader.h"
+#include "ppapi/cpp/graphics_2d.h"
+#include "ppapi/cpp/image_data.h"
+#include "ppapi/cpp/size.h"
 #include "ppapi/cpp/var.h"
 
+#include "main.h"
+#include "render.h"
+#include "vc.h"
 #include "fs.h"
 
 void MiscSetup();
 void PutOwnerText();
-void initvga();
+void initvga(pp::Graphics2D* g2d, pp::ImageData* bb);
 void InitItems();
 
 struct Downloader {
@@ -225,12 +231,33 @@ struct V1naclInstance : public pp::Instance {
         , ccfactory(this)
         , fileSystem(this, PP_FILESYSTEMTYPE_LOCALTEMPORARY)
         , gameDownloader(this, &fileSystem)
+        , graphics(0)
+        , backBuffer(0)
     {}
 
     virtual ~V1naclInstance() {
     }
 
+#if 0
+    void DidChangeView(const pp::Rect& position, const pp::Rect& clip) {
+    }
+#endif
+
     virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
+        graphics = new pp::Graphics2D(this, pp::Size(320, 240), true);
+        auto result = BindGraphics(*graphics);
+        if (!result) {
+            printf("BindGraphics failed %i\n", result);
+            return false;
+        }
+
+        backBuffer = new pp::ImageData(
+            this,
+            PP_IMAGEDATAFORMAT_BGRA_PREMUL,
+            pp::Size(320, 200),
+            false
+        );
+
         auto cb = ccfactory.NewCallback(&V1naclInstance::fileSystemIsOpen);
         fileSystem.Open(5000, cb);
         return true;
@@ -258,14 +285,33 @@ struct V1naclInstance : public pp::Instance {
 
         MiscSetup();
         PutOwnerText();
-        initvga();
+        initvga(graphics, backBuffer);
         InitItems();
+
+        while (1) {
+            qabort = 0;
+            /* -- ric: 01/Jun/98 --
+             * These variables set to allow the vc layer functions to work
+             * by preventing the engine from trying to draw a non-existant
+             * map
+             */
+            cameratracking = 0;
+            layer0 = 0;
+            layer1 = 0;
+            drawparty = 0;
+            drawentities = 0;
+
+            StartupScript();
+        }
     }
 
 private:
     pp::CompletionCallbackFactory<V1naclInstance> ccfactory;
     pp::FileSystem fileSystem;
     GameDownloader gameDownloader;
+
+    pp::Graphics2D* graphics;
+    pp::ImageData* backBuffer;
 };
 
 class V1naclModule : public pp::Module {

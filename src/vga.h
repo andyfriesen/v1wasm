@@ -1,5 +1,9 @@
+
+namespace pp {
+    class ImageData;
+}
+
 // vga.h
-void initvga();
 void closevga();
 void quick_killgfx();
 void quick_restoregfx();
@@ -32,8 +36,8 @@ void VCprintstring(int xx, int yy, char* str);
 
 void dec_to_asciiz(int num, char* buf);
 
-extern unsigned char* screen;
-extern unsigned char* virscr;
+extern unsigned char screen[];
+extern unsigned char virscr[];
 extern unsigned char pal[768];
 
 extern unsigned char menuxlatbl[256], greyxlatbl[256], scrnxlatbl[256], *transparencytbl;

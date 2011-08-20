@@ -8,6 +8,9 @@
 #include "timer.h"
 #include "vga.h"
 #include "main.h"
+#include "fs.h"
+
+using namespace verge;
 
 char manufacturer;                     // pcx header
 char version;
@@ -28,16 +31,16 @@ unsigned short int width, depth;
 unsigned short int bytes, i;
 unsigned char c, run, ss = 0;
 unsigned int vidoffset;
-FILE* pcxf;
+VFILE* pcxf;
 
 void ReadPCXLine(unsigned char* dest) {
     int n = 0;
 
     do {
-        c = fgetc(pcxf) & 0xff;
+        c = vgetc(pcxf) & 0xff;
         if ((c & 0xc0) == 0xc0) {
             run = c & 0x3f;
-            c = fgetc(pcxf);
+            c = vgetc(pcxf);
             for (int j = 0; j < run; j++) {
                 dest[vidoffset + n + j] = c;
             }
@@ -50,31 +53,35 @@ void ReadPCXLine(unsigned char* dest) {
 }
 
 void LoadPCXHeader(char* fname) {
-    if (!(pcxf = fopen(fname, "rb"))) {
-        err("Could not open specified PCX file.");
+    if (!(pcxf = vopen(fname, "rb"))) {
+        err("Could not open PCX file '%s'", fname);
     }
-    fread(&manufacturer, 1, 1, pcxf);
-    fread(&version, 1, 1, pcxf);
-    fread(&encoding, 1, 1, pcxf);
-    fread(&bits_per_pixel, 1, 1, pcxf);
-    fread(&xmin, 1, 2, pcxf);
-    fread(&ymin, 1, 2, pcxf);
-    fread(&xmax, 1, 2, pcxf);
-    fread(&ymax, 1, 2, pcxf);
-    fread(&hres, 1, 2, pcxf);
-    fread(&vres, 1, 2, pcxf);
-    fread(&palette, 1, 48, pcxf);
-    fread(&reserved, 1, 1, pcxf);
-    fread(&color_planes, 1, 1, pcxf);
-    fread(&bytes_per_line, 1, 2, pcxf);
-    fread(&palette_type, 1, 2, pcxf);
-    fread(&filler, 1, 58, pcxf);
-    fseek(pcxf, -768L, SEEK_END);
-    fread(pal, 1, 768, pcxf);
-    fseek(pcxf, 128L, SEEK_SET);
+    vread(&manufacturer, 1, 1, pcxf);
+    vread(&version, 1, 1, pcxf);
+    vread(&encoding, 1, 1, pcxf);
+    vread(&bits_per_pixel, 1, 1, pcxf);
+    vread(&xmin, 1, 2, pcxf);
+    vread(&ymin, 1, 2, pcxf);
+    vread(&xmax, 1, 2, pcxf);
     width = xmax - xmin + 1;
+
+    vread(&ymax, 1, 2, pcxf);
     depth = ymax - ymin + 1;
+
+    vread(&hres, 1, 2, pcxf);
+    vread(&vres, 1, 2, pcxf);
+    vread(&palette, 1, 48, pcxf);
+    vread(&reserved, 1, 1, pcxf);
+    vread(&color_planes, 1, 1, pcxf);
+    vread(&bytes_per_line, 1, 2, pcxf);
+    vread(&palette_type, 1, 2, pcxf);
+    vread(&filler, 1, 58, pcxf);
+    vseek(pcxf, -768L, SEEK_END);
+    vread(pal, 1, 768, pcxf);
+    vseek(pcxf, 128L, SEEK_SET);
     bytes = bytes_per_line;
+
+    printf("LoadPCX %s (%i, %i)\n", fname, width, depth);
 
     for (i = 0; i < 768; i++) {
         pal[i] = pal[i] >> 2;
@@ -82,25 +89,25 @@ void LoadPCXHeader(char* fname) {
 }
 
 void LoadPCXHeaderNP(char* fname) {
-    if (!(pcxf = fopen(fname, "rb"))) {
-        err("Could not open specified PCX file.");
+    if (!(pcxf = vopen(fname, "rb"))) {
+        err("Could not open PCX file '%s'", fname);
     }
-    fread(&manufacturer, 1, 1, pcxf);
-    fread(&version, 1, 1, pcxf);
-    fread(&encoding, 1, 1, pcxf);
-    fread(&bits_per_pixel, 1, 1, pcxf);
-    fread(&xmin, 1, 2, pcxf);
-    fread(&ymin, 1, 2, pcxf);
-    fread(&xmax, 1, 2, pcxf);
-    fread(&ymax, 1, 2, pcxf);
-    fread(&hres, 1, 2, pcxf);
-    fread(&vres, 1, 2, pcxf);
-    fread(&palette, 1, 48, pcxf);
-    fread(&reserved, 1, 1, pcxf);
-    fread(&color_planes, 1, 1, pcxf);
-    fread(&bytes_per_line, 1, 2, pcxf);
-    fread(&palette_type, 1, 2, pcxf);
-    fread(&filler, 1, 58, pcxf);
+    vread(&manufacturer, 1, 1, pcxf);
+    vread(&version, 1, 1, pcxf);
+    vread(&encoding, 1, 1, pcxf);
+    vread(&bits_per_pixel, 1, 1, pcxf);
+    vread(&xmin, 1, 2, pcxf);
+    vread(&ymin, 1, 2, pcxf);
+    vread(&xmax, 1, 2, pcxf);
+    vread(&ymax, 1, 2, pcxf);
+    vread(&hres, 1, 2, pcxf);
+    vread(&vres, 1, 2, pcxf);
+    vread(&palette, 1, 48, pcxf);
+    vread(&reserved, 1, 1, pcxf);
+    vread(&color_planes, 1, 1, pcxf);
+    vread(&bytes_per_line, 1, 2, pcxf);
+    vread(&palette_type, 1, 2, pcxf);
+    vread(&filler, 1, 58, pcxf);
     width = xmax - xmin + 1;
     depth = ymax - ymin + 1;
     bytes = bytes_per_line;
@@ -108,7 +115,6 @@ void LoadPCXHeaderNP(char* fname) {
 
 
 void loadpcx(char* fname, unsigned char* dest) {
-
     LoadPCXHeader(fname);
 
     for (i = 0; i < depth; i++) {
@@ -116,7 +122,7 @@ void loadpcx(char* fname, unsigned char* dest) {
         ReadPCXLine(dest);
     }
 
-    fclose(pcxf);
+    vclose(pcxf);
 }
 
 void WritePCXLine(unsigned char* p) {
@@ -133,9 +139,9 @@ void WritePCXLine(unsigned char* p) {
         }
         if (samect > 1 || (byte & 0xC0) != 0) {
             repcode = 0xC0 | samect;
-            fwrite(&repcode, 1, 1, pcxf);
+            vwrite(&repcode, 1, 1, pcxf);
         }
-        fwrite(&byte, 1, 1, pcxf);
+        vwrite(&byte, 1, 1, pcxf);
     } while (i < 320);
 }
 
@@ -148,8 +154,8 @@ void WritePalette() {
     }
 
     b = 12;
-    fwrite(&b, 1, 1, pcxf);
-    fwrite(pal, 1, 768, pcxf);
+    vwrite(&b, 1, 1, pcxf);
+    vwrite(pal, 1, 768, pcxf);
 
     for (i = 0; i < 768; i++) {
         pal[i] = pal[i] >> 2;
@@ -171,52 +177,52 @@ void ScreenShot() {
     fnamestr[b1++] = 'X';
     fnamestr[b1++] = 0;
 
-    pcxf = fopen(fnamestr, "wb");
+    pcxf = vopen(fnamestr, "wb");
     ss++;
 
     // Write PCX header
 
     b1 = 10;
-    fwrite(&b1, 1, 1, pcxf); // manufacturer always = 10
+    vwrite(&b1, 1, 1, pcxf); // manufacturer always = 10
     b1 = 5;
-    fwrite(&b1, 1, 1, pcxf);  // version = 3.0, >16 colors
+    vwrite(&b1, 1, 1, pcxf);  // version = 3.0, >16 colors
     b1 = 1;
-    fwrite(&b1, 1, 1, pcxf);  // encoding always = 1
+    vwrite(&b1, 1, 1, pcxf);  // encoding always = 1
     b1 = 8;
-    fwrite(&b1, 1, 1, pcxf);  // 8 bits per pixel, for 256 colors
+    vwrite(&b1, 1, 1, pcxf);  // 8 bits per pixel, for 256 colors
     w1 = 0;
-    fwrite(&w1, 1, 2, pcxf);  // xmin = 0;
+    vwrite(&w1, 1, 2, pcxf);  // xmin = 0;
     w1 = 0;
-    fwrite(&w1, 1, 2, pcxf);  // ymin = 0;
+    vwrite(&w1, 1, 2, pcxf);  // ymin = 0;
     w1 = 319;
-    fwrite(&w1, 1, 2, pcxf);  // xmax = 319;
+    vwrite(&w1, 1, 2, pcxf);  // xmax = 319;
     w1 = 199;
-    fwrite(&w1, 1, 2, pcxf);  // ymax = 199;
+    vwrite(&w1, 1, 2, pcxf);  // ymax = 199;
     w1 = 320;
-    fwrite(&w1, 1, 2, pcxf);  // hres = 320;
+    vwrite(&w1, 1, 2, pcxf);  // hres = 320;
     w1 = 200;
-    fwrite(&w1, 1, 2, pcxf);  // vres = 200;
+    vwrite(&w1, 1, 2, pcxf);  // vres = 200;
 
-    fwrite(virscr, 1, 48, pcxf);  // 16-color palette data. Who knows what's
+    vwrite(virscr, 1, 48, pcxf);  // 16-color palette data. Who knows what's
     // actually in here. It doesn't matter since
     // the 256-color palette is stored elsewhere.
 
     b1 = 0;
-    fwrite(&b1, 1, 1, pcxf);   // reserved always = 0.
+    vwrite(&b1, 1, 1, pcxf);   // reserved always = 0.
     b1 = 1;
-    fwrite(&b1, 1, 1, pcxf);   // number of color planes. Just 1 for 8bit.
+    vwrite(&b1, 1, 1, pcxf);   // number of color planes. Just 1 for 8bit.
     w1 = 320;
-    fwrite(&w1, 1, 2, pcxf); // number of bytes per line
+    vwrite(&w1, 1, 2, pcxf); // number of bytes per line
 
     w1 = 0;
-    fwrite(&w1, 1, 1, pcxf);
-    fwrite(virscr, 1, 59, pcxf);          // filler
+    vwrite(&w1, 1, 1, pcxf);
+    vwrite(virscr, 1, 59, pcxf);          // filler
 
     for (w1 = 0; w1 < 200; w1++) {
         WritePCXLine(screen + (w1 * 320));
     }
 
     WritePalette();
-    fclose(pcxf);
+    vclose(pcxf);
     timer_count = 0;
 }

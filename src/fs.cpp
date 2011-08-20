@@ -3,8 +3,20 @@
 #include <algorithm>
 #include <cstdio>
 #include <cassert>
+#include <cctype>
+
+extern verge::VFILE* pcxf;
 
 namespace verge {
+
+    namespace {
+        std::string toLower(std::string s) {
+            for (size_t i = 0; i < s.length(); ++i) {
+                s[i] = tolower(s[i]);
+            }
+            return s;
+        }
+    }
 
     File::File(DataVec data)
         : mode(FileMode::None)
@@ -39,9 +51,27 @@ namespace verge {
     size_t File::read(void* dest, size_t length) {
         auto s = std::min(pos + length, data.size());
         auto p = static_cast<char*>(dest);
-        std::copy(&data[pos], &data[pos + s], p);
-        pos += s;
+        std::copy(&data[pos], &data[s], p);
+        pos = s;
         return s;
+    }
+
+    int File::seek(long int origin, int offset) {
+        switch (offset) {
+            case SEEK_SET: pos = size_t(std::max<int>(0, origin)); break;
+            case SEEK_CUR: pos += origin; break;
+            case SEEK_END: pos = size_t(std::max<int>(0, data.size() - origin)); break;
+        }
+        if (pos > data.size()) {
+            pos = 0;
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    int File::tell() {
+        return pos;
     }
 
     /*
@@ -53,8 +83,10 @@ namespace verge {
     FilePtr FS::open(const std::string& filename, FileMode mode) {
         assert(mode == FileMode::Read && "Writing is not yet implemented");
 
-        if (files.count(filename)) {
-            auto f = files[filename];
+        auto fn = toLower(filename);
+
+        if (files.count(fn)) {
+            auto f = files[fn];
             f->open(mode);
             return f;
         }
@@ -63,7 +95,8 @@ namespace verge {
     }
 
     void FS::set(const std::string& filename, DataVec data) {
-        files[filename].reset(new File(data));
+        auto fn = toLower(filename);
+        files[fn].reset(new File(data));
     }
 
     namespace {
@@ -112,6 +145,18 @@ namespace verge {
         return dest;
     }
 
+    char vgetc(VFILE* f) {
+        return f->getc();
+    }
+
+    int vseek(VFILE* f, long int offset, int origin) {
+        return f->seek(offset, origin);
+    }
+
+    int vtell(VFILE* f) {
+        return f->tell();
+    }
+
     namespace impl {
         bool iswhite(char c) {
             return c == ' '
@@ -153,7 +198,6 @@ namespace verge {
 
         int scan(VFILE* file, char* value) {
             int count = 0;
-            auto v = value;
 
             do {
                 auto c = file->getc();
@@ -168,8 +212,6 @@ namespace verge {
                 }
             } while (true);
             *value = 0;
-
-            //printf("Scanned string '%s'\n", v);
             return count;
         }
     }

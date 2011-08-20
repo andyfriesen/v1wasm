@@ -1652,6 +1652,7 @@ void VCLoadRaw() {
 }
 
 void ExecLibFunc(unsigned char func) {
+    printf("vc::ExecLibFunc(%i)\n", func);
     switch (func) {
     case 1:
         MapSwitch();

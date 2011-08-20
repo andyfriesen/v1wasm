@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include "control.h"
 #include "engine.h"
 #include "keyboard.h"
@@ -40,12 +41,18 @@ int Exist(char* fname) {
     }
 }
 
-void err(const char* ermsg) {
+void err(const char* ermsg, ...) {
     keyboard_close();
     stopsound();
     timer_close();
     closevga();
-    printf("%s \n", ermsg);
+
+    va_list args;
+    va_start(args, ermsg);
+    vprintf(ermsg, args);
+    va_end(args);
+
+    putchar('\n');
     exit(-1);
 }
 

@@ -28,8 +28,10 @@ namespace verge {
         void ungetc();
 
         size_t read(void* dest, size_t length);
+        int seek(long int offset, int origin);
+        int tell();
 
-    //private:
+    private:
         FileMode mode;
         DataVec data;
         size_t pos;
@@ -59,6 +61,9 @@ namespace verge {
     size_t vread(void* dest, size_t size, size_t length, VFILE* f);
     size_t vwrite(const void* src, size_t size, size_t length, VFILE* f);
     char* vgets(char* dest, int num, VFILE* file);
+    char vgetc(VFILE* file);
+    int vseek(VFILE* file, long int offset, int origin);
+    int vtell(VFILE* file);
 
     namespace impl {
         bool iswhite(char c);

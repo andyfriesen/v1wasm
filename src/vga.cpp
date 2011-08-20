@@ -6,6 +6,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cassert>
+#include <algorithm>
+#include "ppapi/cpp/graphics_2d.h"
+#include "ppapi/cpp/image_data.h"
+#include "ppapi/cpp/completion_callback.h"
 #include "control.h"
 #include "render.h"
 #include "timer.h"
@@ -17,7 +22,14 @@ using namespace verge;
 
 #include "engine.h" // for valloc()
 
-void err(const char*);
+namespace {
+    pp::Graphics2D* graphics;
+    pp::ImageData* backBuffer;
+
+    const int XRES = 320;
+    const int YRES = 240;
+    const int BACKBUFFER_SIZE = 90000; // More than we need, but random other things seem to depend on this figure.
+}
 
 unsigned char pal[768];
 unsigned char pal2[768];
@@ -26,14 +38,15 @@ extern char waitvrt, fade, cancelfade, *strbuf;
 unsigned char* fnt, *fnt2, *tbox, *n;
 short int x1 = 17, y1 = 17;
 
-unsigned char* screen;
-unsigned char* virscr;
+unsigned char screen[BACKBUFFER_SIZE];
+unsigned char virscr[BACKBUFFER_SIZE];
 
 void wait() {
     // vsync?
 }
 
 void set_palette(unsigned char* pall) {
+    std::copy(pall, pall + sizeof(pal), pal);
 }
 
 void get_palette() {
@@ -47,7 +60,9 @@ void set_intensity(unsigned int n) {
     set_palette(pal2);
 }
 
-void initvga() {
+void initvga(pp::Graphics2D* g2d, pp::ImageData* bb) {
+    graphics = g2d;
+    backBuffer = bb;
 }
 
 void closevga() {
@@ -59,26 +74,35 @@ void quick_killgfx() {
 void quick_restoregfx() {
 }
 
+unsigned _8to32(unsigned char c) {
+    return 0xFF000000
+        | pal[c * 3] << 24
+        | pal[c * 3 + 1] << 16
+        | pal[c * 3 + 2];
+}
+
 void vgadump() {
     if (waitvrt) {
         wait();
     }
-#if 0
-    asm("movl _virscr, %%esi              \n\t"
-        "addl $5648, %%esi                \n\t"
-        "movl _screen, %%edi              \n\t"
-        "movl $200, %%eax                 \n\t"
-        "lineloop:                              \n\t"
-        "movl $80, %%ecx                  \n\t"
-        "rep                              \n\t"
-        "movsl                            \n\t"
-        "addl $32, %%esi                  \n\t"
-        "decl %%eax                       \n\t"
-        "jnz lineloop                     \n\t"
-        :
-        :
-        : "esi", "edi", "cc", "eax", "ecx");
-#endif
+
+    auto i = 320 * 240;
+    auto src = virscr;
+    auto dst = (uint32_t*)backBuffer->data();
+    assert(0 == (backBuffer->stride() % sizeof(int32_t)));
+    const auto stride = backBuffer->stride() / sizeof(int32_t);
+
+    for (int y = 0; y < YRES; ++y) {
+        for (int x = 0; x < XRES; ++x) {
+            dst[x] = _8to32(*src++);
+        }
+        dst += stride;
+    }
+
+    graphics->PaintImageData(*backBuffer, pp::Point());
+    pp::CompletionCallback cb = pp::BlockUntilComplete();
+    printf("Flush\n");
+    graphics->Flush(cb);
 }
 
 void setpixel(int x, int y, char c) {

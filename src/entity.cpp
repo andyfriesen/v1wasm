@@ -5,8 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "engine.h"
+#include "main.h"
 #include "vc.h"
-void err(const char* ermsg);
+
 int ObstructionAt(int tx, int ty);
 void ProcessEntity(int);
 int random(int, int);
