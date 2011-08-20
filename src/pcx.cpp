@@ -224,5 +224,5 @@ void ScreenShot() {
 
     WritePalette();
     vclose(pcxf);
-    timer_count = 0;
+    setTimerCount(0);
 }

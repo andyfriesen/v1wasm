@@ -346,7 +346,7 @@ inputloop:
         goto inputloop;
     }
     fout();
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void RemoveItem(char c, char i) {
@@ -1326,7 +1326,7 @@ usesec:
 
         ExecuteMagicEffect(magic[t1].useeffect);
     } else {
-        timer_count = 0;
+        setTimerCount(0);
         an = 1;
 drawloop2:
         drawmap();
@@ -1340,7 +1340,7 @@ drawloop2:
                 goto drawloop2;
             } else {
                 an = 0;
-                timer_count = 0;
+                setTimerCount(0);
                 return;
             }
         if (first && !b1 && !b2 && !b4 && !down && !up) {
@@ -1357,7 +1357,7 @@ drawloop2:
             first = 2;
             goto drawloop2;
         }
-        timer_count = 0;
+        setTimerCount(0);
         an = 0;
 
     }

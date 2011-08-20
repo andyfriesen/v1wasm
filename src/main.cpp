@@ -518,6 +518,7 @@ drawloop:
     }
 
 inputloop:
+    printf("inputloop\n");
     readcontrols();
     if (down) {
         cursel++;
@@ -549,7 +550,7 @@ inputloop:
         LoadSaveErase(0);
     }
     if (cursel == 2) {
-        timer_count = 0;
+        setTimerCount(0);
         s = 91;
 fadeloop:
         i = (timer_count * 64) / s;

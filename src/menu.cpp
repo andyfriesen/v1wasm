@@ -456,7 +456,7 @@ drawloop:
     readcontrols();
 
     if (first == 2) if (b2 || b4) { goto drawloop; }
-        else { an = 0; timer_count = 0; return; }
+        else { an = 0; setTimerCount(0); return; }
     if (first && !b1 && !b4 && !down && !up) { first = 0; }
     else if (first) { goto drawloop; }
 
@@ -511,7 +511,7 @@ drawloop:
     if (!b4 && !b2) { goto drawloop; }
     if (b4) { first = 2; goto drawloop; }
 
-    timer_count = 0;
+    setTimerCount(0);
     an = 0;
 }
 
@@ -569,7 +569,7 @@ drawloop:
     readcontrols();
 
     if (first == 3) if (b2 || b3) { goto drawloop; }
-        else { an = 0; timer_count = 0; return; }
+        else { an = 0; setTimerCount(0); return; }
     if (first == 2) { fin(); first = 1; }
     if (first && !b1 && !b3 && !down && !up) { first = 0; }
     else if (first) { goto drawloop; }
@@ -609,7 +609,7 @@ drawloop:
             qabort = 1;
             killvc = 1;
             while (b1) { readcontrols(); }
-            timer_count = 0;
+            setTimerCount(0);
             return;
         }
         an = 1;

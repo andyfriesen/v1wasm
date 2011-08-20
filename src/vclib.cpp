@@ -132,7 +132,7 @@ void MapSwitch() {
         fin();
     }
     killvc = 1;
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void Warp() {
@@ -164,7 +164,7 @@ void Warp() {
         vgadump();
         fin();
     }
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void AddCharacter() {
@@ -176,7 +176,7 @@ void AddCharacter() {
     }
 
     addcharacter(c);
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void SoundEffect() {
@@ -218,7 +218,7 @@ drawloop:
             pstats[partyidx[i] - 1].inv[j] = c;
             pstats[partyidx[i] - 1].invcnt++;
             an = 0;
-            timer_count = 0;
+            setTimerCount(0);
             return;
         }
     if (first && !b1 && !b2 && !b4) {
@@ -257,7 +257,7 @@ drawloop:
             goto drawloop;
         } else {
             an = 0;
-            timer_count = 0;
+            setTimerCount(0);
             return;
         }
     if (first && !b1 && !b2 && !b4) {
@@ -324,7 +324,7 @@ void FakeBattle() {
 void PlayMusic() {
     GrabString(strbuf);
     playsong(strbuf);
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void StopMusic() {
@@ -357,34 +357,29 @@ void AlterParallax() {
 }
 
 void FadeIn() {
-    int i, s;
-
-    s = ResolveOperand();
-    timer_count = 0;
-inloop:
-    i = (timer_count * 64) / s;
-    set_intensity(i);
-    if (timer_count < s) {
-        goto inloop;
+    int s = ResolveOperand();
+    const auto startTime = getTimerCount();
+    int t = 0;
+    while (t < s) {
+        t = getTimerCount() - startTime;
+        int i = (t * 64) / s;
+        set_intensity(i);
     }
+
     set_intensity(63);
-    timer_count = 0;
 }
 
 void FadeOut() {
-    int i, s;
-
-    s = ResolveOperand();
-    timer_count = 0;
-outloop:
-    i = (timer_count * 64) / s;
-    i = 64 - i;
-    set_intensity(i);
-    if (timer_count < s) {
-        goto outloop;
+    int s = ResolveOperand();
+    const auto startTime = getTimerCount();
+    int t = 0;
+    while (t < s) {
+        t = getTimerCount() - startTime;
+        int i = (timer_count * 64) / s;
+        i = 64 - i;
+        set_intensity(i);
     }
     set_intensity(0);
-    timer_count = 0;
 }
 
 void RemoveCharacter() {
@@ -418,7 +413,7 @@ void RemoveCharacter() {
         party[i].cx = -1;
         party[i].cy = -1;
     }
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void Banner() {
@@ -429,7 +424,7 @@ void Banner() {
     an = 1;
     GrabString(strbuf);
     duration = ResolveOperand() * 91;
-    timer_count = 0;
+    setTimerCount(0);
 drawloop:
     drawmap();
     tmenubox(106, 106, 246, 126);
@@ -443,7 +438,7 @@ drawloop:
             goto drawloop;
         } else {
             an = 0;
-            timer_count = 0;
+            setTimerCount(0);
             return;
         }
     if (first && !b1 && !b2 && !b4 && !down && !up) {
@@ -460,7 +455,7 @@ drawloop:
         first = 2;
         goto drawloop;
     }
-    timer_count = 0;
+    setTimerCount(0);
     an = 0;
 }
 
@@ -499,7 +494,7 @@ drawloop:
         goto drawloop;
     }
     an = 0;
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void DestroyItemProcessChar(unsigned char i, unsigned char c) {
@@ -592,7 +587,7 @@ drawloop:
             goto drawloop;
         } else {
             an = 0;
-            timer_count = 0;
+            setTimerCount(0);
             flags[flagidx] = selptr;
             return;
         }
@@ -678,7 +673,7 @@ void EarthQuake() {
     j = ResolveOperand();
     i = ResolveOperand();
 
-    timer_count = 0;
+    setTimerCount(0);
     while (timer_count <= i) {
         nxw = xwin;
         nyw = ywin;
@@ -714,7 +709,7 @@ void SaveMenu() {
     drawmap();
     vgadump();
     fin();
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void EnableSave() {
@@ -769,7 +764,7 @@ void SText() {
     st2[0] = 0;
     st3[0] = 0;
     an = 1;
-    timer_count = 0;
+    setTimerCount(0);
 
 drawloop:
     while (timer_count != 0) {
@@ -820,7 +815,7 @@ drawloop:
             goto drawloop;
         } else {
             an = 0;
-            timer_count = 0;
+            setTimerCount(0);
             return;
         }
     if (first && !b1 && !b2 && !b4) {
@@ -850,7 +845,7 @@ void Wait() {
     short int delaytime, ct2;
 
     delaytime = ResolveOperand();
-    timer_count = 0;
+    setTimerCount(0);
     ct2 = 0;
 main_loop:
     while (timer_count != 0) {
@@ -866,7 +861,7 @@ main_loop:
     if (ct2 < delaytime) {
         goto main_loop;
     }
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void SetFace() {
@@ -904,7 +899,7 @@ void BoxFadeOut() {
     int duration, hd, vd;
 
     duration = ResolveOperand();
-    timer_count = 0;
+    setTimerCount(0);
     an = 1;
 
 dloop:
@@ -919,7 +914,7 @@ dloop:
     if (timer_count <= duration) {
         goto dloop;
     }
-    timer_count = 0;
+    setTimerCount(0);
     an = 0;
 }
 
@@ -927,7 +922,7 @@ void BoxFadeIn() {
     int duration, hd, vd;
 
     duration = ResolveOperand();
-    timer_count = 0;
+    setTimerCount(0);
     an = 1;
 
 dloop:
@@ -944,7 +939,7 @@ dloop:
     if (timer_count <= duration) {
         goto dloop;
     }
-    timer_count = 0;
+    setTimerCount(0);
     an = 0;
 }
 
@@ -1044,7 +1039,7 @@ drawloop:
             goto drawloop;
         } else {
             an = 0;
-            timer_count = 0;
+            setTimerCount(0);
             return;
         }
     if (first && !b1 && !b3 && !down && !up) {
@@ -1317,7 +1312,7 @@ void VCCenterText() {
 }
 
 void ResetTimer() {
-    timer_count = 0;
+    setTimerCount(0);
 }
 
 void VCBlitTile() {
@@ -1348,11 +1343,9 @@ void NewGame() {
 }
 
 void Delay() {
-    int s;
-
-    s = ResolveOperand();
-    timer_count = 0;
-    while (timer_count < s)
+    auto s = ResolveOperand();
+    auto finishTime = getTimerCount() + s;
+    while (getTimerCount() < finishTime)
         if ((keyboard_map[SCAN_ALT]) &&
                 (keyboard_map[SCAN_CTRL]) &&
                 (keyboard_map[SCAN_DEL])) {
@@ -1553,7 +1546,7 @@ void MoveParty() {
 void PartyMove() {
     party[0].scriptofs = code;
     GrabString(stringbuffer);
-    timer_count = 0;
+    setTimerCount(0);
 
 main_loop:
     while (timer_count != 0) {
@@ -2647,7 +2640,7 @@ void WriteVar1(int var, int arg1, int value) {
 }
 
 int ReadVar2(int var, int arg1, int arg2) {
-    int i, j, l;
+    int i, j;
 
     switch (var) {
     case 0:

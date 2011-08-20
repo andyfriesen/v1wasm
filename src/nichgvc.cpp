@@ -304,7 +304,7 @@ drawloop:
             goto drawloop;
         } else {
             an = 0;
-            timer_count = 0;
+            setTimerCount(0);
             return;
         }
     if (first && !b1 && !b3 && !down && !up) {
@@ -365,7 +365,7 @@ void PlayVAS() {
     }
     fclose(pcxf);
 
-    timer_count = 0;
+    setTimerCount(0);
     while (i < frames) {
         memset(vcscreen, 0, 64000);
         VCtcopysprite(wherex, wherey, sizex, sizey, (unsigned char*)vcdatabuf + (i * sizeoff));
@@ -378,10 +378,10 @@ void PlayVAS() {
             i2++;
             i2--;
         }
-        timer_count = 0;
+        setTimerCount(0);
         i++;
     }
-    timer_count = 0;
+    setTimerCount(0);
     an = ansave;
 
 }

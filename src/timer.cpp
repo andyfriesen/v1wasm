@@ -40,3 +40,15 @@ int time() {
     static int t = 0;
     return ++t;
 }
+
+namespace {
+    int timer_count_offset = 0;
+}
+
+void setTimerCount(int offset) {
+    timer_count_offset = offset;
+}
+
+int getTimerCount() {
+    return time() - timer_count_offset;
+}

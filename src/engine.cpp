@@ -898,7 +898,7 @@ void startmap(char* fname) {
     vgadump();
     fin();
 
-    timer_count = 0;
+    setTimerCount(0);
     lz = 0;
     tickctr = 0;
     zonedelay = 0;

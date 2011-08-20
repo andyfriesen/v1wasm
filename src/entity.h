@@ -1,5 +1,5 @@
 struct chrrec {
-    char fname[13]                       __attribute__ ((packed));
+    char fname[13];
 };
 
 struct entitydata {

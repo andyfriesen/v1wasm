@@ -15,6 +15,7 @@
 #include "render.h"
 #include "timer.h"
 #include "vclib.h"
+#include "vga.h"
 #include "main.h"
 #include "fs.h"
 
@@ -27,7 +28,7 @@ namespace {
     pp::ImageData* backBuffer;
 
     const int XRES = 320;
-    const int YRES = 240;
+    const int YRES = 200;
     const int BACKBUFFER_SIZE = 90000; // More than we need, but random other things seem to depend on this figure.
 }
 
@@ -58,6 +59,7 @@ void set_intensity(unsigned int n) {
         pal2[i] = (pal[i] * n) >> 6;
     }
     set_palette(pal2);
+    //vgadump();
 }
 
 void initvga(pp::Graphics2D* g2d, pp::ImageData* bb) {
@@ -86,11 +88,10 @@ void vgadump() {
         wait();
     }
 
-    auto i = 320 * 240;
     auto src = virscr;
-    auto dst = (uint32_t*)backBuffer->data();
-    assert(0 == (backBuffer->stride() % sizeof(int32_t)));
-    const auto stride = backBuffer->stride() / sizeof(int32_t);
+    uint32_t* dst = (uint32_t*)backBuffer->data();
+    assert(0 == (backBuffer->stride() % sizeof(uint32_t)));
+    const auto stride = backBuffer->stride() / sizeof(uint32_t);
 
     for (int y = 0; y < YRES; ++y) {
         for (int x = 0; x < XRES; ++x) {
@@ -101,7 +102,6 @@ void vgadump() {
 
     graphics->PaintImageData(*backBuffer, pp::Point());
     pp::CompletionCallback cb = pp::BlockUntilComplete();
-    printf("Flush\n");
     graphics->Flush(cb);
 }
 
@@ -356,7 +356,7 @@ void fin() {
         return;
     }
 
-    timer_count = 0;
+    setTimerCount(0);
 inloop:
     i = (timer_count * 64) / 30;
     set_intensity(i);
@@ -377,7 +377,7 @@ void fout() {
         return;
     }
 
-    timer_count = 0;
+    setTimerCount(0);
 outloop:
     i = (timer_count * 64) / 30;
     i = 64 - i;
