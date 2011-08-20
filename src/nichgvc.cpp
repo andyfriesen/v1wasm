@@ -374,7 +374,7 @@ void PlayVAS() {
 
         i2 = 0;
 
-        while (timer_count < (speed)) {
+        while (getTimerCount() < (speed)) {
             i2++;
             i2--;
         }

@@ -1233,7 +1233,7 @@ void DrawMagicMenu(char c, char ptr) {
 void MagicUse(char c, char p) {
     int first = 1, ptr = 0, i, j;
     unsigned char l, t1, a;
-    int timer_count, an;
+    int getTimerCount(), an;
 
     playeffect(1);
     a = partyidx[c] - 1;

@@ -375,7 +375,7 @@ void FadeOut() {
     int t = 0;
     while (t < s) {
         t = getTimerCount() - startTime;
-        int i = (timer_count * 64) / s;
+        int i = (getTimerCount() * 64) / s;
         i = 64 - i;
         set_intensity(i);
     }
@@ -448,7 +448,7 @@ drawloop:
     }
 
 
-    while (!b4 && !b2 && !b1 && timer_count < duration) {
+    while (!b4 && !b2 && !b1 && getTimerCount() < duration) {
         goto drawloop;
     }
     while (b4 || b2 || b1) {
@@ -478,7 +478,8 @@ void EnforceAnimation() {
          fread(vsp0, i, 256, f);
          fread(&va0, 1, 800, f);
          fclose(f);
-         timer_count=0; z++;
+         setTimerCount(0);
+         z++;
        }
     */
 }
@@ -674,7 +675,7 @@ void EarthQuake() {
     i = ResolveOperand();
 
     setTimerCount(0);
-    while (timer_count <= i) {
+    while (getTimerCount() <= i) {
         nxw = xwin;
         nyw = ywin;
         if (!switchflag) {
@@ -767,7 +768,7 @@ void SText() {
     setTimerCount(0);
 
 drawloop:
-    while (timer_count != 0) {
+    while (getTimerCount() != 0) {
         switch (line) {
         case 1:
             st1[chr] = str1[chr];
@@ -804,7 +805,7 @@ drawloop:
     textwindow(portrait, st1, st2, st3);
     vgadump();
 
-    while (!timer_count) {
+    while (!getTimerCount()) {
         gp--;
         gp++;
     }
@@ -848,7 +849,7 @@ void Wait() {
     setTimerCount(0);
     ct2 = 0;
 main_loop:
-    while (timer_count != 0) {
+    while (getTimerCount() != 0) {
         decTimerCount();
         ct2++;
         check_tileanimation();
@@ -904,14 +905,14 @@ void BoxFadeOut() {
 
 dloop:
     drawmap();
-    hd = (timer_count * 176 / duration);
-    vd = (timer_count * 116 / duration);
+    hd = (getTimerCount() * 176 / duration);
+    vd = (getTimerCount() * 116 / duration);
     box(0, 0, hd, 216, 0);
     box(352 - hd, 16, 352, 232, 0);
     box(0, 0, 352, vd, 0);
     box(0, 232 - vd, 352, 232, 0);
     vgadump();
-    if (timer_count <= duration) {
+    if (getTimerCount() <= duration) {
         goto dloop;
     }
     setTimerCount(0);
@@ -927,8 +928,8 @@ void BoxFadeIn() {
 
 dloop:
     drawmap();
-    hd = (timer_count * 176 / duration);
-    vd = (timer_count * 116 / duration);
+    hd = (getTimerCount() * 176 / duration);
+    vd = (getTimerCount() * 116 / duration);
     hd = 176 - hd;
     vd = 116 - vd;
     box(0, 0, hd, 216, 0);
@@ -936,7 +937,7 @@ dloop:
     box(0, 0, 352, vd, 0);
     box(0, 232 - vd, 352, 232, 0);
     vgadump();
-    if (timer_count <= duration) {
+    if (getTimerCount() <= duration) {
         goto dloop;
     }
     setTimerCount(0);
@@ -1549,7 +1550,7 @@ void PartyMove() {
     setTimerCount(0);
 
 main_loop:
-    while (timer_count != 0) {
+    while (getTimerCount() != 0) {
         decTimerCount();
         check_tileanimation();
         process_entities();

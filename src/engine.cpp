@@ -904,7 +904,7 @@ void startmap(char* fname) {
     zonedelay = 0;
 
 main_loop:
-    while (timer_count != 0) {
+    while (getTimerCount() != 0) {
         decTimerCount();
         game_ai();
     }
@@ -912,7 +912,7 @@ main_loop:
     drawmap();
     vgadump();
 
-    while (!timer_count) {
+    while (!getTimerCount()) {
         gp--;
         gp++;
     }

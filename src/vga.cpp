@@ -358,9 +358,9 @@ void fin() {
 
     setTimerCount(0);
 inloop:
-    i = (timer_count * 64) / 30;
+    i = (getTimerCount() * 64) / 30;
     set_intensity(i);
-    if (timer_count < 30) {
+    if (getTimerCount() < 30) {
         goto inloop;
     }
     set_intensity(63);
@@ -379,10 +379,10 @@ void fout() {
 
     setTimerCount(0);
 outloop:
-    i = (timer_count * 64) / 30;
+    i = (getTimerCount() * 64) / 30;
     i = 64 - i;
     set_intensity(i);
-    if (timer_count < 30) {
+    if (getTimerCount() < 30) {
         goto outloop;
     }
     set_intensity(0);

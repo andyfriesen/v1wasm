@@ -18,7 +18,7 @@
 #define OCR2    0xA0
 #define IMR2    0xA1
 
-unsigned int timer_count = 0, timer = 0, hooktimer = 0;
+unsigned int timer = 0, hooktimer = 0;
 unsigned char an = 0, tickctr = 0, sec = 0, min = 0, hr = 0;
 
 void sethz(unsigned int hz) {
@@ -36,13 +36,13 @@ void timer_close() {
 void delay(int ms) {
 }
 
-int time() {
-    static int t = 0;
-    return ++t;
+namespace {
+    unsigned int timer_count = 0;
+    int timer_count_offset = 0;
 }
 
-namespace {
-    int timer_count_offset = 0;
+int time() {
+    return timer_count++;
 }
 
 void setTimerCount(int offset) {

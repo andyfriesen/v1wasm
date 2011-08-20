@@ -553,10 +553,10 @@ inputloop:
         setTimerCount(0);
         s = 91;
 fadeloop:
-        i = (timer_count * 64) / s;
+        i = (getTimerCount() * 64) / s;
         i = 64 - i;
         set_intensity(i);
-        if (timer_count < s) {
+        if (getTimerCount() < s) {
             goto fadeloop;
         }
         set_intensity(0);
