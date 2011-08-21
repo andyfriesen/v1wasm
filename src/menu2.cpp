@@ -17,6 +17,9 @@
 #include "sound.h"
 #include "pcx.h"
 #include "vga.h"
+#include "fs.h"
+
+using namespace verge;
 
 char sg1[] = "SAVEDAT.000";
 char sg2[] = "SAVEDAT.001";
@@ -63,7 +66,7 @@ void LoadSaveErase(char mode)
 // into one function, using the Mode variable to specify the intent.
 // MODE: 0=Load Game, 1=Save Game, 2=Erase Game
 {
-    FILE* f;
+    VFILE* f;
     int i, j, r = 0;
     unsigned char tbuf[2560], buf1[2560], buf2[2560], buf3[2560], buf4[2560];
     unsigned char rbuf[256];
@@ -76,84 +79,85 @@ void LoadSaveErase(char mode)
     playeffect(1);
     fout();
 redraw:
-    if (!(f = fopen(mnuname[mode], "r"))) {
+    f = vopen(mnuname[mode], "r");
+    if (!f) {
         err("Fatal Error: Could not open specified MNU file.");
     }
 parseloop:
-    fscanf(f, "%s", strbuf);
+    vscanf(f, "%s", strbuf);
 
     if (strcmp(strbuf, "background") == 0) {
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         loadpcx(strbuf, virscr);
         goto parseloop;
     }
 
     if (strcmp(strbuf, "print") == 0) {
-        fscanf(f, "%u", &i);
+        vscanf(f, "%u", &i);
         i += 16;
-        fscanf(f, "%u", &j);
+        vscanf(f, "%u", &j);
         j += 16;
         gotoxy(i, j);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         printstring(strbuf);
         goto parseloop;
     }
 
     if (strcmp(strbuf, "printb") == 0) {
-        fscanf(f, "%u", &i);
+        vscanf(f, "%u", &i);
         i += 16;
-        fscanf(f, "%u", &j);
+        vscanf(f, "%u", &j);
         j += 16;
         gotoxy(i, j);
-        fscanf(f, "%s", strbuf);
+        vscanf(f, "%s", strbuf);
         bigprintstring(strbuf);
         goto parseloop;
     }
 
     if (strcmp(strbuf, ":selectors") == 0) {
         for (i = 0; i < 4; i++) {
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             menus[i].posx = atoi(strbuf) + 16;
-            fscanf(f, "%s", strbuf);
+            vscanf(f, "%s", strbuf);
             menus[i].posy = atoi(strbuf) + 16;
         }
         goto parseloop;
     }
-    fclose(f);
+    vclose(f);
 
     for (i = 0; i < 4; i++) {
-        if (!(f = fopen(savename[i], "rb"))) {
+        if (!(f = vopen(savename[i], "rb"))) {
             gotoxy(menus[i].posx + 100, menus[i].posy + 10);
             menus[i].linktype = 0;
             printstring("- NOT USED -");
         } else {
             menus[i].linktype = 1;
-            fread(strbuf, 1, 30, f);
+            vread(strbuf, 1, 30, f);
             gotoxy(menus[i].posx + 90, menus[i].posy + 1);
             printstring(strbuf);
-            fread(strbuf, 1, 9, f);
+            vread(strbuf, 1, 9, f);
             gotoxy(menus[i].posx + 90, menus[i].posy + 11);
             printstring(strbuf);
-            fread(&j, 1, 4, f);
+            vread(&j, 1, 4, f);
             dec_to_asciiz(j, strbuf);
             gotoxy(menus[i].posx + 162, menus[i].posy + 11);
             printstring("LV ");
             printstring(strbuf);
-            fread(&j, 1, 4, f);
+            vread(&j, 1, 4, f);
             gotoxy(menus[i].posx + 230, menus[i].posy + 11);
             dec_to_asciiz(j, strbuf);
             printstring(strbuf);
             printstring("/");
-            fread(&j, 1, 4, f);
+            vread(&j, 1, 4, f);
             dec_to_asciiz(j, strbuf);
             printstring(strbuf);
-            fread(&j, 1, 4, f);
+            vread(&j, 1, 4, f);
             gotoxy(menus[i].posx + 90, menus[i].posy + 21);
             dec_to_asciiz(j, strbuf);
             printstring(strbuf);
             printstring(" G");
             char b;
-            fread(&b, 1, 1, f);
+            vread(&b, 1, 1, f);
             gotoxy(menus[i].posx + 162, menus[i].posy + 21);
             dec_to_asciiz(b, strbuf);
             if (b < 10) {
@@ -161,14 +165,14 @@ parseloop:
             }
             printstring(strbuf);
             printstring(":");
-            fread(&b, 1, 1, f);
+            vread(&b, 1, 1, f);
             dec_to_asciiz(b, strbuf);
             if (b < 10) {
                 printstring("0");
             }
             printstring(strbuf);
-            fread(&b, 1, 2, f);
-            fread(&j, 1, 1, f);
+            vread(&b, 1, 2, f);
+            vread(&j, 1, 1, f);
             if (!i) {
                 img = buf1;
             }
@@ -181,7 +185,7 @@ parseloop:
             if (i == 3) {
                 img = buf4;
             }
-            fread(img, 1, 2560, f);
+            vread(img, 1, 2560, f);
             greyscale(80, 32, (unsigned char*)img, &tbuf[0]);
 
             tcopysprite(menus[i].posx, menus[i].posy, 16, 32, tbuf);
@@ -190,7 +194,7 @@ parseloop:
             tcopysprite(menus[i].posx + 48, menus[i].posy, 16, 32, tbuf + 1536);
             tcopysprite(menus[i].posx + 64, menus[i].posy, 16, 32, tbuf + 2048);
         }
-        fclose(f);
+        vclose(f);
     }
 
     int mpos = 0;

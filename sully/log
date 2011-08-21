@@ -1,0 +1,4 @@
+Changelog:
+ ù All changes from patch.zip applied.
+ ù Added VC variables layer1trans,layervctrans,items
+ ù Added VC command VCLoadRaw().

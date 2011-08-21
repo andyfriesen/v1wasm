@@ -1,0 +1,267 @@
+event /* 0 */
+{
+ flags[151]=0;
+ EnforceAnimation();
+ if(flags[1])
+ {
+  Entity.LocY[5]=1;
+ }
+ if(flags[51])
+ {
+  AlterBTile(24,17,23,2);
+ }
+ if(flags[141])
+ {
+  SetFace(1,1);
+  Entity.LocX[5]=12;
+  Entity.LocY[5]=1;
+  Face[5]=1;
+  Redraw();
+  Timer=600;
+  HookRetrace(7);
+  FadeIn(90);
+  Wait(500);
+  stext(4,"It's so beautiful how the",
+          "moonlight reflects off the",
+          "ocean, don't you think?");
+  SetFace(1,2);
+  stext(1,"Yes, it is. But its beauty",
+          "pales in comparison to your",
+          "sparkling eyes.");
+  stext(4,"Oh, Darin...","","");
+  SetFace(1,1);
+  stext(1,"Oh, Crystal...","","");
+  Wait(500);
+  stext(4,"I just wish this could go on",
+          "forever, don't you? I hope",
+          "absolutely nothing changes.");
+  SetFace(1,2);
+  stext(1,"Don't worry, Crystal. I'll",
+          "never let anything or anyone",
+          "disturb our happiness!");
+  flags[143]=1;
+  SetFace(1,1);
+  Wait(500);
+  FadeOut(90);
+  HookRetrace(0);
+  mapswitch("BUMVILLE.MAP",23,12,1);
+ }
+}
+
+event /* 1 */
+{
+ if(!flags[50])
+ {
+  SText(0,"Darin, my man! Sully Clam",
+          "here! What's up with my main",
+          "homey today, bro?");
+  SText(1,"Oh, hi Sully! Well, yet",
+          "another trip to go save the",
+          "world, I suppose.");
+  SText(0,"Yeah... no matter how many",
+          "times you save it, you end",
+          "up back here, don't you?");
+  SText(0,"Well, we've been suffering",
+          "from some earthquakes here",
+          "lately.");
+  SText(0,"As a result, the map outside",
+          "is completely out of whack!","");
+  SText(0,"The northwest quadrant is now",
+          "Tropical Zone. The southwest",
+          "quadrant is Forest Zone.");
+  SText(0,"The northeast quadrant is",
+          "Rocky Zone, and the southeast",
+          "area is the Swamp Zone.");
+  SText(1,"...","","");
+  SText(1,"Is this some revolutionary",
+          "new feature, or is it just a",
+          "shameless method of making...");
+  SText(1,"...the backtracking in this",
+          "scenario even more lengthy",
+          "and unbearable?!");
+  SText(0,"Umm... the latter. There is",
+          "some new stuff that should",
+          "get your attention, though!");
+  SText(0,"There's a cool Map item in",
+          "your attic that you can use",
+          "on the surface map!");
+  SText(1,"Geez... is someone obsessed",
+          "with surface maps today?","");
+  SText(0,"There's also some minor VC",
+          "optimizations for you poor",
+          "freaks with slow computers.");
+  SText(0,"Also, there's a statue in",
+          "Bumsville. Take new people",
+          "there when you get them!");
+  SText(0,"And... umm... well, I guess",
+          "that's just about it. Good",
+          "luck, Darin!");
+  SText(1,"...! That's all? Two months",
+          "of waiting for a bigger,",
+          "stupider surface map?!");
+  SText(0,"Oh yeah! I think Vecna did",
+          "some... entity stuff or",
+          "something. I dunno. Bye!");
+  return;
+ }
+ if(flags[51])
+ {
+  stext(0,"Please leave me be. I'm just a",
+          "silly little clam. I have no",
+          "objects of value for you!");
+  return;
+ }
+ stext(0,"Hi! My name is Sully Clam. I",
+         "welcome you back to Paradise",
+         "Isle.");
+ stext(5,"Enough small talk, clam. Tell",
+         "us where to find the Pearl of",
+         "Truth before I rough you up!");
+ stext(2,"I thought Pearls came from",
+         "oysters, not clams.","");
+ stext(4,"Sully, is there something you",
+         "haven't told us?","");
+ stext(0,"Alright, I give up! The",
+         "ancient race of cyclops once",
+         "lived on this island.");
+ stext(0,"There's a sacred hall beneath",
+         "here that holds the Pearl of",
+         "Truth.");
+ stext(5,"Grand! Show us the entrance or",
+         "I'll teach you a whole new",
+         "meaning of shellfish abuse!");
+ stext(0,"Okee dokee. Let me just try",
+         "to remember the location...","");
+ stext(5,"Stop stalling, clam! I need to",
+         "get back inside the Castle",
+         "Heck right away!");
+ AlterBTile(24,17,23,2);
+ stext(0,"Oh, I remember! It's near the",
+         "lagoon between the trees. I",
+         "have revealed the entrance!");
+ stext(1,"Thanks, Sully. We owe ya one!","","");
+ flags[51]=1;
+}
+
+event /* 2 */
+{
+ if(!flags[1])
+ {
+  Wait(200);
+  FadeOut(30);
+  Layer0=0;
+  Layer1=0;
+  DrawParty=0;
+  DrawEntities=0;
+  LayerVC=1;
+  VCPutPCX("cryssand.pcx",170,1);
+  Redraw();
+  FadeIn(30);
+  stext(4,"Darin... Hello. How are you",
+          "today? I needed to talk to",
+          "you about something...");
+  stext(4,"I... I've been thinking and",
+          "I've decided we need to leave",
+          "Paradise Island.");
+  VCPutPCX("darin01.pcx",40,1);
+  stext(1,"But Crystal! What's wrong?",
+          "I kinda like this blue lagoon",
+          "thing we have going on.");
+  stext(4,"No... it has to be this way.",
+          "We'll go insane if we don't",
+          "have some adventure soon.");
+  stext(1,"I suppose you're right. I'd",
+          "like to go exploring some",
+          "caves and stuff.");
+  FadeOut(30);
+  Layer0=1;
+  Layer1=1;
+  DrawParty=1;
+  DrawEntities=1;
+  VCClear();
+  LayerVC=0;
+  Redraw();
+  FadeIn(30);
+  stext(4,"I'm glad you understand. I",
+          "suppose we can use the",
+          "undersea passage. Let's go!");
+  EntityMove(5,"U1");
+  Wait(5);
+  While(Entity.Moving[5])
+  {
+   Wait(5);
+  }
+  flags[1]=1;
+  AddCharacter(4);
+  Entity.LocY[5]=1;
+ }
+}
+
+event /* 3 */
+{
+ mapswitch("UNDERSEA.MAP",0,0,0);
+}
+
+event /* 4 */
+{
+ if(flags[51])
+ {
+  mapswitch("UNDERSEA.MAP",47,21,0);
+ }
+}
+
+event /* 5 */
+{
+ Timer=0;
+ While(Timer<100)
+ {
+  Down=1;
+  Redraw();
+ }
+ Down=0;
+}
+
+event /* 6 */
+{
+ if(timer=300)
+ {
+  SoundEffect(24);
+  Timer=0;
+ }
+}
+
+event /* 7 */
+{
+ if(Timer>680)
+ {
+  SoundEffect(24);
+  timer=0;
+ }
+}
+
+event /* 8 */
+{
+ stext(0,"Hi! I'm the invisible entity.",
+         "I am NOT a zone. But you can",
+         "activate me! <:)");
+}
+
+event /* 9 */
+{
+ stext(0,"Hi! I'm Galfrey.",
+         "I am NOT a zone. But you can",
+         "activate me! <:)");
+ face[5]=random(0,3);
+ entity.chrindex[5]=random(0,6);
+
+}
+
+event /* 10 */
+{
+  AutoOn();
+  EntityMove(95,"D3 U3");
+  wait(100);
+  while (entity.moving[95]) wait(100);
+  AutoOff();
+
+}

@@ -1,0 +1,1312 @@
+event /* 0 */
+{
+ flags[151]=0;
+ EnforceAnimation();
+ if(flags[144] and flags[141])
+ {
+  AddCharacter(1);
+  RemoveCharacter(4);
+  DrawParty=1;
+  Volume=q;
+  if(d=1)
+  {
+   AddCharacter(3);
+   d=0;
+  }
+  Fade=0;
+  Redraw();
+  FadeIn(30);
+  EnableSave();
+  stext(0,"Feeling better this morning,",
+          "sir? I hope you had a good",
+          "rest and please come again!");
+  flags[141]=0;
+  flags[143]=1;
+  LayerVC=0;
+  return;
+ }
+ if(flags[143] and flags[141])
+ {
+  Redraw();
+  SoundEffect(26);
+  FadeIn(30);
+  Timer=0;
+  HookTimer(55);
+  stext(1,"I should have put my fears",
+          "aside and attacked Stan with",
+          "all the might I could muster.");
+  stext(0,"Oh? Would your sweetheart be",
+          "so proud of you if you were",
+          "dead?");
+  stext(0,"You know, sometimes you have",
+          "to miss someone before you can",
+          "know how much you love them.");
+  stext(1,"Perhaps... but I know she's",
+          "out there... somewhere...",
+          "waiting for me to come...");
+  CameraTracking=0;
+  a=XWin;
+  Timer=0;
+  While(Timer<180)
+  {
+   XWin=a-(Timer/2);
+   Redraw();
+  }
+  a=XWin;
+  b=YWin;
+  Timer=0;
+  While(Timer<200)
+  {
+   XWin=a-(Timer/2);
+   YWin=b-(Timer/2);
+   Redraw();
+  }
+  Wait(200);
+  mapswitch("LAB.MAP",18,92,0);
+ }
+}
+
+event /* 1 */
+{
+ ChangeCHR(1,"DARIN.CHR");
+ mapswitch("TEST.MAP",58,21,0);
+}
+
+event /* 2 */
+{
+ warp(44,106,0);
+ Banner("School",3);
+}
+
+event /* 3 */
+{
+ warp(3,104,0);
+ Banner("Inn",3);
+}
+
+event /* 4 */
+{
+ warp(46,127,0);
+ Banner("Blacksmith",3);
+}
+
+event /* 5 */
+{
+ warp(13,151,0);
+}
+
+event /* 6 */
+{
+ warp(48,152,0);
+ Banner("Pharmacy",3);
+}
+
+event /* 7 */
+{
+ warp(48,179,0);
+ Banner("Fashion Studio",3);
+ a=0;
+ AlterBTile(55,164,507,2);
+ if(Volume=100)
+ {
+  Volume=99;
+ }
+ c=Volume;
+ b=(Volume/10);
+ AlterBTile(57,164,507+b,2);
+}
+
+event /* 8 */
+{
+ warp(10,174,0);
+ Banner("Blacksmith",3);
+}
+
+event /* 9 */
+{
+ warp(38,66,0);
+}
+
+event /* 10 */
+{
+ Fade=1;
+ warp(8,63,0);
+}
+
+event /* 11 */
+{
+ Fade=1;
+ warp(18,120,0);
+ Banner("2F",3);
+}
+
+event /* 12 */
+{
+ warp(18,96,0);
+}
+
+event /* 13 */
+{
+ warp(44,50,0);
+}
+
+event /* 14 */
+{
+ warp(38,29,0);
+}
+
+event /* 15 */
+{
+ warp(16,30,0);
+}
+
+event /* 16 */
+{
+ warp(18,48,0);
+ PlayMusic("SIMPL2.S3M");
+ Volume=c;
+}
+
+event /* 17 */
+{
+ warp(47,15,0);
+}
+
+event /* 18 */
+{
+ if(flags[141])
+ {
+  stext(0,"Aren't you up past your bed",
+          "time junior? Say, why are you",
+          "looking so sad?");
+  stext(1,"Huh...? Oh... it's nothing.","","");
+  stext(0,"Aww... who are you kidding?",
+          "Come on, kid. You look like",
+          "your puppy just got killed!");
+  stext(1,"Well... a friend of mine is",
+          "in danger and I have to rescue",
+          "her. I'm very worried.");
+  stext(0,"Ah! I see. Well, I see bravery",
+          "in them thar eyes, sonny. I'm",
+          "sure everything with turn out.");
+  stext(1,"*sigh* Crystal... I shouldn't",
+          "have failed you. I wish you",
+          "were here right now.");
+  stext(1,"This breeze is so cool and",
+          "balmy... just like the nights",
+          "we used to spend together...");
+  mapswitch("ISLAND.MAP",11,1,0);
+ }
+ stext(0,"Hello there, young adventurer.",
+         "Keep your hopes up! Never give",
+         "up and you're sure to succeed.");
+}
+
+event /* 19 */
+{
+ stext(0,"We get all of our carrots from",
+         "that nice farm family that",
+         "lives to the northwest.");
+}
+
+event /* 20 */
+{
+ stext(0,"We go about our lives in this",
+         "city worshipping the profound",
+         "and great deity named Vecna.");
+}
+
+event /* 21 */
+{
+ stext(0,"I'm going on vacation next",
+         "fall to Paradise Isle. I hear",
+         "they have great clam hunting.");
+}
+
+event /* 22 */
+{
+ stext(0,"Lord Stan cursed our earth so",
+         "we never get any ground water.",
+         "You need to rest at the inn.");
+}
+
+event /* 23 */
+{
+ stext(0,"There's actually two smiths",
+         "that work in this town.","");
+ stext(0,"However, the one up on the",
+         "hill is a complete and total",
+         "weirdo.");
+ stext(0,"He only fashions equipment",
+         "out of vegetables. He missed",
+         "the Bronze Age I guess.");
+}
+
+event /* 24 */
+{
+ stext(0,"There was an old sage that",
+         "once lived here, giving out",
+         "sage advice.");
+ stext(0,"He disappeared a few years",
+         "back. I think he headed to",
+         "Mt. Jujube to meditate.");
+}
+
+event /* 25 */
+{
+ prompt(0,"I'm a wandering storyteller!",
+          "Do you want to hear a great",
+          "and epic tale?",119,"Sure","Nope");
+ if(flags[119])
+ {
+  stext(0,"Well I didn't want to tell it",
+          "to ya anyway, ya bum!","");
+  return;
+ }
+ stext(0,"Great! Okay, there was once a",
+         "great desert and a king that",
+         "ruled a mighty castle.");
+ stext(0,"He heard of some magic jewels",
+         "so he sent the prince, his",
+         "second son, to fetch them.");
+ stext(0,"The prince rode for five days",
+         "and nights before he",
+         "arrived at the magical cave.");
+ stext(0,"Inside the cave were four",
+         "brilliant gems. Yellow, blue",
+         "green, and red.");
+ stext(0,"And everyone lived happily",
+         "ever after! So what do you",
+         "think? Suspenseful, huh?");
+}
+
+event /* 26 */
+{
+ stext(0,"Welcome to the city of",
+         "Bumsville! We're at the hub",
+         "of the world's civilization!");
+ stext(0,"... Pretty sad, huh?","","");
+}
+
+event /* 27 */
+{
+ stext(0,"This is the mountain city, not",
+         "like the tree hugging hippies",
+         "from Rodne to the south.");
+ stext(0,"Watch your step on the cliffs",
+         "and there's a nice view of Mt.",
+         "Jujube on the highest plateau.");
+}
+
+event /* 28 */
+{
+ if(flags[141])
+ {
+  stext(0,"I trust everything is ok, sir?",
+          "You might want to take a walk",
+          "on such a beautiful night.");
+  return;
+ }
+ stext(0,"Welcome to the Lazy Anteater",
+         "Hotel! We charge by the night,",
+         "hour, or minute here!");
+ prompt(0,"Want a good night's sleep? It",
+          "will only set you back a",
+          "mere 20 gold.",142,"Yes","No");
+ if(flags[142])
+ {
+  stext(0,"Sorry to hear that. Be sure to",
+          "come back for all of your",
+          "lodging needs!");
+  return;
+ }
+ if(GP<20)
+ {
+  stext(0,"You don't have enough money!",
+          "Get out of here, ya deadbeat!","");
+  return;
+ }
+ TakeGP(20);
+ SoundEffect(14);
+ stext(0,"Thank you very much, sir! You",
+         "will find your room upstairs.",
+         "Have a pleasant stay!");
+ HealAll();
+ q=Volume;
+ Timer=0;
+ For(x,1,q,1)
+ {
+  Volume-=1;
+  Wait(1);
+ }
+ Timer=0;
+ For(x,2,64,2)
+ {        
+  PaletteMorph(0,0,0,0,64-x);
+  Wait(1);
+ }
+ Wait(300);
+ if(flags[143])
+ {
+  For(x,1,63,2)
+  {
+   PaletteMorph(0,0,0,0,x);
+   Wait(1);
+  }
+  For(x,1,q,1)
+  {
+   Volume+=1;
+   Wait(1);
+  }
+  stext(0,"Feeling better this morning,",
+          "sir? I hope you had a good",
+          "rest and please come again!");
+  return;
+ }
+ if(flags[29])
+ {
+  For(x,1,63,2)
+  {
+   PaletteMorph(0,0,0,0,x);
+   Wait(1);
+  }
+  For(x,1,q,1)
+  {
+   Volume+=1;
+   Wait(1);
+  }
+  stext(0,"Feeling better this morning,",
+          "sir? I hope you had a good",
+          "rest and please come again!");
+  return;
+ }
+ Warp(1,120,1);
+ MapPaletteGradient(152,159,1,0);
+ ReDraw();
+ if(char(3))
+ {
+  RemoveCharacter(3);
+  d=1;
+  Entity.LocY[36]-=70;
+  SpecialFrame[36]=24;
+ }
+ For(x,1,63,2)
+ {
+  PaletteMorph(0,0,0,0,x);
+  Wait(1);
+ }
+ Timer=0;
+ HookTimer(55);
+ CallEvent(56,46,13);
+ CallEvent(56,37,27);
+ CallEvent(56,15,28);
+ CallEvent(56,17,46);
+ CallEvent(56,43,48);
+ CallEvent(56,37,64);
+ AlterFTile(37,9,0,2);
+ AlterBTile(37,10,541,0);
+ AlterBTile(63,64,101,1);
+ AlterBTile(63,65,0,1);
+ AlterBTile(63,66,103,1);
+ For(x,6,35,1)
+ {
+  MoveCode[x]=0;
+  Entity.LocX[x]=58;
+  Entity.LocY[x]=100;
+ }
+ SetFace(1,1);
+ DisableSave();
+ stext(1,"I can't sleep... not when",
+         "Crystal is in trouble. I need",
+         "to get some fresh air.");
+ flags[141]=1;
+
+}
+
+event /* 29 */
+{
+ stext(0,"Hi! Are you room service?","","");
+}
+
+event /* 30 */
+{
+ stext(0,"Isn't this just the cutest,",
+         "quaintest bed and breakfast",
+         "you've ever seen?");
+}
+
+event /* 31 */
+{
+ stext(0,"Trust me, dude. Do NOT steal",
+         "towels from this place. They",
+         "come after you with knives.");
+}
+
+event /* 32 */
+{
+ stext(0,"Where is that worthless little",
+         "puke? I oughta disown that",
+         "ungrateful ninny of a son!");
+ stext(0,"I paid good money for him to",
+         "go to school, and all he",
+         "studies is magic!");
+ stext(0,"Muttering nonsense with others",
+         "wearing silk bathrobes... it's",
+         "just not right!");
+ stext(0,"I hope I never see that wimpy,",
+         "worthless boy again! He'll",
+         "never be a real man!");
+ stext(0,"Oh, my job? I'm the florist.","","");
+ if(char(3))
+ {
+  stext(3,"But, Dad! The world is danger",
+          "of being destroyed by an",
+          "emissary from the Dark World!");
+  stext(3,"I want to help in any way I",
+          "can with the forces of magic!","");
+  stext(0,"So there you are, you",
+          "ungratefuly pansy! Where are",
+          "your sissy mage friends?");
+  stext(3,"He's just not listening.",
+          "Let's go, Darin.","");
+ }
+}
+
+event /* 33 */
+{
+ stext(0,"My husband goes on like that,",
+         "but I think he loves Dexter",
+         "very much in his heart.");
+ if(char(3))
+ {
+  stext(3,"I know that, Mom. Maybe after",
+          "I help Darin destroy Lord",
+          "Stan he'll respect me more.");
+ }
+}
+
+event /* 34 */
+{
+ if(flags[128]=2)
+ {
+  stext(0,"Hello again, mister! I hope",
+          "the sacred weapon is serving",
+          "you well.");
+  return;
+ }
+ stext(0,"Bah! What do you want from",
+         "me? I ain't got nothin' to",
+         "sell folks anymore.");
+ stext(0,"Everyone's making weapons from",
+         "metal nowadays! The people",
+         "don't respect veggies no more.");
+ stext(0,"I remember when wars were",
+         "fought with radish bombs and",
+         "celery spears!");
+ stext(0,"What I'd give for a chance",
+         "to re-discover the destructive",
+         "potential of veggies again...");
+ if(item(45))
+ {
+  stext(0,"Wait a minute... what's that",
+          "you have there? My god, that",
+          "is one mighty carrot!");
+  stext(0,"Allow me to construct a weapon",
+          "of mass destruction with it!",
+          "You will be pleased!");
+  FadeOut(30);
+  SoundEffect(8);
+  Wait(50);
+  SoundEffect(8);
+  Wait(50);
+  SoundEffect(8);
+  Wait(50);
+  FadeIn(30);
+  stext(0,"Here you are, sir! Cherish",
+          "this sword and keep it at",
+          "your side always.");
+  DestroyItem(45,0);
+  SoundEffect(10);
+  GiveItem(44);
+  flags[128]=2;
+ }
+}
+
+event /* 35 */
+{
+ if(flags[136])
+ {
+  stext(0,"How's the new attire working",
+          "out for you today? You look",
+          "stunning, you really do!");
+  return;
+ }
+ if(flags[131])
+ {
+  if(!flags[133])
+  {
+   stext(0,"Go tell the stylists what you",
+           "want done, then return here.","");
+   return;
+  }
+  if(!flags[134])
+  {
+   stext(0,"Go tell the stylists what you",
+           "want done, then return here.","");
+   return;
+  }
+  if(!flags[135])
+  {
+   stext(0,"Go tell the stylists what you",
+           "want done, then return here.","");
+   return;
+  }
+  stext(0,"Are you all ready? Ok, just",
+          "close your eyes and let us",
+          "do our magic!");
+  FadeOut(30);
+  if(flags[133]=1 AND flags[134]=1 AND flags[135]=1)
+  {
+   ChangeCHR(1,"DARIN2.CHR");
+  }
+  if(flags[133]=1 AND flags[134]=1 AND flags[135]=2)
+  {
+   ChangeCHR(1,"DARIN5.CHR");
+  }
+  if(flags[133]=2 AND flags[134]=1 AND flags[135]=1)
+  {
+   ChangeCHR(1,"DARIN7.CHR");
+  }
+  if(flags[133]=2 AND flags[134]=1 AND flags[135]=2)
+  {
+   ChangeCHR(1,"DARIN6.CHR");
+  }
+  if(flags[133]=1 AND flags[134]=2 AND flags[135]=1)
+  {
+   ChangeCHR(1,"DARIN3.CHR");
+  }
+  if(flags[133]=1 AND flags[134]=2 AND flags[135]=2)
+  {
+   ChangeCHR(1,"DARIN4.CHR");
+  }
+  if(flags[133]=2 AND flags[134]=2 AND flags[135]=1)
+  {
+   ChangeCHR(1,"DARIN9.CHR");
+  }
+  if(flags[133]=2 AND flags[134]=2 and flags[135]=2)
+  {
+   ChangeCHR(1,"DARIN8.CHR");
+  }
+  Redraw();
+  FadeIn(30);
+  stext(0,"You look absolutely fabulous!",
+          "I hope you're happy with your",
+          "new look!");
+  if(numchars>1)
+  {
+  stext(1,"I dunno, guys. What do you",
+          "think?","");
+  }
+  if(char(2))
+  {
+   stext(2,"Umm... what's a nice word",
+           "for complete and total dork?","");
+  }
+  if(char(3))
+  {
+   stext(3,"Err... I guess it's fine,",
+           "Darin. Not my taste, though.","");
+  }
+  if(char(4))
+  {
+   stext(4,"Darin, I love you for what's",
+           "on the inside!","");
+  }
+  if(char(5))
+  {
+   stext(5,"Ha ha ha ha ha ha ha!","","");
+  }
+  stext(1,"Umm...","","");
+  stext(0,"I gave your old clothes to",
+          "Charlene over there. You have",
+          "a nice day now!");
+  flags[136]=1;
+  return;
+ }
+ if(!flags[131])
+ {
+  stext(0,"Well, hello there! My name is",
+          "Little Daddy Bruce and this is",
+          "my fabulous fashion studio!");
+  stext(0,"Here we dare you to explore",
+          "the stylish and trendy You.",
+          "Please have a look around.");
+  stext(0,"We have beauticians from all",
+          "over the world who want to",
+          "make you look your best.");
+  prompt(0,"Would you like a complete",
+           "hair and wardrobe makeover?",
+           "It's only 30 gold!",132,"Yes","No");
+  if(flags[132])
+  {
+   stext(0,"Oh, well I am so sorry to",
+           "hear that. Please come back",
+           "when you want to be pretty.");
+   return;
+  }
+  if(GP<30)
+  {
+   stext(0,"Oh sorry, hon. We can't make",
+           "you into a creature of beauty",
+           "without money. Sorry.");
+   return;
+  }
+  SoundEffect(14);
+  TakeGP(30);
+  stext(0,"Fabulous! Well, when you are",
+          "ready, go and meet the skilled",
+          "people you'll be working with!");
+  stext(0,"In the left booth is Trevor,",
+          "our wardrobe consultant. He'll",
+          "pick out some nice clothes.");
+  stext(0,"In the center booth is Alan.",
+          "He'll be working with your",
+          "hair to create a new you!");
+  stext(0,"In the right booth is James.",
+          "He has dyes from faraway lands",
+          "to fix up that cape of yours.");
+  stext(0,"After you've visited each of",
+          "them, return here and we'll",
+          "turn you into a new man!");
+  stext(0,"Before you begin, feel free to",
+          "set the mood with our juke box",
+          "over there. Thanks again!");
+  flags[131]=1;
+ }
+}
+
+event /* 36 */
+{
+ if(!flags[136])
+ {
+  stext(0,"Hi! My name is Charlene. If",
+          "there's anything you need in",
+          "the studio, let me know.");
+  return;
+ }
+ prompt(0,"I have those ratty old clothes",
+          "of yours right here. Do you",
+          "really want them back?",137,"Yes","No");
+ if(flags[137])
+ {
+  stext(0,"Smart move! You look better",
+          "now anyway.","");
+  return;
+ }
+ stext(0,"Oh, very well...","","");
+ FadeOut(30);
+ ChangeCHR(1,"DARIN.CHR");
+ Redraw();
+ FadeIn(30);
+ stext(0,"I hope you come back soon!","","");
+ flags[131]=0;
+ flags[133]=0;
+ flags[134]=0;
+ flags[135]=0;
+ flags[136]=0;
+}
+
+event /* 37 */
+{
+ if(flags[136])
+ {
+  stext(0,"Hello again! How are those",
+          "new threads working out for",
+          "you?");
+  return;
+ }
+ if(!flags[131])
+ {
+  stext(0,"Well, hello! My name is Trevor",
+          "and clothes are my thing.",
+          "Please go see Bruce up front.");
+  return;
+ }
+ if(flags[133])
+ {
+  stext(0,"I'm getting ready with the",
+          "clothes you requested. See",
+          "you in a bit!");
+  return;
+ }
+ stext(0,"Hello! Let me welcome you as",
+         "a valued customer. Oh boy! Are",
+         "you dressed in rags or what?");
+ stext(0,"I think I can help you. Are",
+         "you into the greek toga look?",
+         "I have some great designs.");
+ stext(0,"Oh! I also have the cutest",
+         "purple tunic you've ever seen!",
+         "It just screams 'violet'.");
+ prompt(0,"So what will it be? The white",
+          "toga or the purple tunic?","",133,"Toga","Tunic");
+ flags[133]+=1;
+ stext(0,"Fabulous! I'll get that sized",
+         "for your measurements then.","");
+}
+
+
+event /* 38 */
+{
+ if(flags[136])
+ {
+  stext(0,"Hello again! How is that",
+          "new haircut working out for",
+          "you?");
+  return;
+ }
+ if(!flags[131])
+ {
+  stext(0,"Well, hello! My name is Alan",
+          "and hair is my thing.",
+          "Please go see Bruce up front.");
+  return;
+ }
+ if(flags[134])
+ {
+  stext(0,"I'm getting ready with the",
+          "style you requested. See",
+          "you in a bit!");
+  return;
+ }
+ stext(0,"Hello! Let me welcome you as",
+         "a valued customer. Yeesh! I",
+         "guess you don't use shampoo?");
+ stext(0,"I think I can help you. Have",
+         "you even considered red? With",
+         "a purple band, it'll be cute.");
+ stext(0,"Or we could just chuck the",
+         "headband and go with the black",
+         "slicked-back look.");
+ prompt(0,"So what will it be? The rad",
+          "red punk or the cool slicked",
+          "black image?",134,"Punk","Slick");
+ flags[134]+=1;
+ stext(0,"Lovely! I'll get the coloring",
+         "and scissors ready.","");
+
+}
+
+event /* 39 */
+{
+ if(flags[136])
+ {
+  stext(0,"Greetings! How is that",
+          "new cape working out for",
+          "you?");
+  return;
+ }
+ if(!flags[131])
+ {
+  stext(0,"Hi, there! My name is James",
+          "and I specialize in dyes.",
+          "Please go see Bruce up front.");
+  return;
+ }
+ if(flags[135])
+ {
+  stext(0,"I'm getting ready with the",
+          "color you requested. See",
+          "you in a bit!");
+  return;
+ }
+ stext(0,"Hello! Let me welcome you as",
+         "a valued customer. Ooo! I do",
+         "love a man wearing a cape!");
+ stext(0,"Capes are stylish for you hero",
+         "types, but blue is *so* last",
+         "week.");
+ stext(0,"I have both orange and black",
+         "dyes here which I could use to",
+         "salvage that fine fabric.");
+ prompt(0,"So what will it be? Orange",
+          "dye or black dye?","",135,"Orange","Black");
+ flags[135]+=1;
+ stext(0,"Splendid! I'll get the water",
+         "and dye bases ready.","");
+
+}
+
+event /* 40 */
+{
+ stext(0,"This is our bitchin' stereo",
+         "system! Feel free to set the",
+         "mood for your experience.");
+ stext(0,"Use the left dial to select",
+         "a song, and the right dial to",
+         "set the volume.");
+}
+
+event /* 41 */
+{
+ if(a=0)
+ {
+  SoundEffect(5);
+  AlterBTile(55,164,508,2);
+  PlayMusic("AURORA.MOD");
+  stext(0,"Now playing 'Shining Lands'.","","");
+  a=1;
+  Return;
+ }
+ if(a=1)
+ {
+  SoundEffect(5);
+  AlterBTile(55,164,509,2);
+  PlayMusic("VANGELIS.MOD");
+  stext(0,"Now playing 'Inventions of",
+          "History'.","");
+  a=2;
+  Return;
+ }
+ if(a=2)
+ {
+  AlterBTile(55,164,510,2);
+  PlayMusic("EXAGE.MOD");
+  stext(0,"Now playing 'Flying Into",
+          "Darkness'.","");
+  a=3;
+  Return;
+ }
+ if(a=3)
+ {
+  AlterBTile(55,164,511,2);
+  PlayMusic("NONEXIST.MOD");
+  stext(0,"Now playing 'Sparks and",
+          "Piping'.","");
+  a=4;
+  Return;
+ }
+ if(a=4)
+ {
+  AlterBTile(55,164,512,2);
+  PlayMusic("MEDIOEVA.MOD");
+  stext(0,"Now playing 'Dance of the",
+          "Sunlight'.","");
+  a=5;
+  Return;
+ }
+ if(a=5)
+ {
+  AlterBTile(55,164,513,2);
+  PlayMusic("CR_GUIT.S3M");
+  stext(0,"Now playing 'Cold Separation'.","","");
+  a=6;
+  Return;
+ }
+ if(a=6)
+ {
+  AlterBTile(55,164,514,2);
+  PlayMusic("DISCO.S3M");
+  stext(0,"Now playing 'Shack of Love'.","","");
+  a=7;
+  Return;
+ }
+ if(a=7)
+ {
+  AlterBTile(55,164,515,2);
+  PlayMusic("DREAMS2.S3M");
+  stext(0,"Now playing 'Ascent of the",
+          "Mountain Eagle'.","");
+  a=8;
+  Return;
+ }
+ if(a=8)
+ {
+  AlterBTile(55,164,516,2);
+  PlayMusic("MYSTWATR.S3M");
+  stext(0,"Now playing 'Ocean Rhapsody'.","","");
+  a=9;
+  Return;
+ }
+ if(a=9)
+ {
+  AlterBTile(55,164,507,2);
+  PlayMusic("SYMPHONY.S3M");
+  stext(0,"Now playing 'Clash of the",
+          "Titans'.","");
+  a=0;
+  Return;
+ }
+}
+
+event /* 42 */
+{
+ prompt(0,"The red button decreases.",
+          "The green button increases.",
+          "",137,"Red","Green");
+ if(!flags[137])
+ {
+  if(b=0)
+  {
+   SoundEffect(13);
+   return;
+  }
+  b-=1;
+  AlterBTile(57,164,507+b,2);
+  Volume=(b*10);
+  WaitKeyUp();
+  return;
+ }
+ if(b=9)
+ {
+  SoundEffect(13);
+  return;
+ }
+ b+=1;
+ AlterBTile(57,164,507+b,2);
+ Volume=(b*10);
+ WaitKeyUp();
+ return;
+}
+
+event /* 43 */
+{
+ stext(0,"Welcome to my apothecary! Do",
+         "you need a potion to help you",
+         "join a deceased loved one?");
+ Shop(2,38,39,1,40,42);
+ stext(0,"Thank you. Come again!","","");
+}
+
+event /* 44 */
+{
+ stext(0,"I'm your friendly neighborhood",
+         "arms dealer! Buy what you see,",
+         "but you didn't get it here!");
+ Shop(33,32,9,34,35,13,8,37,6,36,12,7);
+ stext(0,"Thanks for stopping by.",
+         "Remember, you don't know me!","");
+}
+
+event /* 45 */
+{
+ stext(0,"Welcome to our proud and",
+         "distinguished university! We",
+         "provide great training.");
+ stext(0,"Visit our professors if you",
+         "wish to enroll in a course.","");
+}
+
+event /* 46 */
+{
+ stext(0,"We train young people to use",
+         "arms and to fight. Second",
+         "ammendment forever, man!");
+ prompt(0,"Do you want to train here and",
+          "become manly and hulking like",
+          "us? 150 gold per course.",129,"Yes","No");
+ if(flags[129])
+ {
+  stext(0,"Fine! Run away from a good",
+          "challenge like the wimps you",
+          "are!");
+  return;
+ }
+ if(GP<150)
+ {
+  stext(0,"There are no intelligence",
+          "requirements for this course",
+          "but you still need money!");
+  return;
+ }
+ SoundEffect(14);
+ TakeGP(150);
+ if(char(5))
+ {
+  prompt(0,"Who would like to train and",
+           "increase their power?","",129,"Darin","Galfrey");
+  FadeOut(30);
+  FadeIn(30);
+  if(!flags[129])
+  {
+   GiveXP(1,20);
+  }
+  if(flags[129])
+  {
+   GiveXP(5,20);
+  }
+  stext(0,"Thanks! I hope to see you",
+          "come take a course here again",
+          "some time soon!");
+  return;
+ }
+ GiveXP(1,20);
+ FadeOut(30);
+ FadeIn(30);
+ stext(0,"Thanks! I hope to see you",
+         "come take a course here again",
+         "some time soon!");
+}
+
+  
+  
+
+
+event /* 47 */
+{
+ stext(0,"We train mechanics and",
+         "gadgeteers here. All things",
+         "good come from science!");
+ if(char(2))
+ {
+  prompt(0,"Would Sara like to sit in on",
+           "a class to sharpen her skills",
+           "and expertise? 150 gold.",129,"Yes","No");
+  if(flags[129])
+  {
+   stext(0,"Do not fear the future! You",
+           "people shall be the first to",
+           "die in the... er... bye!");
+   return;
+  }
+  if(GP<150)
+  {
+   stext(0,"The pursuit of truth is nice",
+           "and all, but no money, no",
+           "class. Scram!");
+   return;
+  }
+  GiveXP(2,20);
+  TakeGP(150);
+  SoundEffect(14);
+  FadeOut(30);
+  FadeIn(30);
+  stext(0,"Thanks, Sara! It's good to",
+          "know there's a few things I",
+          "can teach you yet.");
+ }
+}
+
+event /* 48 */
+{
+ stext(0,"Here is where we instruct the",
+         "young people in the ways of",
+         "magic.");
+ 
+ if(char(3))
+ {
+  prompt(0,"Would Dexter like to take a",
+           "moment and study his lore? A",
+           "course costs 150 gold.",129,"Yes","No");
+ }
+ if(char(4))
+ {
+  prompt(0,"Would Crystal like to take a",
+           "moment and study her lore? A",
+           "course costs 150 gold.",129,"Yes","No");
+ }
+ if(flags[129])
+ {
+  stext(0,"I understand. Tampering with",
+          "the fabric of reality may not",
+          "be everyone's cup of tea.");
+  return;
+ }
+ if(GP<150)
+ {
+  stext(0,"Trying to learn magic tricks",
+          "for free now? Get out, you",
+          "cheapskate kids!");
+  return;
+ }
+ TakeGP(150);
+ SoundEffect(14);
+ FadeOut(30);
+ FadeIn(30);
+ if(char(3))
+ {
+  GiveXP(3,20);
+ }
+ if(char(4))
+ {
+  GiveXP(4,20);
+ }
+ stext(0,"I hope this was enlightening",
+         "for you. Please come again to",
+         "learn even deeper wisdom!");  
+}
+
+event /* 49 */
+{
+ stext(0,"We're real fighters! Our",
+         "classes involve bench pressing",
+         "cattle and eating gravel!");
+}
+
+event /* 50 */
+{
+ stext(0,"The boys and I are gonna stay",
+         "after class and beat up the",
+         "mages for their lunch money.");
+}
+
+event /* 51 */
+{
+ stext(0,"There was a girl in this class",
+         "once, but she was smarter than",
+         "the teacher, so she left.");
+}
+
+event /* 52 */
+{
+ stext(0,"I'm working on a top secret",
+         "project for next week's",
+         "science fair!");
+ stext(0,"It's called a 'video game' and",
+         "will rot and control the minds",
+         "of all it enslaves!");
+}
+
+event /* 53 */
+{
+ stext(0,"I'm pretty dumb for signing up",
+         "in a magic class in a world",
+         "that has no mana.");
+ stext(0,"*sigh*... and last month's",
+         "tuition is overdue as well.","");
+}
+
+event /* 54 */
+{
+ stext(0,"I am, like, so totally killer",
+         "with magic. I should, like,",
+         "go adventuring or whatever.");
+}
+
+event /* 55 */
+{
+ if(timer=400)
+ {
+  SoundEffect(23);
+ }
+ if(timer=550)
+ {
+  SoundEffect(23);
+  Timer=0;
+ }
+}
+
+event /* 56 */
+{
+ AlterBTile(var(0),var(1),586,2);
+ AlterBTile(var(0)+1,var(1),587,2);
+ AlterBTile(var(0)+2,var(1),588,2);
+ AlterBTile(var(0),var(1)+1,583,2);
+ AlterBTile(var(0)+1,var(1)+1,584,1);
+ AlterBTile(var(0)+2,var(1)+1,585,2);
+}
+
+event /* 57 */
+{
+ AlterFTile(var(0),var(1),0,2);
+ AlterBTile(var(0),var(1)+1,206,0);
+ ChangeZone(var(0),var(1)+1,0);
+}
+
+event /* 58 */
+{
+ AlterFTile(var(0),var(1),0,2);
+ AlterBTile(var(0),var(1)+1,66,0);
+ ChangeZone(var(0),var(1)+1,0);
+}
+ 
+event /* 59 */
+{
+ if(flags[141] and d=1)
+ {
+  stext(3,"ZzZzZzZzZz...","","");
+ }
+}
+
+event /* 60 */
+{
+ SText(0,"Mister, you gotta help me! My",
+         "sister keeps running in",
+         "circles around the school!");
+ SText(0,"Ever since she got kicked by",
+         "that cow, she does nothing but",
+         "tell stupid stories!");
+ SText(0,"Why do all her stories have",
+         "so many weird extraneous",
+         "numerical references in them?");
+}
+
+event /* 61 */
+{
+ SText(0,"You shall kneel before our",
+         "mighty god, creator of the",
+         "land and skies!");
+ SText(0,"If you fail to pray, you",
+         "shall be smoten by his cruel",
+         "and heartless vengeance!");
+}
+
+event /* 62 */
+{
+ SText(0,"Yeah, I guess Vecna's pretty",
+         "cool. He did, like, make the",
+         "universe and stuff.");
+ SText(0,"Worshipping, though? I mean,",
+         "what did he do for me, like,",
+         "recently, ya know?");
+}
+
+event /* 63 */
+{
+ SText(0,"Isn't Vecna just the",
+         "dreamiest? His sandals and his",
+         "toga are so... revealing!");
+}
+
+event /* 64 */
+{
+ SText(0,"LORD VECNA: ARCHITECT OF THE",
+         "COSMOS. HIS DIVINE TRUTH AND",
+         "LIGHT SHOWERS UPON ALL.");
+ SText(1,"Wow! A statue of Lord Vecna!",
+         "I can only hope to be half as",
+         "cool as him someday.");
+ if(char(4))
+ {
+  SText(4,"Aww... Darin. I think you're",
+          "twice as cool as vecna.","");
+  SText(1,"Blasphemy! Vecna rules over",
+          "all! Repent immediately, you",
+          "heathen temptress!");
+ }
+ if(char(5))
+ {
+  SText(5,"Hey! I think he's copying my",
+          "helmet style. What do you",
+          "think?");
+ }
+ if(char(3))
+ {
+  SText(3,"Ah... yes. We learned about",
+          "Vecna in school. His power",
+          "over our world is absolute.");
+  SText(3,"He decided to give humanity",
+          "feet to walk on rather than",
+          "magic. <grumble>");
+ }
+ if(char(2))
+ {
+  SText(2,"I find all this divine figure",
+          "stuff rather archaic. Truth",
+          "lies in technology.");
+  SText(2,"I wonder if this Vecna fellow",
+          "even knows how to use a",
+          "simple computer...");
+ }
+}
+

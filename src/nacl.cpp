@@ -134,10 +134,9 @@ private:
 };
 
 struct GameDownloader {
-    GameDownloader(pp::Instance* instance, pp::FileSystem* fs)
+    GameDownloader(pp::Instance* instance)
         : instance(instance)
         , ccFactory(this)
-        , fileSystem(fs)
     { }
 
     void start(pp::CompletionCallback oc) {
@@ -204,14 +203,6 @@ struct GameDownloader {
         auto l = downloader->getLength();
         verge::vset(currentFile, verge::DataVec(d, d + l));
         getNextFile();
-
-        /*
-        auto fr = pp::FileRef(*fileSystem, ("/" + currentFile).c_str());
-        fio.reset(new pp::FileIO(instance));
-
-        auto cb = ccFactory.NewCallback(&GameDownloader::openedFile, currentFile);
-        fio->Open(fr, PP_FILEOPENFLAG_CREATE | PP_FILEOPENFLAG_WRITE | PP_FILEOPENFLAG_TRUNCATE, cb);
-        */
     }
 
     void openedFile(int32_t result, std::string currentFile) {
@@ -231,7 +222,6 @@ struct GameDownloader {
         }
 
         auto bytesWritten = writeResult;
-        printf("GameDownloader::Wrote %i bytes to %s OK\n", bytesWritten, currentFile.c_str());
 
         getNextFile();
     }
@@ -239,7 +229,6 @@ struct GameDownloader {
 private:
     pp::Instance* instance;
     pp::CompletionCallbackFactory<GameDownloader> ccFactory;
-    pp::FileSystem* fileSystem;
     std::shared_ptr<Downloader> downloader;
     std::shared_ptr<pp::FileIO> fio;
     std::vector<std::string> manifest;
@@ -255,7 +244,7 @@ struct V1naclInstance
         , module(module)
         , ccfactory(this)
         , fileSystem(this, PP_FILESYSTEMTYPE_LOCALTEMPORARY)
-        , gameDownloader(this, &fileSystem)
+        , gameDownloader(this)
         , graphics(0)
         , backBuffer(0)
     {
@@ -382,7 +371,6 @@ struct V1naclInstance
     }
 
     virtual void vgadump(unsigned char* framebuffer, unsigned char* palette) {
-        printf("vgadump\n");
 
         if (0 != pthread_mutex_lock(&bbMutex)) {
             assert(!"Failed to acquire mutex\n");
@@ -396,7 +384,6 @@ struct V1naclInstance
         for (int y = 0; y < YRES; ++y) {
             for (int x = 0; x < XRES; ++x) {
                 dst[x] = _8to32(*src, palette);
-                //printf("%i,%i = %i / %08X\n", x, y, *src, dst[x]);
                 src++;
             }
             dst += stride;

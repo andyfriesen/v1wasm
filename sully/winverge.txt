@@ -1,0 +1,111 @@
+winverge (v1) v.0.90 beta
+=========================
+copyright (c) 2000 vecna
+all rights reserved
+
+===========================================
+
+Q: What is winverge?
+A: winverge is a direct port of the last vecna-canon version of VERGE (V1)
+   engine to windows/directx native. The port also entailed a port to C++,
+   although it mostly is C++ by extension, and doesn't really use much C++,
+   ie, I didn't rewrite everything to use classes or anything. I did not port
+   VCC or MAPED to windows, so if you run Windows 2000 you still cannot
+   actively develop a game in V1, but you can at least play the old demos
+   and whatnot. Additionally, even for those with Win95/98, winverge is more
+   stable than DOS V1, in addition to supporting any DirectInput and
+   DirectSound device.
+
+===========================================
+
+Q: Will MAPED be ported?
+A: Idunno. If there's enough call for it I guess. MAPED 2.0 works in Win2k,
+   but you can't use it to develop V1 maps. There doesn't seem to be a huge
+   audience of people developing V1 games and using Windows 2000.
+
+===========================================
+
+Q: Does it work with all V1 games?
+A: No. It only supports a specific version of V1, which is fortunately
+   what MOST of the V1 demos out there want, but not all. Some use customly
+   modified EXEs (like Revelation or TCW), others use, for example,
+   Wyrdwad's V1+ which is not supported, and I also do not support most of the
+   additions in the post-vecna "dev-team" versions of verge, because frankly
+   some of the stuff is either poorly designed or not stable. However when the
+   source code is released, if someone would like to re-add the dev-team
+   versions of V1 custom VCC commands, they're welcome to do so.
+
+   As a minor aside, some games did not include a TRANS.TBL file. They're
+   supposed to, and winverge will error out with an appropiate message if
+   they don't. DOS V1 did not do this, and it was a source of instability
+   and memory corruption. So, if you get this message, just copy a TRANS.TBL
+   file from another V1 game (such as the Sully Chronicles pack-in) into
+   that game's directory.
+
+===========================================
+
+Q: Are there any known bugs?
+A: Most of the bugs from 0.80 beta have been fixed, ie, sound system bugs, random crashing,
+   and a total lack of keyboard input. The biggest remaining 'issue' that might be perceived
+   as a bug would be that a number of DirectDraw drivers do not support 320x200x8bit. This is 
+   gay, and there is nothing we can do about this. Probably in a future version we will include
+   windowed mode support, so you can run it regardless of your DirectDraw driver.
+
+   Please report any bugs you find to vecna@verge-rpg.com.
+
+===========================================
+
+Q: Whats the deal with winv2?
+A: Um. Look! A three-assed monkey!
+   (translation: I'm not doing it. zeromus is)
+
+===========================================
+
+Q: Hey, the framerate is extremely jumpy and I have a fast computer.
+   What gives?
+A: There's a good chance that you've done whats happened to myself and
+   [air] a few times. If you have a joystick, gamepad, whatnot installed
+   with DirectInput (ie, it appears in your Control Panel->Game Controllers
+   dialog), but it's NOT PLUGGED IN, then winverge will try to poll the
+   joystick, and the DirectInput joystick routine will take quite a big chunk
+   of time waiting for a response from the joystick before it gives up and
+   times out. The result is a super-crappy framerate on the fastest of
+   computers. This may sound weird, but there've been times where my
+   gamepad came unplugged accidentally, and such a thing will cause this.
+   You can either plug the joystick back in, or if you're not going to use
+   it, you might as well "Remove" it from the Game Controllers setup
+   in Control Panel.
+
+===========================================
+
+Q: Whee, there's source code this time.
+A: Yes. I've released it as free software. That is, REAL free software.
+   Real free software, is of course, public domain. Not this GPL crap that 
+   claims to be free (as in beer) and free (as in speech) blah blah. The
+   RMS/GPL dogma, along with the slashdot rhetoric and drone mentality is
+   sickening -- they claim their software is "free" as in freedom. Yet I,
+   as a free software and open source author, cannot according to the GPL,
+   use GPL code with my code, yet GPL programs CAN use my code. Now I ask
+   you, which license is truly free? I had considered altering the license
+   just so that it could not be used with GPL programs, or maybe a
+   "Propietary-world license" that forbade porting to any open-source OS,
+   but then I remembered that would make me as pathetic as them. I ain't
+   like that, baby. ;)
+
+   In any event, the code is free to do with as you choose. As [air] would
+   say, "Giving me credit where credit is due is optional depending on your
+   own levels of integrity and honesty." The only stipulation is that whatever
+   you do with the code, you do at your own risk. There is no warranty, period.
+
+===========================================
+
+<shameless plug>
+Also check out my cool Sega Master System emulator at:
+  http://chasms.midgetrebellion.com 
+and my personal homepage at:
+  http://vecna.verge-rpg.com 
+
+===========================================
+
+- vecna@verge-rpg.com
+

@@ -1,0 +1,476 @@
+event /* 0 */
+{
+ flags[151]=0;
+ EnforceAnimation();
+ CallEvent(19,5,48,73);
+ CallEvent(19,6,48,74);
+ CallEvent(19,7,57,73);
+ CallEvent(19,8,57,74);
+ CallEvent(19,9,46,82);
+ CallEvent(19,11,53,82);
+}
+
+event /* 1 */
+{
+ Fade=1;
+ mapswitch("TEST.MAP",35,9,0);
+}
+
+event /* 2 */
+{
+ mapswitch("TEST.MAP",35,7,0);
+}
+
+event /* 3 */
+{
+ warp(14,83,0);
+}
+
+event /* 4 */
+{
+ warp(27,13,0);
+}
+
+event /* 5 */
+{
+ warp(27,8,0);
+}
+
+event /* 6 */
+{
+ warp(15,73,0);
+}
+
+event /* 7 */
+{
+ warp(45,72,0);
+ Banner("Attic",3);
+}
+
+event /* 8 */
+{
+ warp(6,74,0);
+}
+
+event /* 9 */
+{}
+
+event /* 10 */
+{
+ Fade=1;
+ if(!flags[4])
+ {
+  SetFace(1,1);
+  SetFace(2,1);
+  For(x,1,20,1)
+  {
+   PaletteMorph(0,0,0,0,63-x);
+   Wait(1);
+  }
+  y=Volume;
+  For(x,1,y,1)
+  {
+   Volume-=1;
+   Wait(1);
+  }
+  stext(4,"Darin, I sense something",
+          "here... an evil presence...",
+          "");
+  LayerVC=1;
+  SoundEffect(20);
+  CallEvent(22,1);
+  CallEvent(22,2);
+  CallEvent(22,1);
+  CallEvent(22,2);
+  CallEvent(22,3);
+  CallEvent(22,4);
+  CallEvent(22,3);
+  CallEvent(22,4);
+  Entity.LocX[5]-=35;
+  Entity.LocX[6]-=35;
+  CallEvent(22,5);
+  CallEvent(22,6);
+  CallEvent(22,5);
+  CallEvent(22,6);
+  Volume=Y;
+  PlayMusic("BADEXPER.MOD");
+  stext(6,"Boogie boogie boogie!",
+          "",
+          "");
+  SpecialFrame[0]=21;
+  SpecialFrame[1]=21;
+  stext(4,"Ahhhhhhhh!","","");
+  SpecialFrame[0]=5;
+  SpecialFrame[1]=5;
+  stext(1,"Whoa... COOL!","","");
+  stext(4,"Yeah, how did you guys pull",
+          "that off?","");
+  stext(6,"It turns out we got some extra",
+          "funding. Kathie Lee Gifford",
+          "owes me a favor or two.");
+  stext(6,"Anyway, I'm just here to",
+          "kidnap Crystal, taunt Darin,",
+          "and introduce my sidekick.");
+  SpecialFrame[6]=22;
+  stext(5,"Yeah! I'm Galfrey, the head",
+          "sidekick! You better watch",
+          "your backs!");
+  SpecialFrame[6]=0;
+  stext(1,"Who are you and why have you",
+          "come to this land of wonder?","");
+  LayerVC=1;
+  VCPutPCX("stan.pcx",40,2);
+  stext(6,"I am Lord Stan, of course.",
+          "Prince of Darkness! Bringer",
+          "of Chaos and Mayhem! Cower!");
+  SpecialFrame[1]=23;
+  Wait(100);
+  SpecialFrame[1]=5;
+  stext(4,"Stan...? Don't you mean...?","","");
+  SpecialFrame[6]=21;
+  Wait(150);
+  SpecialFrame[6]=22;
+  VCPutPCX("galfrey.pcx",200,30);
+  stext(5,"Quiet! With all the right",
+          "wing yahoos in Congress right",
+          "now, you must be careful.");
+  stext(5,"We don't want VERGE to be the",
+          "next target of their",
+          "censorship.");
+  SpecialFrame[6]=0;
+  stext(6,"And now I shall teleport",
+          "Crystal to my secret lab in",
+          "the Jujube mountains!");
+  stext(1,"Why are you telling me all",
+          "this?","");
+  stext(6,"Well, the plot would come to",
+          "a grinding halt if you didn't",
+          "know where to go next.");
+  SpecialFrame[1]=21;
+  stext(4,"Oh, so am I supposed to be",
+          "all panicky and helpless now?",
+          "Eek! Eek! Darin, save me!");
+  LayerVC=0;
+  stext(6,"Mwa ha ha ha! Taste my power!","","");
+  SpecialFrame[1]=25;
+  Wait(10);
+  Timer=0;
+  SoundEffect(6);
+  While(Timer<100)
+  {
+   PaletteMorph(63,0,0,Timer,43);
+  }
+  Timer=0;
+  RemoveCharacter(4);
+  Redraw();
+  SpecialFrame[0]=21;
+  While(Timer<100)
+  {
+   PaletteMorph(63,0,0,100-Timer,43);
+  }
+  SetFace(1,0);
+  SpecialFrame[1]=0;
+  SpecialFrame[0]=0;
+  Wait(40);
+  SpecialFrame[0]=24;
+  Wait(20);
+  SpecialFrame[0]=0;
+  Wait(20);
+  SpecialFrame[0]=24;
+  Wait(20);
+  SpecialFrame[0]=0;
+  Wait(40);
+  SpecialFrame[0]=15;
+  Wait(20);
+  SetFace(1,1);
+  SpecialFrame[0]=0;
+  stext(1,"Crystal! No! She just...",
+          "vanished! Lord Stan! I vow to",
+          "beat you and restore justice!");
+  LayerVC=1;
+  stext(6,"You don't stand a chance,",
+          "puny mortal! My lair in",
+          "Castle Heck is quite secure!");
+  SpecialFrame[6]=22;
+  stext(5,"Yeah! Castle Heck! The gate",
+          "is locked, so you'll never",
+          "get in! Neener Neener Neener!");
+  SpecialFrame[6]=0;
+  stext(1,"Well, what's stopping me from",
+          "beating the snot out of you",
+          "right now?");
+  stext(6,"Because I'm going to vanish",
+          "again before you can strike",
+          "me! Mwa ha ha!");
+  stext(1,"No, you're not. Look.",
+          "*BANG*  *POW*  *BIFF*","");
+  LayerVC=0;
+  SoundEffect(11);
+  Earthquake(4,0,80);
+  LayerVC=1;
+  stext(6,"Ow! Ow! Stop that!","","");
+  SpecialFrame[6]=23;
+  Wait(100);
+  SpecialFrame[6]=0;
+  stext(5,"Geez... Prince of Darkness",
+          "indeed. You sure have let",
+          "yourself go.");
+  stext(1,"Yeah, and what's with that",
+          "retarded purple cloak?","");
+  VCClear();
+  stext(6,"You win this round, Darin,",
+          "but if Vecna ever develops",
+          "a combat system...");
+  stext(6,"I will crush you like a bug!",
+          "MWA HA HA HA HA!","");
+  SoundEffect(20);
+  CallEvent(22,1);
+  CallEvent(22,2);
+  CallEvent(22,1);
+  CallEvent(22,2);
+  CallEvent(22,3);
+  CallEvent(22,4);
+  CallEvent(22,3);
+  CallEvent(22,4);
+  Entity.LocX[5]+=35;
+  Entity.LocX[6]+=35;
+  CallEvent(22,5);
+  CallEvent(22,6);
+  CallEvent(22,5);
+  CallEvent(22,6);
+  For(x,1,y,1)
+  {
+   Volume-=1;
+   Wait(1);
+  }
+  For(x,1,20,1)
+  {
+   PaletteMorph(0,0,0,0,43+x);
+   Wait(1);
+  }
+  SetFace(1,0);
+  SpecialFrame[0]=0;
+  stext(1,"They're gone...","","");
+  Volume=Y;
+  SpecialFrame[0]=25;
+  PlayMusic("CR_GUIT.S3M");
+  stext(1,"*sniff* Crystal... why did",
+          "you have to suffer?",
+          "WHY?!");
+  SetFace(1,1);
+  SpecialFrame[0]=15;
+  Wait(20);
+  SpecialFrame[0]=0;
+  LayerVC=0;
+  flags[4]=1;
+ }
+}
+
+event /* 11 */
+{
+ ChainEvent(18,5,48,73,47);
+}
+
+event /* 12 */
+{
+ ChainEvent(18,6,48,74,38);
+}
+
+event /* 13 */
+{
+ ChainEvent(18,7,57,73,39);
+}
+
+event /* 14 */
+{
+// ChainEvent(18,8,57,74,7);
+ if(!flags[8])
+ {
+  AlterBTile(57,74,177,2);
+  SoundEffect(3);
+  Banner("Found 200 GP!",3);
+  GiveGP(200);
+  flags[8]=1;
+ }
+}
+
+event /* 15 */
+{
+ ChainEvent(18,9,46,82,2);
+}
+
+event /* 16 */
+{
+ ChainEvent(18,11,53,82,2);
+}
+
+event /* 17 */
+{
+ if(!flags[12])
+ {
+  PartyMove("U4");
+  Wait(10);
+  AutoOn();
+  a=char(1)+94;
+  b=char(4)+94;
+  ObsMode[a]=1;
+  ObsMode[b]=1;
+  if(Entity.LocY[b]<Entity.LocY[a])
+  {
+   EntityMove(a,"U1");
+   EntityMove(b,"D1");
+   Face[b]=1;
+   Wait(55);
+  }
+  EntityMove(a,"F3 W40 F1 W20 F2 W40 F0");
+  Wait(105);
+  SText(1,"Ahh... Home Sweet Home at",
+          "last. We should rest up here",
+          "for our trip.");
+  SText(1,"My parents went to Acapulco",
+          "for the month, so we have the",
+          "place to ourselves.");
+  Face[b]=0;
+  SpecialFrame[b]=0;
+  Wait(40);
+  SpecialFrame[b]=24;
+  Wait(20);
+  SpecialFrame[b]=0;
+  Wait(20);
+  SpecialFrame[b]=24;
+  Wait(20);
+  SpecialFrame[b]=0;
+  Wait(60);
+  SpecialFrame[b]=23;
+  Wait(100);
+  SpecialFrame[b]=22;
+  SText(4,"What exactly are you implying,",
+          "Darin?","");
+  SpecialFrame[a]=21;
+  Wait(60);
+  SpecialFrame[a]=0;
+  EntityMove(a,"R5");
+  Speed[a]=5;
+  While(MoveCode[a])
+  {
+   Wait(20);
+  }
+  SpecialFrame[a]=20;
+  Wait(100);
+  Speed[a]=3;
+  SpecialFrame[a]=0;
+  EntityMove(a,"L5 F0");
+  While(MoveCode[a])
+  {
+   Wait(20);
+  }
+  SpecialFrame[b]=10;
+  Wait(20);
+  SpecialFrame[b]=5;
+  Wait(20);
+  SText(1,"Oh! Er... umm... nothing. I",
+          "just think there's some gear",
+          "we can use in the attic.");
+  SpecialFrame[a]=15;
+  Wait(20);
+  SpecialFrame[a]=5;
+  AutoOff();
+  Flags[12]=1;
+ }
+}
+
+event /* 18 */                                  // Master Chest Script
+{
+ if(!flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),177,2);
+  SoundEffect(3);
+  GiveItem(var(3));
+  flags[var(0)]=1;
+ }
+}
+
+event /* 19 */                                  // Master Chest Auto-Exec
+{
+ if(flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),177,2);
+ }
+}
+
+event /* 20 */
+{
+ stext(0,"Oh man... I'm in heaven!",
+         "Look at all these carrots!","");
+ stext(1,"Hey, get away from those! My",
+         "family worked long and hard to",
+         "grow those.");
+ stext(0,"Hey, you have no call to get",
+         "snippy with me, man! I have",
+         "valuable information!");
+ stext(1,"Alright, spill it!","","");
+ if(char(4))
+ {
+  stext(4,"Aww... Darin, be nice to the",
+          "little cutie.","");
+ }
+ stext(0,"You can use any fresh water",
+         "source to heal the group.",
+         "Like wells and waterfalls.");
+ stext(1,"Oh... great. Bye now!","","");
+}
+
+event /* 21 */
+{
+ SoundEffect(10);
+ HealAll();
+ Timer=0;
+ While(Timer<100)
+ {
+  PaletteMorph(20,20,63,100-Timer,63);
+ }
+ stext(0,"HP/MP/Status restored!","","");
+}
+
+event /* 22 */
+{
+ For(x,154,170,16)
+ {
+  if(var(0)=1)
+  {
+   VCPutPCX("SPARKLE1.PCX",x,70);
+  }
+  if(var(0)=2)
+  {
+   VCPutPCX("SPARKLE2.PCX",x,70);
+  }
+  if(var(0)=3)
+  {
+   VCPutPCX("SPARKLE3.PCX",x,70);
+  }
+  if(var(0)=4)
+  {
+   VCPutPCX("SPARKLE4.PCX",x,70);
+  }
+  if(var(0)=5)
+  {
+   VCPutPCX("SPARKLE5.PCX",x,62);
+   VCPutPCX("SPARKLE6.PCX",x,78);
+  }
+  if(var(0)=6)
+  {
+   VCPutPCX("SPARKLE5.PCX",x,78);
+   VCPutPCX("SPARKLE6.PCX",x,62);
+  }
+ }
+ Wait(10);
+ VCClear();
+}
+
+
+
+event /* 23 */
+{
+
+}
+

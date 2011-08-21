@@ -1,0 +1,76 @@
+48
+Starlight 0 Restores_15_MP          1 1 1 0 0 0 300 
+Herb 1 Restores_15_HP               1 0 1 0 0 0 30   
+Speed_Boots 2 +3_REA,_+1_MBL        0 0 0 5 0 0 300   
+Dark_Sword 3 ATK_+20,_*darkness     4 0 0 1 0 0 2000   
+Iron_Sword 4 ATK+22                 0 0 0 1 2 0 440     
+Leather_Vest 5 DEF+8                0 0 0 3 13 0 160      
+Cap 6 DEF+4                         0 0 0 4 18 0 80       
+Buckler 7 DEF+6                     0 0 0 2 24 0 120        
+Staff 8 ATK+9,_MAG+2                0 0 0 1 4 0 200         
+Pooh 0 Pooh!                        0 0 0 0 0 0 0            
+Cloak 9 DEF+4,_MGR+4                0 0 0 3 11 0 120           
+Hood 10 DEF+2,_MAG+2                0 0 0 4 17 0 50            
+Bracer 11 DEF+4                     0 0 0 2 22 0 80             
+Sting_Whip 12 ATK+18,_HIT+5         0 0 0 1 5  0 400              
+Robe 13 DEF+7,_MGR+2                0 0 0 3 12 0 140               
+Tiara 14 DEF+6,_MAG+2               0 0 0 4 19 0 180                
+Silver_Brace 15 DEF+5,_MGR+2        0 0 0 2 23 0 150                 
+Lead_Wrench 16 ATK+21               0 0 0 1 7  0 425                  
+Titanium_Suit 17 DEF+11             0 0 0 3 14 0 220                   
+Head_Brace 18 DEF+7                 0 0 0 4 20 0 140                    
+Laser_Shield 19 DEF+10,_ATK+3       0 0 0 2 25 0 300                     
+Thermal_Activator 20 Starts_crystal_machine 0 0 0 0 0 0 0                 
+Bronze_Key 21 Key_to_the_love_shack 0 0 0 0 0 0 0                          
+Pearl_of_Truth 22 Opens_castle_gate 0 0 0 0 0 0 0                           
+Steel_Lance 23 ATK+28               0 0 0 1 9 0 560                         
+Bronze_Armor 24 DEF+16              0 0 0 3 15 0 320                          
+Gold_Helmet 25 DEF+8                0 0 0 4 21 0 160                           
+Tower_Shield 26 DEF+13              0 0 0 2 26 0 260                          
+West_Tower_Key 21 Key_to_West_Tower 0 0 1 0 0 0 0                               
+East_Tower_Key 21 Key_to_East_Tower 0 0 1 0 0 0 0                                
+Spire_Key 21 Key_to_Central_Spire   0 0 1 0 0 0 0                                 
+Dagger 27 ATK+5                     0 0 0 1 1 0 100                                
+Wand 28 ATK+3,_MAG+5                0 0 0 1 3 0 90                                  
+Brass_Pipe 29 ATK+10                0 0 0 1 6 0 200                                  
+Spear 30 ATK+15                     0 0 0 1 8 0 300                                   
+Headband 31 DEF+1                   0 0 0 4 16 0 20                                     
+Garment 32 DEF+2                    0 0 0 3 10 0 40
+Medicine 33 Restores_45_HP          1 2 1 0 0 0 100
+Miracle_Brew 34 Heals_defeated_ally 1 3 1 0 0 0 250
+Blur_Ring 35 Improves_evasion_rate  0 0 0 5 27 0 450
+Fury_Ring 36 Increases_Ferocity     0 0 0 5 28 0 600
+Running_Boots 37 Extends_Mobility   0 0 0 6 29 0 750
+Protect_Locket 38 Fortifies_magic_defense 0 0 0 6 30 0 1000
+Carrot_Blade 39 ATK+30 0 0 0 1 31 0 5000
+Sacred_Carrot 40 Item_of_Absolute_Power 0 0 0 0 0 0 0
+Pharaoh_Sceptre 41 ATK+15,_MAG+10 0 0 0 1 32 500 0
+Atlas_Scroll 42 Shows_position_on_map 2 4 0 0 0 0 0
+
+Item_Name <#icon> Item_Description <use> <useeffect> <type> <equipflag> <equipidx> <price>
+
+<use>: 0 for nonusable.
+       1 for usable once, then it goes away.
+       2 for usable an infinite number of times.
+       3 for usable ONLY camped, only once.
+       4 for usable ONLY camped, infinitely
+       5 for usable in combat only, once, then it goes away.
+       6 for usable in combat only, indefinetly.
+<useeffect>: an index to EFFECTS.VC
+<type>: one of the following
+        0 for OS. (Own Self)
+        1 for 1A. (One Ally)
+        2 for AA. (All Allies)
+        3 for 1E. (One Enemy)
+        4 for AE. (All Enemy)
+<equipflag>: 0 if it is nonequipable by anyone.
+             1 Equipment is right-hand (weapon)
+             2 Equipment is left-hand (shield)
+             3 Equipment is armor
+             4 Equipment is helmet
+             5 Equipment is acc1
+             6 Equipment is acc2
+<equipidx> is a pointer to EQUIP.DAT when necessary.
+<price>: Is the cost to buy the item in a store. It can be sold for half the
+         cost. Note that it might not necessarily appear in any stores for
+         sale, such as Althena's sword, but you can still sell it or something.

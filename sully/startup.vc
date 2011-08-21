@@ -1,0 +1,15 @@
+script
+{
+  playmusic("AURORA.MOD");
+  sys_displaypcx("verge320.pcx");
+  vgadump();
+  fadein(100);
+  delay(100);
+  fadeout(100);
+  sys_displaypcx("verge1.pcx");
+  vgadump();
+  fadein(100);
+  delay(50);
+  OldStartupMenu();
+  return;
+}

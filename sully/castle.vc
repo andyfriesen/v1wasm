@@ -1,0 +1,1438 @@
+event  /* 0 */
+{
+ flags[151]=0;
+ EnforceAnimation();
+ if(flags[106])
+ {
+  PlayMusic("VANGELIS.MOD");
+ }
+ if(!flags[30])
+ {
+  Entity.LocX[5]=50;
+ }
+ if(flags[50])
+ {
+  Entity.LocX[5]=50;
+ }
+ if(flags[53])
+ {
+  AlterFTile(20,30,423,2);
+  AlterFTile(19,18,398,2);
+  AlterFTile(20,18,399,2);
+  AlterFTile(21,18,399,2);
+  AlterFTile(22,18,400,2);
+  AlterFTile(19,19,396,2);
+  AlterFTile(20,19,210,0);
+  AlterFTile(21,19,210,0);
+  AlterFTile(22,19,397,2);
+ }
+ AlterParallax(flags[54],2,3);
+ if(flags[55])
+ {
+  AlterFTile(32,90,378,0);
+  AlterFTile(33,90,378,0);
+  AlterBTile(32,91,376,1);
+  AlterBTile(33,91,376,1);
+  AlterBTile(32,92,376,1);
+  AlterBTile(33,92,376,1);
+ }
+ if(flags[56])
+ {
+  AlterBTile(11,97,390,2);
+  AlterBTile(8,103,379,0);
+  AlterBTile(8,104,379,0);
+ }
+ CallEvent(62,57,5,100);
+ For(a,0,3,1)
+ {
+  CallEvent(62,a+58,b+5,110);
+ }
+ if(flags[62])
+ {
+  AlterBTile(35,122,379,0);
+  AlterBTile(35,123,379,0);
+ }
+ if(flags[63])
+ {
+  Entity.LocY[6]+=30;
+ }
+ CallEvent(62,64,49,101);
+ CallEvent(62,65,84,54);
+ CallEvent(66,66,84,89,69);
+ CallEvent(66,67,85,92,69);
+ CallEvent(66,68,86,87,78);
+ CallEvent(66,69,88,90,69);
+ CallEvent(66,70,89,91,78);
+ CallEvent(66,71,90,88,69);
+ if(flags[73])
+ {
+  For(a,48,54,1)
+  {
+   AlterBTile(112,a,195,1);
+   AlterBTile(113,a,378,1);
+   AlterBTile(116,a,378,1);
+   AlterBTile(117,a,195,1);
+  }
+ }
+ if(flags[74])
+ {
+  AlterFTile(62,128,0,2);
+  AlterBTile(62,129,379,0);
+  AlterFTile(63,128,451,0);
+  AlterBTile(63,128,450,1);
+  AlterFTile(70,128,0,2);
+  AlterBTile(70,129,379,0);
+  AlterFTile(69,128,451,0);
+  AlterBTile(69,129,450,1);
+  AlterFTile(63,129,457,1);
+  AlterBTile(63,130,456,1);
+  AlterFTile(69,129,459,1);
+  AlterBTile(69,130,458,1);
+ }
+ if(flags[76])
+ {
+  AlterBTile(74,14,448,2);
+  AlterBTile(74,11,376,2);
+  AlterBTile(74,12,210,2);
+ }
+ CallEvent(64,77,3,68);
+ CallEvent(64,79,31,61);
+ CallEvent(64,78,59,67);
+ if(flags[80])
+ {
+  AlterFTile(74,30,379,2);
+ }
+ if(flags[89])
+ {
+  AlterBTile(88,67,390,2);
+  AlterBTile(80,71,501,2);
+ }
+}
+
+event /* 1 */
+{
+ if(!flags[30])
+ {
+  return;
+ }
+ if(flags[74])
+ {
+  ChainEvent(56);
+ }
+ SpecialFrame[5]=21;
+ Wait(100);
+ SpecialFrame[5]=0;
+ Face[5]=0;
+ AutoOn();
+ a=Char(1)+94;
+ b=Char(2)+94;
+ c=Char(4)+94;
+ ObsMode[a]=1;
+ ObsMode[b]=1;
+ ObsMode[c]=1;
+ EntityMove(a,"X21 Y23 F3");
+ EntityMove(b,"X20 Y24 F1");
+ EntityMove(c,"X20 Y22 F0");
+ While(MoveCode[c])
+ {
+  Wait(20);
+ }
+ Wait(100);
+ Face[5]=2;
+ Wait(50);
+ Face[5]=1;
+ Wait(50);
+ Face[5]=2;
+ Wait(50);
+ SpecialFrame[5]=27;
+ stext(5,"Darin! What are you doing",
+         "here, you nosy do-gooder?","");
+ stext(4,"We've come to beat up your",
+         "boss, Galfrey! There is no",
+         "escape for you this time!");
+ SpecialFrame[5]=0;
+ SpecialFrame[a]=23;
+ Wait(100);
+ SpecialFrame[a]=0;
+ stext(1,"Wait... what are you doing",
+         "outside the fortress? You are",
+         "vulnerable to heroes!");
+ SpecialFrame[5]=20;
+ Wait(50);
+ stext(5,"Er... well... I accidentally",
+         "locked my keys inside, and",
+         "I've been stuck out here.");
+ stext(2,"Ha! What a pathetic excuse",
+         "for a head sidekick.","");
+ SpecialFrame[5]=0;
+ SpecialFrame[a]=26;
+ stext(1,"Galfrey, you evil person! You",
+         "shall feel my the sharp sting",
+         "of my blade's justice!");
+ SpecialFrame[a]=0;
+ stext(4,"Wait, Darin. If Galfrey cannot",
+         "get us inside the castle, then",
+         "defeating him is pointless.");
+ Face[5]=1;
+ Wait(75);
+ Face[5]=2;
+ stext(5,"Umm... yeah! That's right.",
+         "Your only hope is the Pearl",
+         "of Truth.");
+ stext(1,"What are you talking about?","","");
+ stext(5,"The ancient legends say that",
+         "the cyclops can open the",
+         "entrance to the castle.");
+ stext(5,"But it sees with the Pearl of",
+         "Truth, an artifact buried deep",
+         "under Paradise Isle.");
+ stext(5,"I've been trying to locate the",
+         "Pearl, but I cannot find the",
+         "way to Paradise Isle.");
+ SpecialFrame[c]=23;
+ Wait(100);
+ SpecialFrame[c]=0;
+ stext(4,"Geez... you're pretty stupid,",
+         "then. Darin and I hang out",
+         "there all the time.");
+ Face[b]=3;
+ Wait(30);
+ Face[b]=0;
+ Wait(50);
+ SpecialFrame[b]=25;
+ stext(2,"Well, it seems that neither us",
+         "nor Galfrey is entering the",
+         "castle without that Pearl.");
+ SpecialFrame[b]=0;
+ Face[b]=2;
+ Wait(30);
+ Face[b]=1;
+ stext(1,"We can take you to Paradise",
+         "Isle, but only if you let us",
+         "in to destroy your evil army.");
+ SpecialFrame[5]=23;
+ Wait(100);
+ SpecialFrame[5]=0;
+ Wait(50);
+ SpecialFrame[5]=29;
+ stext(5,"Well, I don't trust you one",
+         "bit, Darin, but it seems I",
+         "have no choice.");
+ SpecialFrame[c]=22;
+ stext(4,"I don't know, Darin. Can we",
+         "trust him? He's Lord Stan's",
+         "big lackey.");
+ stext(1,"It's ok, Crystal. Once we get",
+         "the Pearl of Truth, we can go",
+         "inside and defeat Lord Stan!");
+ SpecialFrame[c]=0;
+ SpecialFrame[5]=0;
+ stext(5,"Once I get to Paradise Isle,",
+         "I can show you how to find",
+         "the Pearl of Truth.");
+ stext(1,"You're pretty desperate,",
+         "Galfrey. Anyway, we better",
+         "get going!");
+ Speed[b]=2;
+ Speed[c]=2;
+ EntityMove(b,"R1 F1");
+ EntityMove(c,"R1 F0");
+ While(MoveCode[c])
+ {
+  Wait(20);
+ }
+ Wait(100);
+ SpecialFrame[5]=29;
+ Wait(100);
+ SpecialFrame[5]=0;
+ Wait(100);
+ EntityMove(b,"U1");
+ EntityMove(c,"D1");
+ EntityMove(5,"R1");
+ While(MoveCode[5])
+ {
+  Wait(20);
+ }
+ Entity.LocX[5]=50;
+ Warp(21,23,1);
+ AutoOff();
+ AddCharacter(5);
+ SetFace(1,0);
+ SText(1,"You know... I'm willing to bet",
+         "the bridge across the North",
+         "River is completed by now."); 
+ flags[50]=1;
+}
+
+event /* 2 */
+{
+ mapswitch("TEST.MAP",93,41,0);
+}
+
+event /* 3 */
+{
+ stext(0,"The cyclops guardian can show",
+         "you the entrance. He needs the",
+         "Pearl of Truth to see it.");
+}
+
+event /* 4 */
+{
+ if(flags[106] AND flags[111])
+ {
+  stext(2,"I don't need to deal with",
+          "this weird petrified",
+          "Cyclops anymore.");
+  return;
+ }
+ if(flags[106])
+ {
+  stext(2,"Hmm... what a strange statue.",
+          "I wonder where I am anyway?",
+          "There's something down here.");
+  stext(2,"A ha! This slime under its",
+          "feet seems like the ideal",
+          "lubricant! I'll take some.");
+  SoundEffect(10);
+  Banner("Took Lubricant!",5);
+  flags[111]=1;
+  return;
+ }
+ if(!flags[52])
+ {
+  stext(1,"What a suspicious looking",
+          "statue!","");
+  return;
+ }
+ if(!flags[53])
+ {
+  SoundEffect(4);
+  AlterFTile(20,30,423,2);
+  AlterFTile(19,18,398,2);
+  AlterFTile(20,18,399,2);
+  AlterFTile(21,18,399,2);
+  AlterFTile(22,18,400,2);
+  AlterFTile(19,19,396,2);
+  AlterFTile(20,19,210,0);
+  AlterFTile(21,19,210,0);
+  AlterFTile(22,19,397,2);
+  stext(1,"A ha! The Pearl of Truth",
+          "fits perfectly, and the",
+          "gate has opened! Hooray!");
+  DestroyItem(24,0);
+  flags[53]=1;
+ }
+}
+
+event /* 5 */
+{
+ CallEvent(67,32,99);
+ Banner("Great Hall",3);
+}
+
+event /* 6 */
+{
+ ChainEvent(67,20,20);
+}
+
+event /* 7 */
+{
+ warp(2,106,0);
+ Banner("B1",3);
+}
+
+event /* 8 */
+{
+ warp(16,106,0);
+ Banner("B1",3);
+}
+
+event /* 9 */
+{
+ ChainEvent(63,29,3,68,77,15,11,2);
+}
+
+event /* 10 */
+{
+ ChainEvent(63,31,31,61,79,86,112,0);
+}
+
+event /* 11 */
+{
+ ChainEvent(63,30,59,67,78,25,11,2);
+}
+
+event /* 12 */
+{
+ warp(23,68,0);
+}
+
+event /* 13 */
+{
+ warp(42,68,0);
+}
+
+event /* 14 */
+{
+ ChainEvent(67,4,70);
+}
+
+event /* 15 */
+{
+ CallEvent(67,35,128);
+ Banner("West Tower",3);
+}
+
+event /* 16 */
+{
+ ChainEvent(67,61,69);
+}
+
+event /* 17 */
+{
+ CallEvent(67,87,81);
+ Banner("East Tower",3);
+}
+
+event /* 18 */
+{
+ ChainEvent(68,4,11);
+}
+
+event /* 19 */
+{
+ warp(65,103,0);
+ Banner("2F",3);
+}
+
+event /* 20 */
+{
+ warp(43,120,0);
+}
+
+event /* 21 */
+{
+ ChainEvent(68,36,11,0);
+}
+
+event /* 22 */
+{
+ warp(86,47,0);
+ Banner("2F",3);
+}
+
+event /* 23 */
+{
+ warp(87,72,0);
+}
+
+event /* 24 */
+{
+ warp(32,63,0);
+}
+
+event /* 25 */
+{
+ warp(114,44,0);
+ Banner("Spire 2F",3);
+}
+
+event /* 26 */
+{
+ warp(86,97,0);
+}
+
+event /* 27 */
+{
+ warp(66,134,0);
+ Banner("Spire 3F",3);
+}
+
+event /* 28 */
+{
+ warp(115,59,0);
+}
+
+event /* 29 */
+{
+ CallEvent(68,74,29);
+ Banner("Pinnacle",3);
+}
+
+event /* 30 */
+{
+ if(flags[80])
+ {
+  return;
+ }
+ ChainEvent(67,66,125);
+}
+
+event /* 31 */
+{
+ if(!flags[55])
+ {
+  soundeffect(9);
+  AlterFTile(32,90,378,0);
+  AlterFTile(33,90,378,0);
+  AlterBTile(32,91,376,1);
+  AlterBTile(33,91,376,1);
+  AlterBTile(32,92,376,1);
+  AlterBTile(33,92,376,1);
+  For(x,20,1,-1)
+  {
+   Earthquake(0,x,5);
+  }
+  stext(4,"Oh no! The entry way has been",
+          "sealed behind us!","");
+  stext(1,"There's no turning back now,",
+          "gang!","");
+  flags[55]=1;
+ }
+}
+
+event /* 32 */
+{
+ if(!flags[56])
+ {
+  soundeffect(4);
+  AlterBTile(11,97,390,2);
+  AlterBTile(8,103,379,0);
+  AlterBTile(8,104,379,0);
+  WaitKeyUp();
+  flags[56]=1;
+ }
+}
+
+event /* 33 */
+{
+ ChainEvent(61,57,5,100,29);
+}
+
+event /* 34 */
+{
+ ChainEvent(61,58,5,110,46);
+}
+
+event /* 35 */
+{
+ ChainEvent(61,59,6,110,26);
+}
+
+event /* 36 */
+{
+ ChainEvent(61,60,7,110,39);
+}
+
+event /* 37 */
+{
+ ChainEvent(61,61,8,110,42);
+}
+
+event /* 38 */
+{
+ if(!flags[62])
+ {
+  stext(1,"This gate is locked.","","");
+  stext(5,"No problem. They're latched",
+          "from the outside, so getting",
+          "in from this side is easy.");
+  soundeffect(3);
+  AlterBTile(35,122,379,0);
+  AlterBTile(35,123,379,0);
+  stext(5,"Told you so.","","");
+  flags[62]=1;
+ }
+}
+
+event /* 39 */
+{
+ if(!flags[63])
+ {
+  PartyMove("U1 L3");
+  While(MoveCode[0])
+  {
+   Wait(20);
+  }
+  AutoOn();
+  For(x,95,98,1)
+  {
+   Face[x]=1;
+  }
+  SpecialFrame[6]=21;
+  Wait(50);
+  SpecialFrame[6]=0;
+  stext(3,"Darin! You've come to rescue",
+          "us! Thank you!","");
+  stext(1,"Dexter! Big Daddy Bubba! What",
+          "are you two doing here?","");
+  stext(0,"Like, that ungroovy Lord Stan",
+          "launched an attack on my land",
+          "and took us prisoner!");
+  stext(3,"Lord Stan felt threatened by",
+          "Bubba being the only other",
+          "great power of the world.");
+  stext(4,"This has serious implications",
+          "for the world. The House of",
+          "Bubba is well recognized.");
+  stext(4,"This action may create",
+          "instability in the Imperial",
+          "senate.");
+  stext(4,"Furthermore, Lord Stan will",
+          "probably lose some respect",
+          "in the council of Remus.");
+  stext(4,"We may be looking at an",
+          "unprecedented shift in the",
+          "flow of power in this region.");
+  stext(4,"However, Lord Stan's clout in",
+          "the kingdom of Vicaria will",
+          "allow him to maintain himself.");
+  stext(4,"And possibly fight House",
+          "Bubba from other economical",
+          "angles.");
+  a=char(2)+94;
+  Face[a]=2;
+  Wait(30);
+  Face[a]=0;
+  Wait(30);
+  SpecialFrame[a]=24;
+  Wait(30);
+  SpecialFrame[a]=0;
+  Wait(30);
+  SpecialFrame[a]=24;
+  Wait(30);
+  SpecialFrame[a]=0;
+  Wait(30);
+  SpecialFrame[a]=23;
+  Wait(150);
+  stext(2,"What the hell are you talking",
+          "about?","");
+  SpecialFrame[a]=0;
+  Face[a]=3;
+  Wait(30);
+  Face[a]=1;
+  stext(1,"Umm... anyway, Dexter, we're",
+          "raiding the castle right now.",
+          "Care to join us?");
+  SpecialFrame[6]=25;
+  stext(3,"I would like to fight with",
+          "you, but I must stay and care",
+          "for Big Daddy Bubba.");
+  SpecialFrame[6]=0;
+  Face[6]=2;
+  Face[7]=3;
+  stext(0,"No, that's ok little funk",
+          "master. I can't walk in these",
+          "platform shoes anyway.");
+  Face[6]=0;
+  Face[7]=0;
+  stext(3,"Well, all right then. Now we",
+          "stand a chance against Lord",
+          "Stan. Count me in!");
+  stext(1,"Right. We'll be back for you,",
+          "Bubba! You can count on it.",
+          "Let's go, team!");
+  ObsMode[96]=1;
+  ObsMode[97]=1;
+  ObsMode[98]=1;
+  ObsMode[6]=1;
+  EntityMove(96,"L1");
+  EntityMove(97,"L2");
+  EntityMove(98,"L3");
+  EntityMove(6,"L1 D4");
+  While(MoveCode[6])
+  {
+   Wait(20);
+  }
+  AddCharacter(3);
+  Entity.LocY[6]+=30;
+  AutoOff();
+  flags[63]=1;
+ }
+}
+
+event /* 40 */
+{
+ stext(0,"Don't you worry about me, my",
+         "little love kittens. I'll be",
+         "fine until you return.");
+ Face[7]=0;
+}
+
+event /* 41 */
+{
+ stext(0,"It is said that when it looks",
+         "hopeless, the hero Zorro will",
+         "bring the wind to your steps.");
+}
+
+event /* 42 */
+{
+ ChainEvent(61,64,49,101,30);
+}
+
+event /* 43 */
+{
+ stext(0,"Light the torches with care.",
+         "Some will illuminate and",
+         "others will burn.");
+}
+
+event /* 44 */
+{
+ ChainEvent(61,65,84,54,31);
+}
+
+event /* 45 */
+{
+ ChainEvent(65,66,84,89,0);
+}
+
+event /* 46 */
+{
+ ChainEvent(65,67,85,92,0);
+}
+
+event /* 47 */
+{
+ ChainEvent(65,68,86,87,1);
+}
+
+event /* 48 */
+{
+ ChainEvent(65,69,88,90,0);
+}
+
+event /* 49 */
+{
+ ChainEvent(65,70,89,91,1);
+}
+
+event /* 50 */
+{
+ ChainEvent(65,71,90,88,0);
+}
+
+event /* 51 */
+{
+ if(!flags[72])
+ {
+  PartyMove("X86");
+  While(MoveCode[0])
+  {
+   Wait(20);
+  }
+  AutoOn();
+  For(a,95,99,1)
+  {
+   Face[a]=1;
+  }
+  x=Volume;
+  For(y,1,20,1)
+  {
+   PaletteMorph(0,0,0,0,63-y);
+   Wait(1);
+  }
+  For(z,1,x,1)
+  {
+   Volume-=1;
+   Wait(1);
+  }
+  LayerVC=1;
+  SoundEffect(20);
+  VCPutPCX("SPARKLE1.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE2.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE1.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE2.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE3.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE4.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE3.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE4.PCX",155,38);
+  Wait(10);
+  VCClear();
+  Entity.LocX[10]=86;
+  Entity.LocY[10]=100;
+  Redraw();
+  VCPutPCX("SPARKLE5.PCX",155,30);
+  VCPutPCX("SPARKLE6.PCX",155,46);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE5.PCX",155,46);
+  VCPutPCX("SPARKLE6.PCX",155,30);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE5.PCX",155,30);
+  VCPutPCX("SPARKLE6.PCX",155,46);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE5.PCX",155,46);
+  VCPutPCX("SPARKLE6.PCX",155,30);
+  Wait(10);
+  VCClear();
+  Volume=x;
+  playmusic("BADEXPER.MOD");
+  stext(6,"Well, well. It seems that the",
+          "rats infesting my castle made",
+          "it farther than I thought.");
+  stext(4,"It's no use resisting us,",
+          "Lord Stan! You will be",
+          "defeated!");
+  stext(6,"Hmm... seems that brat Darin",
+          "found where I was keeping you",
+          "after all. Clever boy.");
+  stext(5,"Prepare to die, evil master",
+          "of pooh!","");
+  stext(6,"Mwa ha ha! Come back to your",
+          "senses, Galfrey? You were",
+          "useful once.");
+  stext(6,"But now you will die with the",
+          "rest of these scum!","");
+  stext(3,"I will teach you that there",
+          "are consequences for trying",
+          "to take over our land!");
+  stext(1,"Come on, team! It's time for",
+          "a Super Pooper Trooper",
+          "Transform!");
+  SpecialFrame[char(2)+94]=23;
+  Wait(100);
+  stext(2,"Umm... no thank you.","","");
+  SpecialFrame[char(2)+94]=0;
+  stext(6,"You can give up now, fools!",
+          "You must have been clever to",
+          "get this far...");
+  stext(6,"But you will never be able to",
+          "survive the traps I have laid",
+          "throughout this spire!");
+  stext(6,"I'll be waiting for you on",
+          "the rooftop, Darin. That is,",
+          "if you make it there! Hahaha!");
+  SoundEffect(20);
+  VCPutPCX("SPARKLE1.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE2.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE1.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE2.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE3.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE4.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE3.PCX",155,38);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE4.PCX",155,38);
+  Wait(10);
+  VCClear();
+  Entity.LocX[10]=74;
+  Entity.LocY[10]=12;
+  Redraw();
+  VCPutPCX("SPARKLE5.PCX",155,30);
+  VCPutPCX("SPARKLE6.PCX",155,46);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE5.PCX",155,46);
+  VCPutPCX("SPARKLE6.PCX",155,30);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE5.PCX",155,30);
+  VCPutPCX("SPARKLE6.PCX",155,46);
+  Wait(10);
+  VCClear();
+  VCPutPCX("SPARKLE5.PCX",155,46);
+  VCPutPCX("SPARKLE6.PCX",155,30);
+  Wait(10);
+  VCClear();
+  For(z,1,x,1)
+  {
+   Volume-=1;
+   Wait(1);
+  }
+  For(y,1,20,1)
+  {
+   PaletteMorph(0,0,0,0,43+y);
+   Wait(1);
+  }
+  volume=x;
+  playmusic("EXAGE.MOD");
+  stext(3,"What a geek!","","");
+  stext(1,"Agreed, Dexter, but we must",
+          "cautious from now on.",
+          "Onward, team!");
+  flags[72]=1;
+  AutoOff();
+  LayerVC=0;
+ }
+}
+
+event /* 52 */
+{
+ if(!flags[73])
+ {
+  playmusic("BADEXPER.MOD");
+  AutoOn();
+  For(x,95,99,1)
+  {
+   EntityMove(x,"X114");
+  }
+  Wait(100);
+  Face[95]=3;
+  Face[96]=2;
+  Face[97]=3;
+  Face[98]=2;
+  Face[99]=3;
+  Wait(100);
+  Face[95]=2;
+  Face[96]=3;
+  Face[97]=2;
+  Face[98]=3;
+  Face[99]=2;
+  Wait(100);
+  SoundEffect(9);
+  For(x,95,99,1)
+  {
+   SpecialFrame[x]=21;
+  }
+  For(a,10,0,-1)
+  {
+   Earthquake(a,0,15);
+  }
+  For(a,48,54,1)
+  {
+   AlterBTile(112,a,195,1);
+   AlterBTile(117,a,195,1);
+  }
+  LayerVC=1;
+  For(x,1,16,1)
+  {
+   For(y,15,118,16)
+   {
+    VCBlitTile(123+x,y,378);
+    VCBlitTile(203-x,y,378);
+   }
+   wait(1);
+   VCClear();
+  }
+  VCClear();
+  LayerVC=0;
+  For(a,48,54,1)
+  {
+   AlterBTile(113,a,378,1);
+   AlterBTile(116,a,378,1);
+  }
+  For(x,95,99,1)
+  {
+   SpecialFrame[x]=0;
+  }
+  stext(3,"Egad! The walls have started",
+          "to move inward. They're going",
+          "to crush us! Help!");
+  stext(5,"Hey! At least they scroll",
+          "smoothly this time! Count",
+          "your blessings, mage boy!");
+  stext(1,"They're moving fast! Galfrey!",
+          "Dexter! You guys are strong.",
+          "Try to hold the walls back!");
+  stext(5,"Naa... my arms are tired. Let",
+          "the girls do it.","");
+  stext(2,"Crystal! Ready? It's time to",
+          "cast the magic of Stone on",
+          "us to hold the walls!");
+  stext(4,"Umm... wrong game. Let's just",
+          "push on them instead.","");
+  a=Char(1)+94;
+  b=Char(2)+94;
+  c=Char(3)+94;
+  d=Char(4)+94;
+  e=Char(5)+94;
+  EntityMove(e,"X114 Y52 F1");
+  EntityMove(a,"X114 Y53 F1");
+  EntityMove(c,"X114 Y54 F1");
+  EntityMove(b,"X115 Y50 Z27");
+  EntityMove(d,"X114 Y50 Z26");
+  While(MoveCode[c])
+  {
+   Wait(20);
+  }
+  Wait(100);
+  stext(2,"Urmph! This is a strong trap!",
+          "Can't you push any harder,",
+          "you delicate flower?");
+  stext(4,"Shut up! I'm doing the best",
+          "I can, you fiend!","");
+  stext(4,"Darin, hurry! Take the guys",
+          "with you and defeat Lord",
+          "Stan on the rooftop!");
+  stext(2,"Don't worry about us, Darin.",
+          "We'll hold this trap at bay.",
+          "Go!");
+  playmusic("EXAGE.MOD");
+  Face[e]=0;
+  Wait(50);
+  Speed[e]=3;
+  Speed[c]=3;
+  EntityMove(e,"D1");
+  EntityMove(c,"U1");
+  While(MoveCode[e])
+  {
+   Wait(20);
+  }
+  RemoveCharacter(2);
+  RemoveCharacter(4);
+  Entity.LocX[8]-=20;
+  Entity.LocX[9]-=20;
+  SpecialFrame[8]=26;
+  SpecialFrame[9]=27;
+  AutoOff();
+  flags[73]=1;
+ }
+}
+
+event /* 53 */
+{
+ if(flags[73])
+ {
+  stext(4,"Darin, save yourself! Hurry",
+          "upstairs. And see if you can",
+          "get R2-D2 to stop these walls.");
+ }
+}
+
+event /* 54 */
+{
+ if(flags[73])
+ {
+  stext(2,"Darin, why did you have to",
+          "have such a wimp for a",
+          "girlfriend? Push harder, wuss!");
+ }
+}
+
+event /* 55 */
+{
+ if(!flags[74])
+ {
+  playmusic("BADEXPER.MOD");
+  SoundEffect(8);
+  AlterFTile(62,128,0,2);
+  AlterBTile(62,129,379,0);
+  AlterFTile(63,128,451,0);
+  AlterBTile(63,129,450,1);
+  AlterFTile(70,128,0,2);
+  AlterBTile(70,129,379,0);
+  AlterFTile(69,128,451,0);
+  AlterBTile(69,129,450,1);
+  stext(5,"Yikes! The suits are armor",
+          "have come alive! They're",
+          "attacking!");
+  stext(3,"I know! It's like some bad",
+          "episode of Hercules or",
+          "something.");
+  stext(1,"They're blocking the corridor.",
+          "They won't let us pass!","");
+  stext(5,"Dexter! Break and attack",
+          "pattern Delta Omega 3!","");
+  stext(3,"Check!","","");
+  AutoOn();
+  ObsMode[char(5)+94]=1;
+  ObsMode[char(3)+94]=1;
+  EntityMove(char(5)+94,"X63 Y130");
+  EntityMove(char(3)+94,"X69 Y130");
+  While(MoveCode[char(3)+94])
+  {
+   Wait(20);
+  }
+  Wait(50);
+  SpecialFrame[char(5)+94]=7;
+  SpecialFrame[char(3)+94]=9;
+  stext(5,"Grr... my weapon has no",
+          "effect on them!","");
+  stext(3,"Argh! My flame magic isn't",
+          "affecting them at all!","");
+  stext(5,"But at least we seem to be",
+          "holding them off.","");
+  stext(3,"Right. Darin! It's all up to",
+          "you now. Hurry to the roof",
+          "and confront Lord Stan!");
+  stext(5,"Our hopes go with you, Darin.",
+          "We'll take care of these",
+          "ninnies. Good luck!");
+  stext(1,"...","","");
+  RemoveCharacter(3);
+  RemoveCharacter(5);
+  AutoOff();
+  Entity.LocX[5]=63;
+  Entity.LocY[5]=130;
+  Entity.LocX[6]=69;
+  Entity.LocY[6]=130;
+  SpecialFrame[5]=7;
+  SpecialFrame[6]=9;
+  Entity.Face[5]=0;
+  playmusic("EXAGE.MOD");
+  flags[74]=1;
+ }
+}
+
+event /* 56 */
+{
+ stext(5,"Run while you can, Darin!",
+         "Everything depends on you",
+         "now. Be brave, Darin!");
+ return;
+}
+
+event /* 57 */
+{
+ stext(3,"This is your only chance,",
+         "Darin! We'll be fine. Go",
+         "now and face Lord Stan!");
+}
+
+event /* 58 */
+{
+ if(!flags[75])
+ {
+  CameraTracking=0;
+  For(x,1,40,1)
+  {
+   YWin-=1;
+   Wait(1);
+  }
+  q=volume;
+  for(x,1,q,1)
+  {
+   volume-=1;
+   Wait(1);
+  }
+  volume=q;
+  playmusic("SYMPHONY.S3M");
+  stext(6,"Welcome to your doom, you",
+          "fool, Darin! Witness the",
+          "last moments of your life!");
+  stext(6,"So it comes to this: what",
+          "is to be our decisive",
+          "confrontation!");
+  stext(6,"I am Lord Stan, creator and",
+          "destroyer of worlds! You can",
+          "never hope to defeat me!");
+  stext(6,"You will be crushed beneath",
+          "my omnipotence! There is no",
+          "hope left for you!");
+  stext(6,"I am INVINCIBLE! Do you hear",
+          "me? INVINCIBLE! INVINCIBLE!",
+          "INVINCIBLE!");
+  For(x,1,40,1)
+  {
+   YWin+=1;
+   Wait(1);
+  }
+  CameraTracking=1;
+  flags[75]=1;
+ }
+}
+
+event /* 59 */
+{
+ if(!flags[76])
+ {
+  soundeffect(3);
+  AlterFTile(74,14,448,2);
+  AlterFTile(74,12,195,2);
+  Entity.LocY[10]+=50;
+  SoundEffect(22);
+  stext(6,"Ahhhhhhhhhhhhhh!","","");
+  Wait(180);              
+  SoundEffect(9);
+  For(a,20,0,-1)
+  {
+   Earthquake(0,a,12);
+  }
+  stext(1,"Hmm... that was pretty lame.","","");
+  playmusic("AURORA.MOD");
+  stext(0,"And thus did Darin defeat the",
+          "evil Lord Stan and restore",
+          "peace, justice, and truth!");
+  stext(1,"And I didn't even get to",
+          "explore any caves. Dang. Oh",
+          "well.");
+  stext(1,"Ok, folks. Show's over! You",
+          "can exit now. Thanks for",
+          "everything. Buh-bye now!");
+  FadeOut(60);
+  Layer0=0;
+  Layer1=0;
+  LayerVC=1;
+  VCCenterText(92,"- THE END -");
+  DrawParty=0;
+  Redraw();
+  FadeIn(60);
+  Wait(300);
+  FadeOut(60);
+  DrawParty=1;
+  LayerVC=0;
+  Layer0=1;
+  Layer1=1;
+  Redraw();
+  Exit();
+ }
+}
+
+event /* 60 */
+{
+ if(!flags[80])
+ {
+  soundeffect(3);
+  AlterFTile(74,30,379,2);
+  flags[80]=1;
+ }
+}
+
+event /* 61 */                                  // Master Chest Script
+{
+ if(!flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),443,2);
+  SoundEffect(3);
+  GiveItem(var(3));
+  flags[var(0)]=1;
+ }
+}
+
+event /* 62 */                                  // Master Chest Auto-Exec
+{
+ if(flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),443,2);
+ }
+}
+
+event /* 63 */                                  // Master Gold Door Open
+{
+ if(item(var(0)))
+ {
+  soundeffect(3);
+  AlterBTile(var(1),var(2),398,2);
+  AlterBTile(var(1)+1,var(2),399,2);
+  AlterBTile(var(1)+2,var(2),399,2);
+  AlterBTile(var(1)+3,var(2),400,2);
+  AlterBTile(var(1),var(2)+1,396,2);
+  AlterBTile(var(1)+1,var(2)+1,195,0);
+  AlterBTile(var(1)+2,var(2)+1,195,0);
+  AlterBTile(var(1)+3,var(2)+1,397,2);
+  stext(partyindex(1)+1,"The key fits!","","");
+  DestroyItem(var(0),0);
+  flags[var(3)]=1;
+  return;
+ }
+ if(flags[var(3)])
+ {
+  AlterParallax(var(6),2,3);
+  warp(var(4),var(5),0);
+  if(var(6))
+  {
+   flags[54]=1;
+  }
+  return;
+ }
+ stext(PartyIndex(1)+1,"Hmm... locked.","","");
+}
+
+event /* 64 */                                  // Master Gold Door Auto-Exec
+{
+ if(flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),398,2);
+  AlterBTile(var(1)+1,var(2),399,2);
+  AlterBTile(var(1)+2,var(2),399,2);
+  AlterBTile(var(1)+3,var(2),400,2);
+  AlterBTile(var(1),var(2)+1,396,2);
+  AlterBTile(var(1)+1,var(2)+1,195,0);
+  AlterBTile(var(1)+2,var(2)+1,195,0);
+  AlterBTile(var(1)+3,var(2)+1,397,2);
+ }
+}
+
+event /* 65 */                                  // Master Tower Torch
+{
+ if(var(3))
+ {
+  a=195;
+  b=377;
+  c=78;
+  d=69;
+ }
+ if(!var(3))
+ {
+  a=377;
+  b=195;
+  c=69;
+  d=78;
+ }
+ if(!flags[var(0)])
+ {
+  soundeffect(4);
+  AlterBTile(var(1),43,390,2);
+  AlterFTile(var(2),51,a,0);
+  ChangeZone(var(2),51,c);
+  flags[var(0)]=1;
+  WaitKeyUp();
+  return;
+ }
+ if(flags[var(0)])
+ {
+  AlterBTile(var(1),43,389,2);
+  AlterFTile(var(2),51,b,0);
+  ChangeZone(var(2),51,d);
+  WaitKeyUp();
+  flags[var(0)]=0;
+ }
+}
+
+event /* 66 */                                  // Master Torch Auto-Exec
+{
+ if(flags[var(0)])
+ {
+  AlterBTile(var(1),43,390,2);
+  AlterFTile(var(2),51,377,0);
+  ChangeZone(var(2),51,var(3));
+ }
+}
+
+event /* 67 */                                  // Master Walk Inside
+{
+ flags[54]=0;
+ AlterParallax(flags[54],2,3);
+ warp(var(0),var(1),0);
+}
+
+event /* 68 */                                  // Master Walk Outside
+{
+ flags[54]=2;
+ AlterParallax(flags[54],2,3);
+ warp(var(0),var(1),0);
+}
+
+event /* 69 */
+{
+ if(!flags[89])
+ {
+  soundeffect(4);
+  AlterBTile(88,67,390,2);
+  AlterBTile(80,71,501,2);
+  flags[89]=1;
+ }
+}
+
+event /* 70 */
+{
+ if(flags[89])
+ {
+  soundeffect(7);
+  Timer=0;
+  Wait(5);
+  While(Timer<100 AND Timer>4)
+  {
+   PaletteMorph(63,63,63,100-Timer,63);
+  }
+  Banner("Save Point",3);
+  EnableSave();
+ }
+}
+
+event /* 71 */
+{
+ DisableSave();
+}
+
+event /* 72 */
+{
+ if(!flags[150])
+ {
+  SoundEffect(8);
+ }
+ FakeBattle();
+}
+
+event /* 73 */
+{
+ SoundEffect(22);
+ Warp(35,120,0);
+}
+
+event /* 74 */
+{
+ if(char(1) and !flags[152])
+ {
+  stext(1,"So this is it... the mighty",
+          "Castle Heck. Lord Stan rules",
+          "his evil empire from here.");
+  CameraTracking=0;
+  Timer=0;
+  a=XWin;
+  b=YWin;
+  While(YWin>b-350)
+  {
+   XWin=a-(Timer/2);
+   YWin=b-Timer;
+   Redraw();
+  }
+  Timer=0;
+  While(Timer<350)
+  {
+   XWin=a-175+Timer;
+   Redraw();
+  }
+  Timer=0;
+  While(YWin<b)
+  {
+   XWin=(a+175)-(Timer/2);
+   YWin=(b-350)+Timer;
+   Redraw();
+  }
+  CameraTracking=1;
+  if(char(2))
+  {
+   stext(2,"What an impractical, ancient",
+           "design! Hrmph.","");
+  }
+  if(char(3))
+  {
+   stext(3,"It is indeed an immense and",
+           "dreadful structure.","");
+  }
+  if(char(4))
+  {
+   stext(4,"It is foreboding, but we must",
+           "be strong if we are to release",
+           "Stan's grip on this world.");
+  }
+  flags[152]=1;
+ }
+}
+
+event /* 75 */
+{
+ SoundEffect(22);
+ Warp(87,77,0);
+}

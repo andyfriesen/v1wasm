@@ -9,9 +9,12 @@
 #include "keyboard.h"
 #include "timer.h"
 #include "vga.h"
+#include "fs.h"
+
+using namespace verge;
 
 extern char* strbuf;
-FILE* d;
+VFILE* d;
 void UpdateEquipStats();
 
 char whotoattack() {
@@ -55,8 +58,8 @@ rnd1:
 int getnum() {
     int i, tmin, tmax;
 
-    fscanf(d, "%d", &tmin);
-    fscanf(d, "%d", &tmax);
+    vscanf(d, "%d", &tmin);
+    vscanf(d, "%d", &tmax);
     i = random(tmin, tmax);
     return i;
 }
@@ -64,35 +67,34 @@ int getnum() {
 int getsnum() {
     int i, tmin;
 
-    fscanf(d, "%d", &tmin);
+    vscanf(d, "%d", &tmin);
     i = tmin;
     return i;
 }
 
-void levelup (int chr) {
-    int i, i2, i3, tmin, tmax, j;
+void levelup(int chr) {
+    int i, i3, j;
     int alreadyhave;
-    char* img;
 
-    d = fopen("PARTY.DAT", "r");
-    fscanf(d, "%s", strbuf);
+    d = vopen("PARTY.DAT", "r");
+    vscanf(d, "%s", strbuf);
     for (i = 0; i <= chr; i++) {
-        fscanf(d, "%s", strbuf);
-        fscanf(d, "%s", strbuf);
-        fscanf(d, "%s", strbuf);
+        vscanf(d, "%s", strbuf);
+        vscanf(d, "%s", strbuf);
+        vscanf(d, "%s", strbuf);
     }
-    fclose(d);
+    vclose(d);
 
-    d = fopen(strbuf, "r");
-    fgets(strbuf, 99, d);
-    fgets(strbuf, 99, d);
+    d = vopen(strbuf, "r");
+    vgets(strbuf, 99, d);
+    vgets(strbuf, 99, d);
 
     pstats[chr].lv++;
     for (i = 0; i < pstats[chr].lv; i++) {
-        fgets(strbuf, 99, d);
+        vgets(strbuf, 99, d);
     }
 
-    fscanf(d, "%d", &pstats[chr].nxt);
+    vscanf(d, "%d", &pstats[chr].nxt);
     i = getnum();
     pstats[chr].maxhp += i;
     pstats[chr].curhp += i;
@@ -154,7 +156,7 @@ void levelup (int chr) {
         }
     }
 
-    fclose(d);
+    vclose(d);
 
     UpdateEquipStats();
 }

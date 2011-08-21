@@ -1,0 +1,92 @@
+/* =======================================================================
+   = effects.vc =
+   ==============    There are a few differences between EFFECTS.VC and
+                     ordinary MAP-based VCs. First, you'll notice that
+"effect" denotes the beginning of a script, not "event". VCC handles it
+differently, it recognizes it simply by filename and compiles to
+EFFECTS.VCS instead of appending the compiled code to the MAP.  Upon entering
+a script, var(0) contains the pointer to whoever was selected to receive
+the effect. If you have an AA or AE effect, however, you will need to cycle
+through the characters individually. For an AA effect, use this example:
+
+for (x, 1, numchars(0), 1)
+{
+  Heal(partyindex(x), 50);
+}
+
+Obviously, AE effects are not yet implemented.
+The valid effect commands currently are:
+
+Heal(character,amount);
+RestoreMP(character,amount);
+ReviveChar(character);
+
+========================================================================== */
+
+effect                             // Herb
+{
+  Heal(var(0),15);
+  soundeffect(10);
+}
+
+effect                             // Starlight
+{
+  RestoreMP(var(0),15);
+  soundeffect(10);
+}
+
+effect                             // Medicine
+{
+  Heal(var(0),45);
+  soundeffect(10);
+}
+
+effect                             // Miracle Brew
+{
+  ReviveChar(var(0));
+  soundeffect(10);
+}
+
+effect                             // Atlas Scroll
+{
+ if(!flags[151])
+ {
+  SText(1,"This map should only be used",
+          "when travelling in the main",
+          "field area.");
+  return;
+ }
+ FadeOut(30);
+ DrawParty=0;
+ VCLoadPCX("map01.pcx",0);
+ VCLoadPCX("pointer.pcx",40000);
+ Layer0=0;
+ Layer1=0;
+ LayerVC=1;
+ a=(2*LocX)+52;
+ b=(2*LocY)-8;
+ VCBlitImage(60,0,200,200,0);
+ VCTBlitImage(a,b,16,16,40000);
+ Redraw();
+ FadeIn(30);
+ b2=0;
+ While(b2=0)
+ {
+  VCBlitImage(60,0,200,200,0);
+  VCCenterText(190,"Press <Cancel> to exit.");
+  Wait(10);
+  VCTBlitImage(a,b,16,16,40000);
+  Wait(10);
+  VCClear();
+  ReadControls();
+ }
+ FadeOut(30);
+ Layer0=1;
+ Layer1=1;
+ LayerVC=0;
+ VCClear();
+ Redraw();
+ DrawParty=1;
+ FadeIn(30);
+}
+

@@ -1,0 +1,200 @@
+5event /* 0 */
+{
+ flags[151]=1;
+ if(flags[106])
+ {
+  PlayMusic("VANGELIS.MOD");
+ }
+ if(flags[50])
+ {
+  AlterBTile(22,26,272,0);
+ }
+ if(!flags[102])
+ {
+  GiveXP(3,11);
+  GiveXP(2,81);
+  GiveXP(5,161);
+  ForceEquip(1,32);
+  ForceEquip(1,36);
+  ForceEquip(1,37);
+  ForceEquip(2,34);
+  ForceEquip(2,7);
+  ForceEquip(2,13);
+  ForceEquip(2,37);
+  ForceEquip(3,33);
+  ForceEquip(3,36);
+  ForceEquip(3,37);
+  ForceEquip(4,9);
+  ForceEquip(4,37);
+  ForceEquip(5,35);
+  ForceEquip(5,27);
+  ForceEquip(5,6);
+  ForceEquip(5,8);
+  GetItem(4,2);
+  Layer0=0;
+  Layer1=0;
+  LayerVC=1;
+  DrawParty=0;
+  VCPutPCX("ISLAND.PCX",80,50);
+  Redraw();
+  FadeIn(30);
+  For(x,0,425,1)
+  {
+   VCPutPCX("ISLAND.PCX",80,50);
+   if(x<200)
+   {
+    VCCenterText(200-x,"Our world is but one in the universe.");
+   }
+   if(x>25 and x<225)
+   {
+    VCCenterText(225-x,"The imagination is vast and limitless.");
+   }
+   if(x>50 and x<250)
+   {
+    VCCenterText(250-x,"An astral force known as VERGE allows");
+   }
+   if(x>75 and x<275)
+   {
+    VCCenterText(275-x,"us to shape our dreams into reality.");
+   }
+   if(x>100 and x<300)
+   {
+    VCCenterText(300-x,"Darin's is but one small world in the");
+   }
+   if(x>125 and x<325)
+   {
+    VCCenterText(325-x,"endless reaches of space. Darin sailed");
+   }
+   if(x>150 and x<350)
+   {
+   VCCenterText(350-x,"from his home in search of a new world,");
+   }
+   if(x>175 and x<375)
+   {
+   VCCenterText(375-x,"but alas, he found each of the worlds");
+   }
+   if(x>200 and x<400)
+   {
+   VCCenterText(400-x,"still undergoing construction. Sad, yet");
+   }
+   if(x>225 and x<425)
+   {
+   VCCenterText(425-x,"hopeful, Darin returns to spend time");
+   }
+   if(x>250)
+   {
+   VCCenterText(450-x,"in peace with his eternal soulmate...");
+   }
+   Wait(2);
+   VCClear();
+  }
+  VCClear();
+  FadeOut(30);
+  VCCenterText(82,"- VERGE -");
+  VCCenterText(110,"The Sully Chronicles");
+  Redraw();
+  FadeIn(120);
+  Wait(300);
+  FadeOut(120);
+  LayerVC=0;
+  Layer0=1;
+  Layer1=1;
+  DrawParty=1;
+  VCClear();
+  Redraw();
+  FadeIn(30);
+  Fade=0;
+  flags[102]=1;
+ }
+ EnforceAnimation();
+ flags[54]=2;
+ layer1trans=1;
+}
+
+event /* 1 */
+{
+ Fade=1;
+ layer1trans=0;
+ mapswitch("ISLAND.MAP",0,0,0);
+}
+
+event /* 2 */
+{
+ layer1trans=0;
+ mapswitch("UNDERSEA.MAP",13,20,0);
+}
+
+event /* 3 */
+{
+ layer1trans=0;
+ if(facing(0))
+ {
+  mapswitch("COTTAGE.MAP",41,2,0);
+ }
+ mapswitch("COTTAGE.MAP",0,0,0);
+}
+
+event /* 4 */
+{
+ layer1trans=0;
+ mapswitch("MOUNTAIN.MAP",0,0,0);
+}
+
+event /* 5 */
+{
+ layer1trans=0;
+ mapswitch("CHASM.MAP",0,0,0);
+}
+
+event /* 6 */
+{
+ layer1trans=0;
+ if(flags[106])
+ {
+  Mapswitch("OLDVILLE.MAP",0,0,0);
+ }
+ mapswitch("VILLAGE.MAP",0,0,0);
+}
+
+event /* 7 */
+{
+ layer1trans=0;
+ mapswitch("VILLAGE.MAP",98,5,0);
+}
+
+event /* 8 */
+{
+ layer1trans=0;
+ mapswitch("SHACK.MAP",1,29,0);
+}
+
+event /* 9 */
+{
+ layer1trans=0;
+ mapswitch("CASTLE.MAP",0,0,0);
+}
+
+
+event /* 10 */
+{
+ if(!flags[106])
+ {
+  if(!flags[150])
+  {
+   SoundEffect(8);
+  }
+  FakeBattle();
+ }
+}
+
+event /* 11 */
+{
+ layer1trans=0;
+ mapswitch("BUMVILLE.MAP",0,0,0);
+}
+
+event /* 12 */
+{
+ layer1trans=0;
+ mapswitch("CHASM.MAP",97,40,0);
+}

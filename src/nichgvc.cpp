@@ -361,7 +361,7 @@ void PlayVAS() {
     for (i2 = 0; i2 < depth; i2++) {
         ReadPCXLine(i2 * width, (unsigned char*)vcdatabuf);
     }
-    fclose(pcxf);
+    vclose(pcxf);
 
     setTimerCount(0);
     while (i < frames) {

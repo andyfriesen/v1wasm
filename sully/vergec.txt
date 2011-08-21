@@ -1,0 +1,1407 @@
+VergeC Library of Commands and Variables
+=======================================================
+Originally written by Hahn (hahn@ll.net)
+Last modified 04.Jun.98
+
+| Modifications from the 13/Feb/98 version to the 04/Jun/98
+| version have been made by Aen (Fist1000@aol.com),
+| NichG (nickh@erols.com) and Ric (riclau@mailcity.com).
+| New commands and information in this version are marked as:
+| !!! New !!!
+
+The following is a list of the specific commands, functions, and
+variables that are supported by VergeC, VERGE's event scripting
+language. This document does NOT explain the basic principles of
+VergeC, nor does it explain how to add events to your map. That
+information in located in VERGEDOC.TXT, Chapter 2.
+=======================================================
+
+Chapter 1: Commands
+----------------------------------------------
+  Section 1: Movement
+  Section 2: Party, Item, and Game Management
+  Section 3: Sound
+  Section 4: Text and Prompts
+  Section 5: Environmental Manipulation
+  Section 6: VergeC Event Control
+  Section 7: Gratuitous Eye Candy
+  Section 8: VergeC Graphic Layer Controls
+  Section 9: Entities
+  Section 10: The Startup Script
+----------------------------------------------
+
+Section 1: Movement
+
+Warp(x coordinate, y coordinate, no fade);
+------------------------------------------
+Example: Warp(29,15,0);
+This will move the party to a new location in the current map. If you supply
+a 1 for the no-fade parameter, then the travel will be instantaneous.
+Otherwise, a brief fade out and fade in will accompany the warp.
+If your event has other commands after the Warp command, they will execute
+after the party reaches their destination.
+
+MapSwitch("map file name",x coordinate, y coordinate, no fade);
+---------------------------------------------------------------
+Example: MapSwitch("ICECAVE.MAP",31,12,0);
+This will move the party to a new map. If you supply a 0 for both the x and
+y coordinate, then the party will appear at the new map's START POSITION.
+(edited in the Map Properties window). If you supply a 1 for the no-fade
+parameter, the travel will be instantaneous. Otherwise, a brief fade out
+and fade in will accompany the switch. Realize that all commands in your
+event after a MapSwitch will NOT be executed. To have events execute after
+a MapSwitch, you will need to place them in the AutoExec event of the
+destination map.
+--------------------------------------------------------------
+
+Section 2: Party, Item, and Game Management
+
+!!! New !!! 
+StatusScreen(roster order index);
+-----------------------------
+Example: StatusScreen(3);
+This will invoke the built in status screen for the character in the given 
+party roster order. 
+
+AddCharacter(party.dat index);
+------------------------------
+Example: AddCharacter(3);
+This will add the specified character to the current adventuring group,
+provided the party currently has less than 5 members.
+
+RemoveCharacter(party.dat index);
+---------------------------------
+Example: RemoveCharacter(3);
+If the specified character is currently in the active party, they will leave
+and be removed from the group.
+
+GiveXP(character, amount);
+--------------------------
+Example: GiveXP(7,500);
+This will add the amount of experience points to a character's current total.
+The character reference is from PARTY.DAT. After this event is run, the
+character's level will increase if they have sufficient experience points.
+
+ChangeCHR(character, "chr file name");
+--------------------------------------
+Example: ChangeCHR(4,"KNIGHT.CHR");
+This will permanently which CHR file is associated with the specified
+character, immediately changing their walking graphics.
+
+HealAll();
+----------
+This will restore the Hit Points, Magic Points, and Condition of all the
+characters currently in the active party.
+
+GiveGP(amount);
+---------------
+Example: GiveGP(500);
+This adds the specified amount of money to the party's current amount.
+
+TakeGP(amount);
+---------------
+Example: TakeGP(200);
+This removes the specified amount of money from the party's current amount.
+
+GiveItem(items.dat index);
+--------------------------
+Example: GiveItem(12);
+This will give the specified item to the character currently in the front
+of the party, displaying the item's icon and name briefly.
+
+DestroyItem(items.dat index, character);
+----------------------------------------
+Example: DestroyItem(12,0);
+This will destroy the specified item and remove it from the specified
+character's inventory. A 0 in either field will be interpreted as "all":
+(12,4)- Destroys specific item from specific character's inventory.
+(12,0)- Destroys specific item from all characters' inventories.
+(0,4) - Destroys all items from specific character's inventory.
+(0,0) - Destroys all items from all characters' inventories.
+
+GetItem(items.dat index, character);
+------------------------------------
+Example: GetItem(18,2);
+This is similar to GiveItem, but you may specify which character receives
+the item, and the name and icon box does not appear. This is most useful for
+giving characters inventories that they carry before joining the group.
+
+!!! New !!!
+GetMagic(character, magic.dat index);
+------------------------------------
+Example: GetMagic(1,4);
+This is similar to GetItem, but works for magic. A character will not recieve
+a spell that they already posess, and may not recieve more spells than fit
+in the magic menu (24). This is mainly used in giving characters spells on
+startup, or for plot given magic during the game. However, no box appears to
+signal this, so you must code one in vc if you wish it to be known to the
+player (using simple text boxes, or through the new icon displaying commands)
+
+ForceEquip(items.dat index, character);
+---------------------------------------
+Example: ForceEquip(10,1);
+This equips the specified character with the specified item. If the item does
+not exist in that character's inventory, it will be created and equipped.
+This is useful for having new characters join the group with items already
+equipped.
+
+Shop(item1, item2, item3, ... item12);
+---------------------------------------
+Example: Shop(14,12,27,3,5,9,20);
+This will summon the shop window and allow the player to buy and sell items
+until they exit the shop. The items available to buy are specified in the
+Shop command's parameters. You need only include the items you wish to have
+for sale, and may not offer more than 12 items in a single Shop event.
+
+!!! New !!!
+MagicShop(spell1, spell2, spell3, ... spell12);
+---------------------------------------
+Example: MagicShop(14,12,27,3,5,9,20);
+This will summon the shop window and allow the player to buy and sell spells
+until they exit the shop. The spells available to buy are specified in the
+MagicShop command's parameters. You need only include the spells you wish to
+have for sale, and may not offer more than 12 spells in a single MagicShop
+event. A character may not buy a spell that they cannot use, or spells that
+they already posess. Otherwise, a character may buy any spell offered.
+
+Exit();
+-------
+This will leave the current game and return to the title screen.
+
+Quit(message);
+-------
+This will close VERGE altogether and return to the DOS prompt with the
+specified message.
+---------------------------------------------------------------------------
+
+Section 3: Sound
+
+SoundEffect(main.sfx index);
+----------------------------
+Example: SoundEffect(7);
+This plays the specified sound effect. Note that sound effects always play
+at their maximum volume, despite the Volume variable.
+
+PlayMusic("file name");
+-----------------------
+Example: PlayMusic("AURORA.MOD");
+This starts the specified music module file.
+
+StopMusic();
+------------
+This commands stops the music and disables the sound effects. To play sound
+effects while the music is stopped, it is recommended you set the Volume
+variable to 0(see Variables in Chapter 2).
+---------------------------------------------------------------------------
+
+Section 4: Text and Prompts
+
+!!! New !!! 
+TextMenu(x coordinate, y coordinate, flag, default, "choice1","choice2",..);
+----------------------------------------------------------------------------
+Example: TextMenu(4,4,0,0,"Item", "Equip", "Magic","Status","Order","Tactic");
+This command will print a menu at the given coordinates, setting Flags[flag]
+to the number of the option chosen or zero if the menu was cancelled. The text
+that is displayed for the options are listed starting at the fourth parameter.
+Setting default to a value of n will initially position the menu pointer on
+the nth option. You can have as many options as you like provided that the 
+menu does not go off the boundaries of the screen.
+
+!!! New !!! 
+ItemMenu(roster order index);
+-----------------------------
+Example: ItemMenu(1);
+This will invoke the built in item menu for the character in the given party 
+roster order. 
+
+!!! New !!! 
+EquipMenu(roster order index);
+-----------------------------
+Example: EquipMenu(3);
+This will invoke the built in equip menu for the character in the given party 
+roster order. 
+
+!!! New !!!
+MagicMenu(roster order index);
+-----------------------------
+Example: MagicMenu(3);
+This will invoke the built in magic menu for the character in the given party 
+roster order. 
+
+Text(speech portrait, "line1", "line2", "line3");
+-------------------------------------------------
+Example: Text(3,"I am the mighty dragon slayer",
+                "Felgar! I have come to save",
+                "your wretched little village!");
+This will display the main dialogue box with the specified text. All of the
+text will be displayed immediately. Please note that the maximum number of
+characters per line is 30. Your event will compile if it exceeds 30, but it
+will be alarmingly unattractive when the game executes. The speech portrait
+is in reference to the images in SPEECH.SPC. Note that spacing in a text
+event is not important, but the above example shows how it can be done in
+a tidy and readable manner. The text box will vanish once the player hits
+a key.
+
+SText(speech portrait, "line1", "line2", "line3");
+--------------------------------------------------
+Example: SText(3,"I am the mighty dragon slayer",
+                 "Felgar! I have come to save",
+                 "your wretched little village!");
+This is identical to a regular Text event, except the letters will print out
+one at a time in a scrolling fashion. A key press will make the text box
+disappear, even if the text has not finished printing yet. Note that SText
+is still a bit uncertain on slower machines, but will most likely be
+stable in the future.
+
+Prompt(speech portrait, "line1", "line2", "line3", flag, "choice1", "choice2");
+-------------------------------------------------------------------------------
+Example: Prompt(0,"I'm a great fighter and I'm",
+                  "pretty studly too! Do you want",
+                  "me to tag along with you?",45,"Sure!","Nope!");
+This event will print out a text box in a similar manner to a Text statement,
+but will then pass control to a small cursor window where the player must
+make a selection between two options. The box will print the last two
+parameters of the Prompt event as the choices. If the player selects the
+first option, then the Flags[x] variable that the Prompt event references
+will be assigned a value of 0. If the second option is selected, it will be
+assigned a value of 1. It is common to follow a Prompt event with an
+IF statement to evaluate the effects of the decision.
+
+Banner("message", duration);
+----------------------------
+Example: Banner("The key works!",3);
+This will display a small window in the center of the screen with the
+specified message. The Banner will disappear when the player presses a key,
+or after the specified number of seconds elapses. The message for the
+Banner should not exceed 16 characters.
+---------------------------------------------------------------------------
+
+Section 5: Environmental Manipulation
+
+AlterBTile(x coordinate, y coordinate, new tile, obstruction value);
+--------------------------------------------------------------------
+Example: AlterBTile(62,14,382,1);
+This will alter one tile in the current map's background layer.
+The new tile parameter references a tile graphic from the map's VSP.
+The obstruction value can be set to 0(non-obstructed), 1(obstructed),
+or 2(remains the same). It is very important to note that these changes
+will be LOST when the player exits the maps. If you wish the change to be
+permanent, you will need to add an event in the map's AutoExec to alter
+the tile when the map is entered.
+
+AlterFTile(x coordinate, y coordinate, new tile, obstruction value);
+--------------------------------------------------------------------
+Example: AlterFTile(62,14,382,1);
+This works identically to AlterBTile, except that it alters a tile in the
+map's foreground layer as opposed to the background layer.
+
+ChangeZone(x coordinate, y coordinate, new zone);
+-------------------------------------------------
+ChangeZone(62,14,9);
+This will change the zone number associated with a tile. Like AlterBTile
+and AlterFTile events, this change is NOT permanent and must be kept track
+of in the map's AutoExec event to be consistent when the map is left and
+re-entered.
+
+AlterParallax(parallax control mode, multiplier, divisor);
+----------------------------------------------------------
+Example: AlterParallax(2,3,2);
+This will re-configure the map's Parallax and layer attributes. Refer to
+VERGEDOC.TXT on how the control mode and multiplier/divisor work. Again,
+this change is not permanent and will be forgotten when the map is exited.
+
+EnforceAnimation();
+-------------------
+This command should be in EVERY map's AutoExec that uses a VSP with at least
+one animation strand. It ensures that the map's animated tiles animate when
+the map is first loaded. You should NOT use this command in a map if the
+map's VSP contains no animation data, however.
+
+DisableMenu();
+--------------
+This will prevent the player from accessing the gameplay menu. However, the
+system menu can still be accessed. Mostly used for semi-interactive sequences
+in games.
+
+EnableMenu();
+-------------
+This command will undo a DisableMenu command.
+
+DisableSave();
+--------------
+This will prevent the player from saving his game. However, the system menu
+can still be accessed to load games, change volume, quit, etc.
+
+EnableSave();
+-------------
+This will undo a DisableSave event, or allow the player the save his game in
+a map specified as non-saveable.
+
+SaveMenu();
+-----------
+This command will summon the Savegame menu and allow the player to save his
+game. This will not affect whether or not the save menu is accessible
+through the system menu.
+---------------------------------------------------------------------------
+
+Section 6: VergeC Event Control
+
+Return;
+-------
+This command will abort all current VergeC event processing and return
+control to the engine. Most useful in mutually exclusive conditional events.
+
+WaitKeyUp();
+------------
+This will halt the current event execution until the player releases any
+depressed keys. This is most useful in events that are activated through
+Adjacent Activation, and can be repeatedly executed. If this command is not
+present in such an event, the event will be activated *many* times with a
+single key press.
+
+ReadControls();
+---------------
+This command will update the player's control variables (up, down, left, right,
+b1, b2, b3, b4). Any direction or button not depressed will be assigned a
+value of 0, and any direction or button that is depressed will be assigned
+a value of 1. See Variables in Chapter 2 to better understand the eight
+control variables.
+
+ChainEvent(event number, optional variable 1, optional variable 2, etc.);
+-------------------------------------------------------------------------
+Example: ChainEvent(42,2,2,9,51);
+This command requires only one parameter, but may use more. It will pass
+all event execution control to the destination event. If more parameters
+are provided, their values will immediately be assigned to Var(0), Var(1),
+Var(2), etc. respectively. See the VergeC section of VERGEDOC.TXT for more
+information on how to effectively use ChainEvent. Note that once you pass
+control to an event using ChainEvent, it is up to the destination event
+to handle VergeC processing. The commands listed immediately after the
+ChainEvent will not occur.
+
+CallEvent(event number, optional variable 1, optional variable 2, etc.);
+------------------------------------------------------------------------
+Example: CallEvent(42,2,2,9,51);
+This command works identically to ChainEvent, except that once the destination
+event has been executed, VergeC will pass control back to the line immediately
+beneath the original CallEvent command.
+
+!!! New !!! 
+CallEffect(effect number, optional variable 1, optional variable 2, etc.);
+-------------------------------------------------------------------------
+Example: CallEffect(2,3,1,0);
+This works similarly to CallEvent but will run the appropriate VC script in 
+the EFFECTS.VCS file. The value of the temporary variables (a-z) are saved
+before the script is run and restored when the script has finished running.
+If you wish to pass values back from the effects script use flags.
+
+!!! New !!! 
+CallScript(script number, optional variable 1, optional variable 2, etc.);
+-------------------------------------------------------------------------
+Example: CallScript(4,3,2);
+This works similarly to CallEffect but will run the appropriate VC script in 
+the STARTUP.VCS file.
+
+HookTimer(event number);
+------------------------
+Example: HookTimer(17);
+This powerful command will cause the VERGE engine to call a certain event
+every single time the timer ticks, which is 100 times a second. This command
+must be used with extreme care, but is capable of a wide array of interesting
+functions if done so. The destination event must not include ANY commands
+that require player input, or would otherwise slow the game down for more
+than a fraction of a second. The commands you use in the destination event
+must only include such instantaneous things as AlterBTile, AlterFTile,
+SoundEffect, and variable assignments. The most common use of a timer-hooked
+event is to make something happen at regular time intervals. Your destination
+event could look like this:
+{
+ if(timer=500)
+ {
+  SoundEffect(12);
+  Timer=0;
+ }
+}
+Provided you set the Timer variable to 0 before hooking this event, each time
+the Timer variable reaches 500, which would happen in 5 seconds, the sound
+effect would play, then Timer would be reset to 0, and the sound effect would
+play in another 5 seconds. To turn off a Timer-hooked script, use this
+command with a 0 parameter, ie. HookTimer(0); Be sure to shut it off in
+such a manner before calling a MapSwitch.
+
+HookRetrace(event number);
+--------------------------
+Example: HookRetrace(17);
+This is mostly identical to HookTimer above, but this causes the destination
+event to be called each time the screen updates, which does not necessarily
+happen 100 times a second on all but the fastest machines. Since this causes
+the hooked event to let the screen keep up with it, HookRetrace is in many
+ways more stable than HookTimer. You may use the Timer variable to control
+the hooked event, but realize that the event will not be called each timer
+tick, but most likely every other tick, or approximately in that whereabouts.
+The above sound effect example for HookTimer would need to use
+IF(Timer>500) instead of IF(Timer=500) as the chance of the event being
+called right when Timer is equal to 500 is quite uncertain. As with Hook
+Timer, use a 0 to turn it off, ie. HookRetrace(0); Again, be sure to do
+this before calling a MapSwitch or both vecna and I will come to your
+house, beat you senseless, and steal the computer you are not worthy of.
+----------------------------------------------------------------------------
+
+Section 7: Gratuitous Eye Candy
+
+!!! New !!!
+PlayVAS ("VAS filename", delay, width, height, x coordinate, y coordinate);
+---------------------------------------------------------------------------
+Example: PlayVAS ("animate.pcx", 5, 320, 200, 0, 0);
+This plays a VAS animation. VAS animations are compiled from FLIs or FLCs
+using a utility by Ric that is available in DEVUTIL.ZIP.
+Delay specifies how long to wait between drawing each frame (see duration for
+the command FadeIn below). To actually see the animation you must switch on
+the VC layer. The size of each VAS animation frame is given by the width and
+height parameters and the animation will be played back at the given x and y
+coordinates on the VC layer. Note that the animation will be loaded into
+the VC data buffer so should not be larger than it (to find out how large the
+VC data buffer needs to be multiply width x height x number of frames).
+Make sure to apply to verge palette to the VAS after it is made.
+This will clear the memory in which pcx's are loaded, so be warned.
+
+FadeIn(duration);
+-----------------
+Example: FadeIn(30);
+This will cause the screen to fade from black to normal. The duration is how
+quickly it fades. 30 is typical, while something like 150 is a bit more
+prolonged.
+
+FadeOut(duration);
+------------------
+Example: FadeOut(30);
+Fades the screen from normal to black. Duration works in a similar fashion to
+FadeIn.
+
+BoxFadeIn(duration);
+--------------------
+Example: BoxFadeIn(50);
+This will cause the screen to 'open up' from the center, with a retreating
+black frame. The duration works in a similar manner to a FadeIn.
+
+BoxFadeOut(duration);
+---------------------
+Example: BoxFadeOut(50);
+This will cause the screen to 'close' from all sides with a constricting
+black frame. Duration works like BoxFadeIn.
+
+Earthquake(x intensity, y intensity, duration);
+-----------------------------------------------
+Example: Earthquake(10,10,300);
+This command rattles the screen around for as long as the duration lasts.
+The intensity is in number of pixels, so bear in mind that each 16 points
+of intensity will make one border tile visible during the earthquake.
+
+Redraw();
+---------
+Forces the VERGE engine to update the screen. Usually any changes to tiles,
+VC graphic layer, etc. do not appear until control is returned to the
+game engine. This is most useful when you want some animation type things
+to occur directly after a MapSwitch.
+
+Wait(duration);
+---------------
+Example: Wait(100);
+Causes the game to 'halt' for the duration in 1/100 fractions of a second.
+Note that the player cannot do anything during this time, although animated
+tiles and timer-hooked scripts will still work normally.
+
+SetFace(character, direction);
+------------------------------
+Example: SetFace(2,3);
+This will change the direction a character is facing. The character reference
+is by the current party roster order, not by PARTY.DAT. If you wish to
+reference a certain character, you may use the Char(x) function. For
+example, you can make Darin face up, no matter where he is in the group
+with SetFace(char(1),1);  The facing references are 0-down, 1-up, 2-right,
+3-left.
+
+PaletteMorph(red, green, blue, intensity, lighting);
+----------------------------------------------------
+Example: PaletteMorph(10,10,45,50,60);
+This command will alter the entire game palette, affecting the entire
+screen. To change the color 'tint' of the screen, use the RGB values of
+the color you wish to affect the screen with. These RGB values go from
+0 to 63, so 63,0,0 is red, 0,63,0 is green, 0,0,63 is blue, 0,0,0 is black,
+63,63,63 is white, and 63,63,0 is yellow. The intensity is how 'thick' the
+color appears on the screen. This is value from 0 to 100. O would not be
+visible at all, and 100 would make the screen solid color. Finally, the
+lighting parameter is a value from 0 to 63. The game engine is usually at
+63, while 0 is black.  To recover from a morphed Palette and return to the
+regular game colors, simply run this command again with an Intensity of 0.
+
+MapPaletteGradient(start color, end color, invert, mode);
+---------------------------------------------------------
+Example: MapPaletteGradient(152,159,1,0);
+This is a powerful command that will alter one or more aspects of the
+game's graphics to a 'gradient' of colors, maintaining the luminance of
+the artwork, but forcing it all into shades of one hue. Mode 0 will affect
+the entire screen, save for the windows and menu artwork, and Mode 1 will
+affect the text, menu, and information windows. To select which color you
+wish to use, choose your start and end values from the table below.
+If you see (I) next to the gradient you wish to use, then enter a 1 for
+the MapPaletteGradient command's invert parameter. Otherwise, enter a 0.
+
+VERGE Palette Gradients
+(I) = Use inverted mode
+() = Is reasonably useful (ie. not an eyesore)
+
+0-7 = Very Dark Greyscale
+8-15 = Dark Greyscale()
+16-23 = Greyscale
+24-31 = Light Greyscale
+32-39 = Dark Red(I)
+40-47 = Dark Brown(I)()
+48-55 = Light Red(I)
+56-63 = Dark Brown()
+64-71 = Light Yellow(I)
+72-79 = Dark Yellow(I)()
+80-87 = Forest Green(I)
+88-95 = Light Green(I)
+96-103 = Dark Green(I)
+104-111 = Very Dark Green(I)()
+112-119 = Cyan(I)
+120-127 = Dark Cyan(I)()
+128-135 = Periwinkle(I)
+136-143 = Blue(I)
+144-151 = Dark Blue(I)
+152-159 = Nighttime Blue(I)()
+160-167 = Dark Brown()
+168-175 = Mahogany
+176-182 = Tan
+184-191 = Brown
+192-199 = Flesh(I)
+200-207 = Dark Flesh(I)
+208-215 = Brown(I)
+216-223 = Dark Brown(I)()
+224-231 = Red
+232-239 = Orange
+240-247 = Orange/Brown(I)()
+248-254 = Purple
+--------------------------------------------------------------------------
+
+Section 8: VergeC Graphic Layer Controls
+
+There is now a second VC graphics layer which operates in a similar way
+to the first. See the VCLayerWrite and LayerVC2 variables below for more
+details.
+
+!!! New !!! 
+VCBox(x coordinate1, y coordinate1, x coordinate2, y coordinate2);
+------------------------------------------------------------------
+Example: VCBox(104,101,314,194);
+This draws a bordered translucent blue box (like the one that the default
+menus use) on the VC layer. The first set of coordinates specified will be 
+the upper left corner of the box, and the second set will be the lower 
+right corner.
+
+!!! New !!! 
+VCCharName(x coordinate, y coordinate, party.dat index, align);
+VCItemName(x coordinate, y coordinate, items.dat index, align);    
+VCItemDesc(x coordinate, y coordinate, items.dat index, align);    
+VCSpellName(x coordinate, y coordinate, magic.dat index, align);    
+VCSpellDesc(x coordinate, y coordinate, magic.dat index, align);    
+---------------------------------------------------------------
+Example: VCCharName(20,30,1,0);
+This command will use the small font to print a text string directly onto
+the VergeC graphic layer. The align flag is used to determine how the x
+coordinate is used. A value of zero will print the text as "left 
+justified", 1 will print the text centered around the x coordinate and a 
+value of 2 will print the text as "right justified".
+  VCCharName will print the name of the character specified.
+  VCItemName will print the name of the item specified.
+  VCItemDesc will print the description of the item specified.
+  VCSpellName will print the name of the spell specified.
+  VCSpellDesc will print the description of the spell specified.
+
+!!! New !!! 
+VCItemImage(x coordinate, y coordinate, items.dat index, greyflag);
+-------------------------------------------------------------------
+Example: VCItemImage(30,40,2,0);
+This will draw the icon of the item specified onto the VC layer at the 
+given coordinates. A value of 1 for greyflag will greyscale the image. 
+Use a value of 0 for greyflag to display the image normally.
+
+!!! New !!!
+VCSpellImage(x coordinate, y coordinate, items.dat index, greyflag);
+-------------------------------------------------------------------
+Example: VCSpellImage(30,40,2,0);
+This will draw the icon of the spell specified onto the VC layer at the 
+given coordinates. A value of 1 for greyflag will greyscale the image. 
+Use a value of 0 for greyflag to display the image normally.
+
+!!! New !!!
+VCTextBox(x coordinate, y coordinate, pointer, "choice1","choice2",..);
+-----------------------------------------------------------------------
+Example: TextMenu(4,4,0,0,"Item", "Equip", "Magic","Status","Order","Tactic");
+This command will print a list of text at the given coordinates. If pointer is
+set a value n other than 0 then the pointer will be drawn next to the nth item
+in the list. You can have as many items listed as you like provided that the
+menu does not go off the boundaries of the screen.
+
+!!! New !!! 
+VCCr2(x coordinate, y coordinate, roster order index, greyflag);
+----------------------------------------------------------------
+Example: VCr2(4, 4, 1, 0);
+This will draw the CR2 associated with the character in the given party roster
+order onto the VC layer at the given coordinates. It will be drawn normally 
+with a greyflag value of 0. A value of 1 for greyflag will greyscale the CR2.
+
+!!! New !!! 
+VCSpc(x coordinate, y coordinate, speech portrait, greyflag);
+-------------------------------------------------------------
+Example: VCSpc(10, 20, 1, 0);
+This will draw the specified speech portrait onto the VC layer at the
+given coordinates. It will be drawn normally with a greyflag value of 0.
+A value of 1 for greyflag will cause the speech portrait to be greyscaled.
+
+VCPutPCX("pcx file name", x coordinate, y coordinate);
+------------------------------------------------------
+Example: VCPutPCX("DRAGON.PCX",125,50);
+This will load the specified PCX image file and paste it onto the VergeC
+graphic layer. Note that the image will not be immediately visible unless
+the VergeC layer has been turned on. See Variables in Chapter 2 below.
+Since this accesses the disk, it is recommended that you only use this
+command for single images that are to be loaded once, as opposed to small
+images that are loaded several times in animation sequences.
+
+VCLoadPCX("pcx file name", memory offset);
+------------------------------------------
+Example: VCLoadPCX("FIREBALL.PCX",256);
+This will load an image into the VergeC graphic layer's memory buffer. Once
+the image is loaded, it can be dispayed with Blit commands many times rapidly
+without having to access the disk each time. The memory offset is the
+'location' in memory in which to store the image. One must be careful to
+not overlap the offsets and jumble up the loaded images. If you multiply
+the X dimension and Y dimension of your image, you will discover the size
+of the buffer you need to allocate for your image. For example, if you
+load a 16x16 PCX at memory offset 0, your next image should use memory
+offset 256(16x16=256).
+
+VCBlitImage(x coordinate, y coordinate, width, height, memory offset);
+----------------------------------------------------------------------
+Example: VCBlitImage(200,85,16,16,256);
+This will display an image that has been previously stored using the
+VCLoadPCX command. Specify where on the screen you wish the image to be
+displayed, the size of the image, and at what memory offset you stored the
+image in your previous VCLoadPCX command. Rendering images in this manner
+is done directly from memory, and will thus be much cleaner and faster than
+loading disk files with VCPutPCX.
+
+VCTBlitImage(x coordinate, y coordinate, width, height, memory offset);
+-----------------------------------------------------------------------
+Example: VCTBlitImage(200,85,16,16,256);
+This works just like VCBlitImage, but draws the picture 'transparently' over
+both the map layers and the VergeC graphic layer itself, so that transparent
+pixels will be ignored and will not 'destroy' currently rendered VergeC
+graphic layer images.
+
+VCText(x coordinate, y coordinate, "message");
+----------------------------------------------
+Example: VCText(80,92,"A long, long time ago...");
+This command will use the small font to print a text message directly onto
+the VergeC graphic layer. The message should not exceed 40 characters.
+
+VCCenterText(y coordinate, "message");
+--------------------------------------
+Example: VCCenterText(92,"A long, long time ago...");
+This command is similar to VCText, but centers the message horizontally, so
+only a Y coordinate is required.
+
+VCTextNum(x coordinate, y coordinate, number);
+----------------------------------------------
+Outputs the value of the specified number; good for testing the value of a
+flag or something.
+
+!!! New !!! 
+VCATextNum(x coordinate, y coordinate, number, align);
+------------------------------------------------------
+Example: VCATextNum(20,30,a,0);
+This is like the regular VCTextNum except that setting the align flag to
+1 will center the text around the x coordinate while setting align to 2
+will right justify the text.
+
+VCClear();
+----------
+This command will clear all current contents of the VergeC graphic layer.
+
+!!! New !!!
+VCLine(x coordinate1, y coordinate1, x coordinate2, y coordinate2, color);
+----------
+This command draws a line between the first x and y coordinates and the
+second coordinates in the color specified, onto the vc layer.
+
+VCClearRegion(x coordinate1, y coordinate1, x coordinate2, y coordinate2);
+----------------------------
+Example: VCClearRegion(45,50,80,165);
+This command will clear a rectangular region of the VergeC graphic layer.
+The first set of coordinates specified will be the upper left corner of the
+region, and the second set will be the lower right corner.
+
+VCLoadRaw(filename, vc data buf offset, file start offset, length);
+-------------------------------------------------------------------
+Loads raw data from a file into the VC data buffer.
+
+Screen[x,y]
+-----------
+Type: read/write
+Value: Simple is the pixel value of the specified pixel on the VC layer.
+
+--------------------------------------------------------------------------
+
+Section 9: Entities
+
+Controlling entities with VergeC is morely a matter of variables than
+commands, however, there are several core commands which you will want to
+get very familiar with:
+
+PartyMove(movement script);
+---------------------------
+This makes the party move along the specified scripted path. It can use any
+valid movement script commands besides 'B' (loop) or 'S' (call VC script).
+This command is MUCH easier to make the party follow a complex path than using
+the old hacked method of overriding user controls.
+
+EntityMove(entity number, movement script);
+-------------------------------------------
+This feeds the specified movement script into the entity's brain. Unlike
+PartyMove, the entity does not start the movement right away; the entity will
+not begin moving until either the script aborts and control is returned to the
+main engine or until a Wait() command is issued. So, if you use
+EntityMove(5,"U3 D3"); and you want the script to pause until the entity
+has completed that movement, then you could use:
+While (movecode[5]) { Wait(10); }   Once the entity has completed it's course,
+the script would resume. . Like PartyMove, you cannot use the 'B' (loop)
+command.
+
+EntityMoveScript(entity number, map movement script index number);
+------------------------------------------------------------------
+This sets the Entity's active movement script to the specific script index of
+the map's script. Advantage over EntityMove: You can use any of the normal
+commands, including looping.
+
+AutoOn()/AutoOff();
+-------------------
+What's that, you say? You've mastered EntityMove and PartyMove, but there's one
+problem: How do you make specific members of the party move around
+individually? This is where AutoOn() and AutoOff() come in!
+
+When you call AutoOn(), it sets drawparty to zero, so the REAL party disappears.
+Then it makes 'copies' of the active party in entity slots 95 through 100.
+You see, you should NEVER try to manipulate directly entities 0 through 4 besides
+simple things like facing and specframe. Once you've called AutoOn tho, you can
+use all of the various entity commands and variables on entities 95 through 100
+which are clones of the party; if done correctly, there is no visible way to
+tell if you are looking at the real party or the clones. Be sure to call
+AutoOff() when you're done with them, however, or bad things will happen. :)
+
+The following variables are key in manipulating how entities behave:
+
+SpecialFrame(entity)
+--------------------
+Type: Read/Write
+Value: This sets the active frame number (0-29) of entity, mostly used to
+       display their optional frames. Set it to zero when you want the frame
+       to return to normal.
+
+Face(entity)
+------------
+Type: Read/Write
+Value: Sets the facing value for the specified entity.
+
+Speed(entity)
+-------------
+Type: Read/Write
+Value: This is the speed the entity moves at. Normal player speed is 4. Valid
+       values are 1 through 7. Altering the speed of entity 0 alters the active
+       speed of the party.
+
+MoveCode(entity)
+----------------
+Type: Read/Write
+Value: This is the Movement Code from the entity editor; ie, 0 for stopped,
+       1 for Wander1, 4 for Scripted, etc.
+
+ActiveMode(entity)
+------------------
+Type: Read/Write
+Value: 0=Entity needs to be "activated" in order for it's script to be called.
+       1=Entity will activate itself when it is in the tile adjacent to the
+         party leader.
+
+ObsMode(entity)
+---------------
+Type: Read/Write
+Value: 0=Obstructed by map obstructions, other entities, the player, etc.
+       1=Ignores all obstructions.
+
+Entity.Moving(entity)
+---------------------
+Type: Read only
+Value: zero if stopped, nonzero if the entity is currently moving.
+
+Entity.CHRindex(entity)
+-----------------------
+Type: Read/Write
+Value: Sets the active CHR number associated with the specified entity.
+
+Entity.Step(entity)
+-------------------
+Type: Read/Write
+Value: Sets how many steps will be taken before Entity.Delay occurs.
+
+Entity.Delay(entity)
+--------------------
+Type: Read/Write
+Value: The delay in ms (before adjusting for entity speed) that will occur
+      in between the entity taking Entity.Step steps.
+
+Entity.LocX(entity)
+-------------------
+Type: Read/Write
+Value: The x-axis location of the entity.
+
+Entity.LocY(entity)
+-------------------
+Type: Read/Write
+Value: The y-axis location of the entity.
+
+Entity.Face(entity)
+-------------------
+Type: Read/Write
+Value: Toggles the "face player upon activation" flag of the entity.
+
+Entity.Chasing(entity)
+----------------------
+Type: Read/Write
+Value: If 1, the entity will begin chasing the player when it is within
+       Entity.Chasedist tiles of the player.
+
+Entity.ChaseDist(entity)
+------------------------
+Type: Read/Write
+Value: Controls how close the player must be to the entity before it begins
+       chasing him.
+
+Entity.ChaseSpeed(entity)
+-------------------------
+Type: Read/Write
+Value: Determines the speed at which the entity will chase the player.
+
+--------------------------------------------------------------------------
+
+Section 10: The Startup Script
+
+There are a few things to remember when using startup.vc. First of all, you
+should NEVER use Wait() in startup.. Instead, use Delay(ms); There is no map,
+no party, no entities, so do not use any of those variables / commands or you
+will screw things up pretty good. :) 
+
+!!! New !!!
+You can now use the VC layer in your startup.vc file. To do this you should
+use Redraw() instead of VGAdump. Also remember to make the VC layer you are 
+drawing to visible. 
+Note: Unless you use Sys_DisplayPCX followed by a FadeIn at the start of your
+      script the palette will not be set and your colors will be messed up.
+
+Sys_ClearScreen();
+------------------
+Clears the screen. :)
+
+Sys_DisplayPCX("filename.pcx");
+-------------------------------
+Loads the specified 320x200 PCX into the virtual screen.
+
+OldStartupMenu();
+-----------------
+For those of you who don't want to use your OWN startup menu, you can just
+let the old one do the work for you. You have a bit more flexibility coding
+your own however.
+
+VGAdump();
+----------
+Anything you do to the screen in startup.vc, such as a Sys_DisplayPCX, won't
+actually happen to the screen until you copy the virtual screen to the real
+screen, using this command.
+
+NewGame("mapfile.map");
+-----------------------
+Starts a new game, loading the specified map as the starting point.
+
+LoadMenu();
+-----------
+Executes the Load Game menu.
+
+!!! New !!! 
+BindKey(key code, script number);
+---------------------------------
+Example: BindKey(15, 1);
+This command will cause the specified script number in startup.vcs to be run 
+when the key referred to by key code is pressed. This can be used for calling 
+custom menus and/or giving extra actions to the player. To cancel a bound key
+pass a script number of zero (eg BindKey(15,0);). See Setup.doc for a list of
+key codes.
+
+--------------------------------------------------------------------------
+
+Chapter 2: Variables
+--------------------
+
+These are the various game variables that VERGE uses in its normal execution.
+You may read, and sometimes write, values of these variables in your
+VergeC events. Below is a brief description of each:
+
+!!! New !!! 
+FontColor
+---------
+Type: Read/Write
+Value: This variable controls what color all subsequent text in the small font 
+       will be drawn as. This affects the built-in menus so be careful. 
+       Defaults to 31.
+
+!!! New !!! 
+KeepAZ
+------
+Type: Read/Write
+Value: This variable is included for compatibility. It controls whether or not
+       CallEvent saves and restores the temporary variables like the new 
+       CallEffect and CallScript commands do. By default this variable is set
+       to 0 to preserve compatibility with previous VC scripts. 
+
+Numchars
+--------
+Type: Read only
+Value: Equal to the number of the characters currently in the party
+
+GP
+--
+Type: Read/write
+Value: The amount of money the party currently has
+
+LocX
+----
+Type: Read only
+Value: The horizontal location of the party leader in the current map
+
+LocY
+----
+Type: Read only
+Value: The vertical location of the party leader in the current map
+
+Timer
+-----
+Type: Read/write
+Value: This variable increases by 1 every 100th of a second. It is most
+       commonly set to 0 before running a script that involves it.
+
+DrawParty
+---------
+Type: Read/write
+Value: If this value is 1, the characters are drawn on the screen. If it is
+       0, the party is invisible. This variable has a default value of 1.
+
+DrawEntities
+------------
+Type: Read/Write
+Value: Defaults to 1. When on, the entities are drawn. If it's zero, they are
+       invisible.
+
+CameraTracking
+--------------
+Type: Read/write
+Value: If this value is 1, the screen will follow the player's movements. If
+       it is 0, then the camera will not follow the party, and the XWin and
+       YWin variables may be altered.
+
+ForegroundLock
+--------------
+Type: Read/Write
+Value: Defaults to 1; that is, the foreground simply follows the background,
+       with parallax adjustment if applicable. If you turn this off, however,
+       you can independently scroll the foreground with the Xwin1/ywin1
+       variables.
+
+XWin
+----
+Type: Read/write
+Value: This is the horizontal offset of the screen when CameraTracking is
+       off, in single pixels, ie. Saying XWin-=10 would make the screen's
+       'focus' jump 10 pixels to the left.
+
+YWin
+----
+Type: Read/write
+Value: This is the vertical offset of the screen when CameraTracking is off.
+
+XWin1/Ywin1
+-----------
+Same as xwin/ywin, but refer to the foreground layer specifically. (Only work
+if foregroundlock is zero)
+
+B1,B2,B3,B4
+-----------
+Type: Read/Write
+Value: These are the variables that keep track of which buttons the player
+       has depressed. When the button is depressed, it is assinged a value of
+       1. Alternately, if a VergeC event assigns a button variable a value of
+       1, the game will behave as though the player has pressed the button.
+
+Up,Down,Left,Right
+------------------
+Type: Read/Write
+Value: These are the variables the keep track of which directional controls
+       the player is using. Setting these values to 1 will cause the player
+       to move in the specified direction.
+
+TimerAnimate
+------------
+Type: Read/Write
+Value: This variable should ONLY be set to 1 during animations that would
+       otherwise halt tile animations. Be sure to reset the value of this
+       variable to 0 after the animation is completed.
+
+CurZone
+-------
+Type: Read Only
+Value: Returns the current zone number the player is in.
+
+TileB
+-----
+Type: Read Only
+Value: Returns the tile index number the party leader is standing on (for the
+       background layer).
+
+TileF
+-----
+Type: Read Only
+Value: Returns the tile index number the party leader is standing on (for the
+       foreground layer).
+
+Fade
+----
+Type: Read/Write
+Value: This variable controls whether or not Warps, MapSwitches, and other
+       system fades like the Save/Load menu use fade-outs and fade-ins. It
+       is set to 1 by default.
+
+CancelFade
+----------
+Type: Read/Write
+Value: This is a bit different from fade: It doesn't turn fades on or off,
+       rather, if you were to just say "cancelfade++", then the next fade and
+       the next fade only would be cancelled. You could say Cancelfade+=3 and
+       the next 3 fades would be aborted. This is much nicer for the purposes
+       of Autoexecs and things than Fade is, since you don't need to turn it
+       off afterwards.
+
+Layer0
+------
+Type: Read/Write
+Value: This controls if the background layer is visible. It is set to 1 by
+       default.
+
+Layer1
+------
+Type: Read/Write
+Value: This controls if the foreground layer is visible. It is set to 1 by
+       default.
+
+!!! New !!! 
+VCLayerWrite
+------------
+Type: Read/Write
+Value: This sets which VC layer subsequent VC layer commands (eg VCPutPCX) will
+       draw to. It is set to 1 by default and has the following values:
+       VCLayerWrite=1 - all subsequent vc layer commands are drawn to the first
+                        VC layer.
+       VCLayerWrite=2 - all subsequent vc layer commands are drawn to the second
+                        VC layer.
+
+LayerVC
+-------
+Type: Read/Write
+Value: This controls if the first VergeC graphic layer is visible. Unlike 
+       Layers 0 and 1, it is set to default 0. You should set this value to 0
+       whenever the VergeC graphic layer is not necessary. It has the following
+       values:
+       LayerVC=1 draws the first VC layer on top of everything else.
+       LayerVC=2 draws it under the foreground layer but on top of the chars
+       LayerVC=3 draws it under both the foreground and the characters.
+
+!!! New !!!
+LayerVC2
+--------
+Type: Read/Write
+Value: This controls if the second VergeC graphic layer is visible. It is drawn
+       on top of the first layer if both layers are visible. Unlike Layers 0 and
+       1, it is set to default 0. You should set this value to 0 whenever the 
+       second VergeC graphic layer is not necessary. It has the following values:
+       LayerVC2=1 draws the second VC layer on top of everything else.
+
+Quake
+-----
+Type: Read/Write
+Value: This variable can be used to control perpetual earthquakes. When it is
+       set to 1, the screen will shake continuously using the QuakeX and
+       QuakeY variables until the Quake variable is set to 0.
+
+QuakeX, QuakeY
+--------------
+Type: Read/Write
+Value: These two variables control the horizontal and vertical intensities,
+       respectively, of perpetual earthquakes that are performed when the
+       Quake variable is set to 1.
+
+ScreenGradient
+--------------
+Type: Read/Write
+Value: This variable controls if the alternate gradients invoked through
+       MapPaletteGradient commands are in operation. Setting this value to
+       0 will restore normal screen colors.
+
+ParallaxC
+---------
+Type: Read/Write
+Value: This is the current map's parallax control mode(0-3). Refer to
+       VERGEDOC.TXT Chapter 1 to see how this affects your map layers.
+
+PMultX, PDivX
+-------------
+Type: Read/Write
+Value: This is the multiplier and divisor that determines your map's parallax
+       scrolling speeds when the player is moving horizontally.
+
+PMultY, PDivY
+-------------
+Type: Read/Write
+Value: This is the multiplier and divisor that determines your map's parallax
+       scrolling speeds when the player is moving vertically.
+
+Volume
+------
+Type: Read/Write
+Value: This is the current music volume(0-100).
+
+!!! New !!!
+ModPosition
+-----------
+Type: Read/Write
+Value: This is the current position in the MOD/S3M/XM currently playing.
+
+ATK, DEF, HIT, DOD, MAG, MGR, REA, MBL, FER (party.dat index)
+-------------------------------------------------------------
+All of these variables take a party.dat index, and will return the current
+stat value for the specified stat / party member, post equipment modifiers.
+Read only.
+
+layer1trans, layervctrans, layervc2trans
+----------------------------------------
+These control the transparency settings for the foreground layer and VC
+graphics layer. For each variable, the settings are as follows:
+0=no transparency (opaque) 1=standard transparency 2=inverse-order transparency
+
+FUNCTIONS
+=========
+
+Obs(x,y)
+_________
+Value: This variable returns the obstruction value (0 or 1) of the map square
+       (x,y). 1 is obstructed, 0 is clear.
+
+Facing(direction)
+-----------------
+Value: This variable returns a value depending on which direction the party
+       leader is facing. Down=0, Up=1, Right=2, Left=3.
+
+Char(party.dat index)
+---------------------
+Value: This returns the party roster order of the specified character, or a
+       value of 0 if they are not in the current party.
+
+Item(items.dat index)
+---------------------
+Value: This returns a 1 if the party has the specified item, or a 0 if they
+       do not.
+
+Items(party.dat index, inventory slot)
+--------------------------------------
+Value: Returns the item index value for the specified inventory slot for the
+       specified character. Note: slots 0 through 5 are the equipment slots,
+       6 up are the item slots.
+
+!!! New !!!
+Spell(magic.dat index)
+---------------------
+Value: This returns a 1 if the party has the specified spell, or a 0 if they
+       do not.
+
+!!! New !!!
+Spells(party.dat index, magic slot)
+--------------------------------------
+Value: Returns the magic index value for the specified magic slot for the
+       specified character. 
+
+PartyIndex(roster order index)
+------------------------------
+Value: This will return the PARTY.DAT index of the character in the specified
+       party position. This is most useful if your speech portraits
+       correspond to your PARTY.DAT indices, and you can use this function
+       to, for example, make the party leader say something.
+
+XP(character)
+-------------
+Value: This will return the number of experience points the specified
+       character has earned.
+
+CurHP(character), MaxHP(character)
+----------------------------------
+Value: These functions return the values of the specified character's current
+       Hit Point total and maximum Hit Point total respectively.
+
+CurMP(character), CurMP(character)
+----------------------------------
+Value: These functions return the values of the specified character's current
+       Magic Point total and maximum Magic Point total respectively.
+
+Random(minimum, maximum)
+------------------------
+Value: This function will return a random value between the minimum and
+       maximum values provided.
+
+!!! New !!! 
+Item.Use(items.dat index)
+-------------------------
+Value: This returns how the item can be used as set in ITEMS.DAT.
+       Returned values are:
+         0 for nonusable.
+         1 for usable once, then it goes away.
+         2 for usable an infinite number of times.
+         3 for usable ONLY camped, only once.
+         4 for usable ONLY camped, infinitely
+         5 for usable in combat only, once, then it goes away.
+         6 for usable in combat only, indefinetly.
+
+!!! New !!!
+Spell.Use(magic.dat index)
+-------------------------
+Value: This returns how the magic can be used as set in MAGIC.DAT.
+       Returned values are:
+         2 for usable an infinite number of times.
+         4 for usable ONLY camped, infinitely
+         6 for usable in combat only, indefinetly.
+
+!!! New !!! 
+Item.Effect(items.dat index)
+----------------------------
+Value: This returns the number of the effect script associated with the given
+       item.
+
+!!! New !!!
+Spell.Effect(magic.dat index)
+----------------------------
+Value: This returns the number of the effect script associated with the given
+       spell.
+
+!!! New !!! 
+Item.Type(items.dat index)
+--------------------------
+Value: This returns the type of the given item as set in ITEMS.DAT.
+       Returned values are:
+         0 for OS. (Own Self)
+         1 for 1A. (One Ally)
+         2 for AA. (All Allies)
+         3 for 1E. (One Enemy)
+         4 for AE. (All Enemy)
+
+!!! New !!!
+Spell.Type(magic.dat index)
+--------------------------
+Value: This returns the type of the given magic as set in MAGIC.DAT.
+       Returned values are:
+         0 for OS. (Own Self)
+         1 for 1A. (One Ally)
+         2 for AA. (All Allies)
+         3 for 1E. (One Enemy)
+         4 for AE. (All Enemy)
+
+!!! New !!! 
+Item.EquipType(items.dat index)
+-------------------------------
+Value: This returns the how the given item is equipped, as set in ITEMS.DAT.
+       Returned values are:
+         0 if it is nonequipable by anyone.
+         1 Equipment is right-hand (weapon)
+         2 Equipment is left-hand (shield)
+         3 Equipment is armor
+         4 Equipment is helmet
+         5 Equipment is acc1
+         6 Equipment is acc2
+
+!!! New !!! 
+Item.EquipIndex(items.dat index)
+--------------------------------
+Value: This returns the index in EQUIP.DAT that is associated with the given
+       item as set in ITEMS.DAT.
+
+!!! New !!! 
+Item.Price(items.dat index)
+---------------------------
+Value: This returns the cost of the given item.
+
+!!! New !!!
+Spell.Price(magic.dat index)
+---------------------------
+Value: This returns the cost in money of the given spell.
+
+!!! New !!!
+Spell.Cost(magic.dat index)
+---------------------------
+Value: This returns the cost in mp of the given spell.
+
+!!! New !!! 
+LVL(party.dat index)
+--------------------
+Value: This returns the given character's current level.
+
+!!! New !!! 
+NXT(party.dat index)
+--------------------
+Value: This returns the amount of XP needed for the given character to advance
+       a level.
+
+!!! New !!! 
+CharStatus(party.dat index)
+---------------------------
+Value: This returns the given character's current status. As yet it isn't
+       actually used in-game.
+
+!!! New !!! 
+CanEquip(party.dat index, item.dat index)
+-----------------------------------------
+Value: Returns 1 if the given character can equip the given item otherwise it
+       returns 0.
+
+!!! New !!! 
+ChooseChar(x,y)
+---------------
+Value: This pops up a menu listing the current members of your party and will 
+       return the party roster index of the character chosen or 0 if the menu
+       is cancelled.
+
+Key(key code)
+-------------
+Type: Read/Write
+Value: This indicates whether the given key is depressed, for which it will
+       have a value of 1. 
+
+VCDataBuf(memory offset)
+------------------------
+Type: Read/Write
+Value: This holds the value in the VC memory buffer at the given offset. Take
+       care not to exceed the size of the buffer when specifying the offset.
+

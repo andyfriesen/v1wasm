@@ -1,0 +1,350 @@
+event /* 0 */
+{
+ flags[151]=0;
+ EnforceAnimation();
+ CallEvent(15,2,15,6);
+ CallEvent(15,82,31,5);
+ CallEvent(15,83,24,23);
+ CallEvent(17);
+ if(!flags[81])
+ {
+  AlterBTile(9,24,54,2);
+  AlterBTile(10,23,58,2);
+ }
+ if(flags[81]=1)
+ {
+  AlterBTile(9,24,482,2);
+  AlterBTile(10,23,468,2);
+ }
+ if(flags[81]=2)
+ {
+  AlterBTile(9,24,55,2);
+  AlterBTile(10,23,474,2);
+ }
+
+ if(flags[52])
+ {
+  AlterBTile(47,1,424,2);
+ }
+ if(flags[85])
+ {
+  AlterBTile(15,14,54,2);
+ }
+ if(flags[86])
+ {
+  AlterBTile(16,12,54,2);
+ }
+ if(flags[87])
+ {
+  AlterBTile(16,16,54,2);
+ }
+}
+
+event /* 1 */
+{
+// ChainEvent(14,2,15,6,1);
+  if (!flags[2])
+  {
+    SoundEffect(3);
+    Banner("Found 400 GP!",3);
+    GiveGP(400);
+    AlterBTile(15,6,35,2);
+    flags[2]=1;
+  }
+
+}
+
+event /* 2 */
+{
+ ChainEvent(16,85,15,14);
+}
+
+event /* 3 */
+{
+ soundeffect(6);
+ if(!flags[81])
+ {
+  BoxFadeOut(25);
+  Warp(26,11,1);
+  BoxFadeIn(25);
+ }
+ if(flags[81]=1)
+ {
+  BoxFadeOut(25);
+  Warp(33,3,1);
+  BoxFadeIn(25);
+ }
+ if(flags[81]=2)
+ {
+  BoxFadeOut(25);
+  Warp(18,28,1);
+  BoxFadeIn(25);
+ }
+}
+
+event /* 4 */
+{
+ soundeffect(6);
+ BoxFadeOut(25);
+ warp(9,23,1);
+ BoxFadeIn(25);
+}
+
+event /* 5 */
+{
+ mapswitch("ISLAND.MAP",33,38,0);
+}
+
+event /* 6 */
+{
+ mapswitch("TEST.MAP",4,8,0);
+}
+
+event /* 7 */
+{
+ mapswitch("ISLAND.MAP",24,16,0);
+}
+
+event /* 8 */
+{
+ if(!flags[52])
+ {
+  stext(5,"Well, this looks like the",
+          "place; the legendary resting",
+          "grounds of the Cyclops'.");
+  stext(4,"In the ages past, they",
+          "defended the land from evil.","");
+  stext(2,"Looks like this one has the",
+          "Pearl of Truth stuck in its",
+          "eye socket.");
+  SoundEffect(7);
+  AlterBTile(47,1,424,2);
+  stext(2,"Wee! It just pops right out.",
+          "That was certainly easy.","");
+  SoundEffect(10);
+  GiveItem(24);
+  stext(1,"Yeah, a little *too* easy.","","");
+  stext(5,"Aggh! My head! Too much...",
+          "information... being crammed",
+          "into brain...");
+  stext(4,"Galfrey! What's the matter?","","");
+  stext(5,"The Pearl is filling my mind",
+          "with insight... I can see",
+          "it all so clearly now!");
+  stext(5,"The Pearl told me that Lord",
+          "Stan is my true enemy! He's",
+          "been using me!");
+  stext(5,"I thought he truly cared for",
+          "me, but he's just been using",
+          "me for bullying duty!");
+  stext(5,"Darin, please let me join you",
+          "to Castle Heck. We fight the",
+          "same enemy. It's personal now!");
+  stext(1,"Yes, Galfrey. You see the",
+          "truth!Lord Stan has a big hunk",
+          "of justice coming his way!");
+  stext(5,"Grr... and now I see it was he",
+          "that locked me out of the",
+          "castle gates.");
+  stext(5,"I knew I wouldn't be so dumb",
+          "as to lock my keys in!","");
+  stext(2,"Woo hoo! It looks as though we",
+          "will be able to save this land",
+          "from tyranny after all!");
+  stext(4,"Come with us, Galfrey. Now",
+          "is the time when we will bring",
+          "peace to this wonderful land!");
+  stext(1,"Let's go, team! We shall",
+          "conquer for the forces of",
+          "goodness and light!");
+  flags[52]=1;
+ }
+}
+
+event /* 9 */
+{
+ ChainEvent(16,86,16,12);
+}
+
+event /* 10 */
+{
+ ChainEvent(16,87,16,16);
+}
+
+event /* 11 */
+{
+ soundeffect(3);
+ flags[81]+=1;
+ if(flags[81]=3)
+ {
+  flags[81]=0;
+ }
+ if(!flags[81])
+ {
+  AlterBTile(9,24,54,2);
+  AlterBTile(10,23,58,2);
+ }
+ if(flags[81]=1)
+ {
+  AlterBTile(9,24,482,2);
+  AlterBTile(10,23,468,2);
+ }
+ if(flags[81]=2)
+ {
+  AlterBTile(9,24,55,2);
+  AlterBTile(10,23,474,2);
+ }
+ WaitKeyUp();
+}
+
+event /* 12 */
+{
+ ChainEvent(14,82,31,5,2);
+}
+
+event /* 13 */
+{
+ ChainEvent(14,83,24,23,2);
+}
+
+event /* 14 */                                      // Master Chest Script
+{
+ if(!flags[var(0)])
+ {
+  soundeffect(3);
+  AlterBTile(var(1),var(2),35,2);
+  GiveItem(var(3));
+  flags[var(0)]=1;
+ }
+}
+
+event /* 15 */                                      // Master Chest Auto-Exec
+{
+ if(flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),35,2);
+ }
+}
+
+event /* 16 */                                     // Master Lever Script
+{
+ if(!flags[var(0)])
+ {
+  SoundEffect(3);
+  AlterBTile(var(1),var(2),54,2);
+  flags[var(0)]=1;
+  flags[84]+=1;
+  ChainEvent(17);
+ }
+}
+
+event /* 17 */                                  // Gate Image Tester
+{
+ if(flags[84]=1)
+ {
+  AlterBTile(13,14,481,1);
+ }
+ if(flags[84]=2)
+ {
+  AlterBTile(13,14,480,1);
+ }
+ if(flags[84]=3)
+ {
+  AlterBTile(13,14,57,0);
+ }
+}
+
+event /* 18 */
+{
+ if(flags[88])
+ {
+  if(!flags[150])
+  {
+   prompt(0,"Do you want to turn fake",
+            "battle sounds off?","",150,"No","Yes");
+   stext(0,"Be careful, you guys! See you",
+           "all later.","");
+   return;
+  }
+  if(flags[150])
+  {
+   prompt(0,"Do you want to turn fake",
+            "battle sounds back on?","",150,"Yes","No");
+  }
+  stext(0,"Be careful, you guys! See you",
+          "all later.","");
+  a==numchars;
+  if(a=1)
+  {
+   stext(1,"Guys...? Um, I'm the only one",
+           "in the group right now, Bert.","");
+  }
+  return;
+ }
+ stext(0,"Hi, there! My name is Bert",
+         "Stingray and I'm here to tell",
+         "you about fake battles!");
+ if(char(4))
+ {
+  stext(4,"Hahn sure has a thing for",
+          "helpful, talkative marine",
+          "life, doesn't he?");
+ }
+ stext(0,"As you walk in hostile areas,",
+         "you'll hear sounds. This",
+         "indicates a 'battle' of sorts.");
+ stext(0,"You'll lose some HP and gain",
+         "some XP to simulate the effect",
+         "of combat.");
+ stext(0,"Don't worry, this WILL be",
+         "replaced by a more enjoyable",
+         "and interesting battle system.");
+ stext(0,"This is just to show off the",
+         "effects of event chance and",
+         "delay, items, and level ups.");
+ stext(1,"This sounds pretty scary. We",
+         "just lose HP for no reason?","");
+ if(char(4))
+ {
+  stext(4,"No problem, Darin. I can",
+          "just use my powerful healing",
+          "magic to keep us alive.");
+  stext(0,"Sorry, babe. Vecna hasn't",
+          "gotten to magic yet. You are",
+          "powerless! Mwa ha ha!");
+  stext(4,"Eek! You're right. Oh, well.",
+          "Good thing there's some extra",
+          "herbs in this cave.");
+ }
+ stext(1,"Thanks, Bert. We'll catch up",
+         "with you later.","");
+ flags[88]=1;
+}
+
+
+event /* 19 */
+{
+ soundeffect(7);
+ Timer=0;
+ Wait(5);
+ While(Timer<100 and Timer>4)
+ {
+  PaletteMorph(63,63,63,100-Timer,63);
+ }
+ Banner("Save Point",3);
+ EnableSave();
+}
+
+event /* 20 */
+{
+ DisableSave();
+}
+
+event /* 21 */
+{
+ if(!flags[150])
+ {
+  SoundEffect(8);
+ }
+ FakeBattle();
+}

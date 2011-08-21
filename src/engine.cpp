@@ -279,7 +279,7 @@ void load_map(char* fname) {
 
     map = vopen(fname, "rb");
     if (!map) {
-        err("Could not open specified MAP file.");
+        err("Could not open specified MAP file %s.", fname);
     }
 
     vread(&b, 1, 1, map);
@@ -291,10 +291,8 @@ void load_map(char* fname) {
     vread(musname, 1, 13, map);
 
     vread(&layerc, 1, 1, map);
-    vread(&pmultx, 1, 1, map);
-    pmulty = pmultx;
-    vread(&pdivx, 1, 1, map);
-    pdivy = pdivx;
+    vread(&pmultx, 1, 1, map); pmulty = pmultx;
+    vread(&pdivx, 1, 1, map);  pdivy = pdivx;
 
     vread(levelname, 1, 30, map);
 
@@ -315,7 +313,7 @@ void load_map(char* fname) {
         err("*error* MAP compression not yet supported.");
     }
 
-    vread(map0, 1, 27, map); // skip buffer
+    vseek(map, 27, SEEK_CUR); // skip buffer
 
     // -- aen; 30/May/98 -- dynamic map mem allocation
     // free previously allocate layer/info map mem (if necessary)

@@ -1,0 +1,447 @@
+event /* 0 */
+{
+ flags[151]=0;
+ EnforceAnimation();
+ if(flags[35])
+ {
+  AlterBTile(25,19,195,1);
+  AlterBTile(26,19,195,1);
+  AlterBTile(27,19,195,1);
+ }
+ if(flags[36])
+ {
+  AlterBTile(32,21,0,0);
+ }
+ if(flags[45])
+ {
+  Entity.LocX[6]-=20;
+  SpecialFrame[6]=25;
+ }
+ if(!Flags[45] and Char(2))
+ {
+  ChainEvent(10);
+ }
+}
+
+event /* 1 */
+{
+ warp(79,23,0);
+}
+
+event /* 2 */
+{
+ flags[115]=0;
+ HookTimer(0);
+ ScreenGradient=0;
+ AlterBTile(80,4,550,2);
+ warp(26,6,0);
+}
+
+event /* 3 */
+{
+ AlterBTile(25,19,195,1);
+ AlterBTile(26,19,195,1);
+ AlterBTile(27,19,195,1);
+ stext(3,"Oh no! The leaf patch has",
+         "collapsed beneath us!","");
+ stext(1,"Ahhhh!","","");
+ flags[35]=1;
+ mapswitch("DUNGEON.MAP",0,0,0);
+}
+
+event /* 4 */
+{
+ if(!char(2))
+ {
+  stext(3,"Darin, this rock is too heavy",
+          "for you and I to break. Let's",
+          "just leave it alone for now.");
+  return;
+ }
+ if(!flags[36] AND char(2))
+ {
+  a=char(1)+94;
+  b=char(2)+94;
+  AutoOn();
+  EntityMove(a,"X33 Y21 F3");
+  EntityMove(b,"X34 Y21 F3");
+  While(MoveCode[a])
+  {
+   Wait(20);
+  }
+  Wait(20);
+  SpecialFrame[a]=28;
+  Wait(50);
+  SpecialFrame[a]=0;
+  Wait(30);
+  Face[a]=0;
+  Wait(30);
+  Face[a]=2;
+  SText(1,"Sara, this rock is pretty",
+          "heavy. I don't think we can",
+          "break it.");
+  SpecialFrame[b]=22;
+  SText(2,"Sheesh! Men always give up",
+          "so easily.","");
+  SpecialFrame[b]=0;
+  EntityMove(b,"D1 L1 F1");
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  Face[a]=0;
+  SText(2,"Clear the runway!","","");
+  SpecialFrame[a]=21;
+  EntityMove(a,"U1 F0");
+  EntityMove(b,"U1");
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  SpecialFrame[a]=0;
+  EntityMove(b,"R6 F0 W30 F3");
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  stext(2,"Hieeeee-yahhh!","","");
+  Speed[b]=5;
+  SpecialFrame[b]=26;
+  EntityMove(b,"L6");
+  While(MoveCode[b])
+  {
+   Wait(5);
+  }
+  soundeffect(19);
+  AlterBTile(32,21,0,0);
+  For(x,10,1,-1)
+  {
+   EarthQuake(x,0,10);
+  }
+  SpecialFrame[b]=0;
+  Face[b]=1;
+  stext(2,"Yipee! We did it.","","");
+  EntityMove(a,"D1");
+  Speed[a]=3;
+  While(MoveCode[a])
+  {
+   Wait(20);
+  }
+  AutoOff();
+  Warp(33,21,1);
+  flags[36]=1;
+ }
+}
+
+event /* 5 */
+{
+ mapswitch("TEST.MAP",42,60,0);
+}
+
+event /* 6 */
+{
+ if(!flags[37])
+ {
+  SpecialFrame[0]=23;
+  SpecialFrame[1]=23;
+  Wait(100);
+  SpecialFrame[0]=0;
+  SpecialFrame[1]=0;
+  stext(3,"There appears to be a strange",
+          "little dwelling up ahead.","");
+  stext(1,"Yeah, and where is that funky",
+          "music coming from?","");
+  flags[37]=1;
+ }
+}
+
+event /* 7 */
+{
+ HookTimer(0);
+ flags[115]=0;
+ ScreenGradient=0;
+ mapswitch("DUNGEON.MAP",25,5,0);
+}
+
+event /* 8 */
+{
+ stext(0,"Farewell my love children.",
+         "Feel free to return whenever",
+         "you want to groove to my love.");
+ Face[5]=0;
+}
+
+event /* 9 */
+{
+ SpecialFrame[6]=0;
+ stext(3,"Thanks a lot, guys. You go off",
+         "and save the world while I'm",
+         "trapped here with a funklord.");
+ stext(3,"I'll be sure to remember this",
+         "when your birthday comes,",
+         "Darin.");
+ SpecialFrame[6]=25;
+}
+
+event /* 10 */
+{
+ Redraw();
+ FadeIn(30);
+ PartyMove("R4");
+ While(MoveCode[0])
+ {
+  Wait(20);
+ }
+ a=Char(1)+94;
+ b=Char(2)+94;
+ c=Char(3)+94;
+ ObsMode[a]=1;
+ ObsMode[b]=1;
+ ObsMode[c]=1;
+ AutoOn();
+ SpecialFrame[a]=21;
+ SpecialFrame[b]=21;
+ SpecialFrame[c]=21;
+ Wait(100);
+ SpecialFrame[a]=0;
+ SpecialFrame[b]=0;
+ SpecialFrame[c]=0;
+ stext(0,"Not so fast, my prisoners of",
+         "love. You cannot leave my",
+         "humble abode!");
+ EntityMove(a,"X75 Y7 F2");
+ EntityMove(b,"X76 Y6 F2");
+ EntityMove(c,"X75 Y5");
+ While(MoveCode[b])
+ {
+  Wait(20);
+ }
+ Wait(50);
+ SpecialFrame[b]=27;
+ stext(2,"We're leaving, Big Daddy",
+         "Bubba! You can't stop me this",
+         "time!");
+ stext(0,"You're ruining my groove,",
+         "babe! Now I have no dancers",
+         "for my funky dance floor.");
+ SpecialFrame[b]=0;
+ stext(0,"I once had dozens of dancers",
+         "to boogie to the musical",
+         "langauge of love.");
+ stext(0,"But they all escaped from my",
+         "dungeon. What am I to do now?",
+         "I am incomplete without them.");
+ EntityMove(a,"R1");
+ While(MoveCode[a])
+ {
+  Wait(20);
+ }
+ stext(1,"You cannot force people to",
+         "stay here in this wretched",
+         "little cabin!");
+ stext(0,"I really do need some heart",
+         "shaped pillows and a floating",
+         "disco ball, don't I?");
+ Face[b]=0;
+ stext(2,"Darin, let's make a run for",
+         "it! Now's our chance to",
+         "escape from here!");
+ Face[b]=2;
+ stext(0,"No can do, honey babe. Nobody",
+         "can ever leave this place",
+         "unless it's groovy with me!");
+ stext(0,"Wait... the boy in the gold",
+         "headband there... I feel the",
+         "love is strong with him.");
+ SpecialFrame[c]=21;
+ Wait(50);
+ SpecialFrame[c]=23;
+ Wait(100);
+ stext(3,"What...? Me?","","");
+ SpecialFrame[c]=0;
+ stext(0,"I sense a strong soul in him.",
+         "Oh yeah... I can sense it. He",
+         "shall be the next Big Daddy!");
+ stext(0,"When my groove runs flat, I",
+         "will need an heir to carry on",
+         "the love in this Forest.");
+ stext(0,"That's my condition. Leave",
+         "the young funkmaster here and",
+         "the rest of you may leave.");
+ EntityMove(a,"D1 R1 F3");
+ EntityMove(b,"D2 F2");
+ While(MoveCode[a])
+ {
+  Wait(20);
+ }
+ CameraTracking=0;
+ d=XWin;
+ e=YWin;
+ Timer=0;
+ While(YWin<e+33)
+ {
+  YWin=e+Timer;
+  Redraw();
+ }
+ Timer=0;
+ While(XWin<d+32)
+ {
+  XWin=d+Timer;
+  Redraw();
+ }
+ Wait(50);
+ SpecialFrame[a]=28;
+ Wait(20);
+ SpecialFrame[a]=0;
+ Wait(50);
+ SpecialFrame[b]=29;
+ Wait(20);
+ SpecialFrame[b]=0;
+ Wait(50);
+ EntityMove(c,"R2 F0");
+ While(MoveCode[c])
+ {
+  Wait(20);
+ }
+ stext(3,"Come on, Darin! Let's attack!",
+         "If we fight together, I bet",
+         "we can defeat him!");
+ Face[a]=1;
+ Face[b]=1;
+ stext(1,"Actually, Dexter, Sara and I",
+         "have talked it over and we're",
+         "going to leave you here.");
+ SpecialFrame[c]=21;
+ Wait(50);
+ SpecialFrame[c]=22;
+ stext(3,"What?! You can't be serious.","","");
+ stext(2,"Look at the size of those",
+         "platforms, Dexter. He could",
+         "kick our butts!");
+ stext(1,"We know you'll do what is",
+         "best for the good of the",
+         "party, Dexter.");
+ stext(3,"This isn't very heroic, not",
+         "to mention humane.","");
+ stext(0,"That's the spirit, my young",
+         "love birds. I will instruct",
+         "Dexter in the ways of love.");
+ SpecialFrame[c]=20;
+ Wait(100);
+ SpecialFrame[c]=22;
+ stext(3,"Eek! You guys aren't helping",
+         "very much.","");
+ stext(2,"Ah, calm down Dexter. You'll",
+         "survive. We'll look you up",
+         "if we ever come back here.");
+ stext(1,"Seeya, Dex! Come on, Sara.",
+         "We have work to do!","");
+ stext(0,"Later, sweet peas! If the",
+         "groove is ever beating strong",
+         "you can come back anytime.");
+ Speed[c]=3;
+ SpecialFrame[c]=0;
+ EntityMove(c,"R2 U1 F2 W30 F0 W50 Z25");
+ While(MoveCode[c])
+ {
+  Wait(20);
+ }
+ Face[a]=2;
+ Wait(30);
+ Face[a]=0;
+ Wait(30);
+ Face[b]=2;
+ Wait(30);
+ Speed[b]=3;
+ EntityMove(b,"R1");
+ While(MoveCode[b])
+ {
+  Wait(20);
+ }
+ Warp(77,8,1);
+ RemoveCharacter(3);
+ Entity.LocX[6]-=20;
+ SpecialFrame[6]=25;
+ AutoOff();
+ CameraTracking=1;
+ CancelFade=1;
+ flags[45]=1;
+}
+
+event /* 11 */
+{
+ if(!flags[150])
+ {
+  soundeffect(8);
+ }
+ FakeBattle();
+}
+
+event /* 12 */
+{
+ SoundEffect(10);
+ Timer=0;
+ While(Timer<100)
+ {
+  PaletteMorph(20,20,63,100-Timer,63);
+ }
+ HealAll();
+ stext(0,"HP/MP/Status restored!","","");
+}
+
+event /* 13 */
+{
+ if(!flags[115])
+ {
+  stext(0,"No, you fool! That's my super",
+          "duper psycho-trip lever! It",
+          "amplifies the dance floor!");
+  AlterBTile(80,4,551,2);
+  SoundEffect(3);
+  Timer=99;
+  HookTimer(14);
+  ScreenGradient=1;
+  flags[115]=1;
+  WaitKeyUp();
+  return;
+ }
+ if(flags[115])
+ {
+  SoundEffect(3);
+  AlterBTile(80,4,550,2);
+  HookTimer(0);
+  ScreenGradient=0;
+  flags[115]=0;
+  WaitKeyUp();
+ }
+}
+
+event /* 14 */
+{
+ if(timer=100)
+ {
+  MapPaletteGradient(32,39,1,0);
+ }
+ if(timer=200)
+ {
+  MapPaletteGradient(232,239,0,0);
+ }
+ if(timer=300)
+ {
+  MapPaletteGradient(64,71,1,0);
+ }
+ if(timer=400)
+ {
+  MapPaletteGradient(88,95,1,0);
+ }
+ if(timer=500)
+ {
+  MapPaletteGradient(136,143,1,0);
+ }
+ if(timer=600)
+ {
+  MapPaletteGradient(248,254,1,0);
+  Timer=0;
+ }
+} 
+

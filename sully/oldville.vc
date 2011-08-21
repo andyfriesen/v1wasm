@@ -1,0 +1,425 @@
+event /* 0 */
+{
+ EnforceAnimation();
+ if(flags[109])
+ {
+  AlterBTile(12,85,177,2);
+ }
+ ChainEvent(24);
+}
+
+event /* 1 */
+{
+ mapswitch("TEST.MAP",25,74,0);
+}
+
+
+event /* 2 */
+{
+ stext(0,"Hey, Sara! What's up, toots?",
+         "I'm planted a blessed seed in",
+         "the dirt patch over there.");
+ stext(0,"I'm hoping that a carrot grows,",
+         "so don't change anything, ok?",
+         "I'm counting on you!");
+}
+
+event /* 3 */
+{
+ stext(0,"Hi, Sara! Some weird guy with",
+         "a velvet jacket just passed by",
+         "here, heading into the woods.");
+ stext(0,"He mentioned something about",
+         "building a cabin, and putting",
+         "in some psychadelic lights.");
+}
+
+event /* 4 */
+{
+ stext(0,"Hi, Mrs. Sara! How are you",
+         "today? I'm so lonely. When are",
+         "you going to clone some rats?");
+ stext(2,"Oh hello, Slasher. I'm fine.",
+         "The cloning engine is that big",
+         "mass of steaming pipes there.");
+ stext(0,"Yay! Don't forget that you",
+         "stored that Copper Gear in the",
+         "tall cabin to the north.");
+}
+
+event /* 5 */
+{
+ warp(8,67,0);
+}
+
+event /* 6 */
+{
+ warp(30,69,0);
+}
+
+event /* 7 */
+{
+ warp(34,90,0);
+}
+
+event /* 8 */
+{
+ warp(53,69,0);
+}
+
+event /* 9 */
+{
+ warp(11,21,0);
+}
+
+event /* 10 */
+{
+ warp(11,79,0);
+}
+
+event /* 11 */
+{
+ warp(13,61,0);
+}
+
+event /* 12 */
+{
+ warp(73,64,0);
+}
+
+event /* 13 */
+{
+ warp(53,80,0);
+}
+
+event /* 14 */
+{
+ warp(54,61,0);
+}
+
+event /* 15 */
+{
+ warp(33,21,0);
+}
+
+event /* 16 */
+{
+ warp(29,33,0);
+}
+
+event /* 17 */
+{
+ warp(7,35,0);
+}
+
+event /* 18 */
+{
+ SoundEffect(10);
+ Timer=0;
+ While(Timer<100)
+ {
+  PaletteMorph(20,20,63,100-Timer,63);
+ }
+ if(!flags[108])
+ {
+  stext(2,"I got some water. I better",
+          "take it to the engine before",
+          "it falls through my fingers!");
+  flags[108]=1;
+ }
+}
+
+event /* 19 */
+{
+ Warp(73,68,0);
+}
+
+event /* 20 */
+{
+ if(!flags[108])
+ {
+  stext(2,"The steam engines will not",
+          "start. I need to bring the",
+          "machine some water.");
+  return;
+ }
+ if(flags[107]=0 AND flags[108])
+ {
+  Timer=0;
+  While(Timer<100)
+  {
+   PaletteMorph(20,20,63,100-Timer,63);
+  }
+  SoundEffect(17);
+  Banner("Poured the water",5);
+  flags[107]=1;
+ }
+ if(!flags[109])
+ {
+  stext(2,"I'll need to install a gear",
+          "made of copper before I can",
+          "activate the device.");
+  return;
+ }
+ if(flags[107]=1 AND flags[109])
+ {
+  SoundEffect(18);
+  Banner("Installed Gear",5);
+  flags[107]=2;
+ }
+ if(!flags[110])
+ {
+  stext(2,"I'll need to add some fuel.",
+          "Perhaps there's a nest of",
+          "twigs in the Forest.");
+  return;
+ }
+ if(flags[107]=2 AND flags[110])
+ {
+  SoundEffect(18);
+  Banner("Added the twigs",5);
+  flags[107]=3;
+ }
+ if(!flags[111])
+ {
+  stext(2,"I shouldn't start the machine",
+          "until I lubricate the cogs",
+          "with toe jam of Cyclops.");
+  return;
+ }
+ if(flags[107]=3 AND flags[111])
+ {
+  SoundEffect(17);
+  Banner("Placed lubricant",5);
+  flags[107]=4;
+ }
+ if(!flags[112])
+ {
+  stext(2,"To power the device, I need",
+          "to gather solar energy in",
+          "my suit and touch the engine.");
+  return;
+ }
+ if(flags[107]=4 AND flags[112])
+ {
+  For(x,1,100,2)
+  {
+   PaletteMorph(63,63,0,x,63);
+   Wait(1);
+  }
+  For(x,1,100,2)
+  {
+   PaletteMorph(63,63,0,100-x,63);
+   Wait(1);
+  }
+  stext(2,"Alright! The ignition switch",
+          "has started! This thing should",
+          "start cloning rats in no time!");
+  stext(2,"Oops! I forgot to make one",
+          "minor flow adjustment. Let me",
+          "just reach in here quick...");
+  PaletteMorph(63,0,0,100,63);
+  SoundEffect(16);
+  Warp(57,64,1);
+  Wait(10);
+  PaletteMorph(0,0,0,0,63);
+  stext(2,"Ouch! I cut my finger on one",
+          "of those fast moving gears.",
+          "I hope it's okay...");
+  stext(0,"Yay! Yay! Lots of rats to play",
+          "with. Oh joy!","");
+  stext(2,"Oh no! That drop of blood must",
+          "be jamming up the machine!",
+          "It's really smoking now!");
+  stext(2,"No! According to this system",
+          "monitor, it's starting to",
+          "replicate human DNA!");
+  QuakeX=5;
+  Quake=1;
+  LayerVC=3;
+  CallEvent(25,160,63);
+  CallEvent(25,152,58);
+  CallEvent(25,155,65);
+  Quake=0;
+  stext(2,"Egad! The whole structure is",
+          "about to explode!","");
+  SoundEffect(12);
+  Earthquake(15,15,300);
+  Quake=1;
+  CallEvent(25,155,65);
+  CallEvent(25,152,58);
+  CallEvent(25,160,63);
+  Quake=0;
+  SoundEffect(20);
+  CallEvent(27,1);
+  CallEvent(27,2);
+  CallEvent(27,1);
+  CallEvent(27,2);
+  CallEvent(27,3);
+  CallEvent(27,4);
+  CallEvent(27,3);
+  CallEvent(27,4);
+  AlterBTile(53,61,321,2);
+  AlterBTile(54,61,546,2);
+  AlterBTile(55,61,528,2);
+  AlterBTile(53,62,547,2);
+  AlterBTile(54,62,548,2);
+  AlterBTile(55,62,549,2);
+  AlterBTile(53,63,528,2);
+  AlterBTile(54,63,546,2);
+  AlterBTile(55,63,321,2);
+  AlterFTile(53,60,320,2);
+  AlterFTile(54,60,318,2);
+  AlterFTile(55,60,529,2);
+  AlterFTile(53,61,523,2);
+  AlterFTile(54,61,525,2);
+  AlterFTile(55,61,527,2);
+  AlterFTile(53,62,529,2);
+  AlterFTile(54,62,318,2);
+  AlterFTile(55,62,320,2);
+  CallEvent(27,5);
+  CallEvent(27,6);
+  CallEvent(27,5);
+  CallEvent(27,6);
+  SetFace(1,3);
+  stext(0,"Hello.","","");
+  stext(0,"Hi! How are you today?","","");
+  stext(0,"Greetings! What's your name?","","");
+  stext(2,"Ahhhhhhhhhhhhhhhhhhh!","","");
+  stext(0,"What's wrong, Sara? Why aren't",
+          "any rats coming out?","");
+  stext(2,"*sniff* It wasn't supposed to",
+          "be this way... *sob*. It was",
+          "to be a thing of beauty...");
+  flags[114]=1;
+  EnableSave();
+  EnableMenu();
+  ScreenGradient=0;
+  RemoveCharacter(2);
+  AddCharacter(1);
+  AddCharacter(3);
+  MapSwitch("VILLAGE.MAP",9,84,0);
+  }
+}
+
+event /* 21 */
+{
+ if(!flags[109])
+ {
+  AlterBTile(12,85,177,2);
+  SoundEffect(3);
+  Banner("Got Copper Gear!",5);
+  flags[109]=1;
+ }
+}
+
+event /* 22 */
+{
+ if(!flags[110])
+ {
+  SoundEffect(10);
+  Banner("Took dry twigs!",5);
+  flags[110]=1;
+ }
+}
+
+event /* 23 */
+{
+ stext(2,"Here's my notes on the clone",
+         "machine. Let's see here...","");
+ stext(2,"The cloning device is a steam",
+         "powered mechanism which will",
+         "require both fuel and power.");
+ stext(2,"My special metal body suit can",
+         "absorb solar power and use it",
+         "to ignite the reaction.");
+ stext(2,"The machine cannot be safely",
+         "operated unless the cogs are",
+         "lubricated very well.");
+ stext(2,"Legends speak of the ancient",
+         "race of Cyclops' whose toe jam",
+         "has mystical lubricant powers.");
+}
+         
+event /* 24 */
+{
+ if(!flags[113])
+ {
+  Redraw();
+  FadeIn(30);
+  stext(2,"Ahh... I love that fresh air.",
+          "Building this city all by",
+          "myself certainly was fun.");
+  stext(2,"I'm glad I was able to use",
+          "my free time constructively",
+          "instead of committing crime.");
+  stext(2,"Now that the city is built",
+          "I must finish my cloning",
+          "engine to make lots of rats.");
+  stext(2,"My metropolis of rodents will",
+          "be far superior to those geeks",
+          "in Bumsville in every way!");
+  stext(2,"I better go review my notes.",
+          "I think I locked them up in",
+          "my basement.");
+  Flags[113]=1;
+  Fade=0;
+ }
+}
+
+event /* 25 */
+{
+ SoundEffect(19);
+ VCPutPCX("POP01.PCX",var(0),var(1));
+ Wait(20);
+ VCClear();
+ VCPutPCX("POP02.PCX",var(0),var(1));
+ Wait(20);
+ VCClear();
+ VCPutPCX("POP03.PCX",var(0),var(1));
+ Wait(20);
+ VCClear();
+}
+
+event /* 26 */
+{
+ Fade=1;
+}
+
+event /* 27 */
+{
+ For(x,91,127,16)
+ {
+  For(y,39,71,16)
+  {
+   if(var(0)=1)
+   {
+    VCPutPCX("SPARKLE1.PCX",x,y);
+   }
+   if(var(0)=2)
+   {
+    VCPutPCX("SPARKLE2.PCX",x,y);
+   }
+   if(var(0)=3)
+   {
+    VCPutPCX("SPARKLE3.PCX",x,y);
+   }
+   if(var(0)=4)
+   {
+    VCPutPCX("SPARKLE4.PCX",x,y);
+   }
+   if(var(0)=5)
+   {
+    VCPutPCX("SPARKLE5.PCX",x,y-8);
+    VCPutPCX("SPARKLE6.PCX",x,y+8);
+   }
+   if(var(0)=6)
+   {
+    VCPutPCX("SPARKLE6.PCX",x,y-8);
+    VCPutPCX("SPARKLE5.PCX",x,y+8);
+   }
+  }
+ }
+ Wait(10);
+ VCClear();
+}

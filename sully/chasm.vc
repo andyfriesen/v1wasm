@@ -1,0 +1,139 @@
+event /* 0 */
+{
+ flags[151]=0;
+ EnforceAnimation();
+ if(flags[106])
+ {
+  PlayMusic("VANGELIS.MOD");
+ }
+ if(flags[31] AND !flags[106])
+ {
+  AlterFTile(41,29,182,0);
+ }
+}
+
+event /* 1 */
+{
+ mapswitch("TEST.MAP",32,26,0);
+}
+
+event /* 2 */
+{
+ mapswitch("TEST.MAP",39,26,0);
+}
+
+event /* 3 */
+{
+ stext(0,"Welcome to Raven Gulch! It is",
+         "said that he who leaps off the",
+         "edge will fall to his death!");
+ stext(0,"The forest village of Rodne is",
+         "to the south and Mount Jujube",
+         "is to the northeast.");
+}
+
+event /* 4 */
+{
+ if(!flags[29])
+ {
+  stext(0,"Sorry. Nobody can cross the",
+          "bridge to Rodne unless I say",
+          "so. Now get outta here, kid!");
+  return;
+ }
+ if(flags[31])
+ {
+  stext(0,"You can cross anytime you wish",
+          "now. Have fun, kid!","");
+  return;
+ }
+ stext(0,"This is the Raven Gulch Bridge",
+         "that leads to Rodne. Do you",
+         "have authorization to cross?");
+ stext(3,"It's me, old friend. Darin and",
+         "I need to cross in order to",
+         "save the world from doom.");
+ stext(0,"Hi, Dexter. Well, you really",
+         "should have a passport or",
+         "something, but you can cross.");
+ stext(0,"I shall remove the rock from",
+         "trail here.","");
+ EntityMove(6,"D1 R4 W30");
+ Wait(5);
+ While(Entity.Moving[6])
+ {
+  Wait(30);
+ }
+ AlterFTile(41,29,182,0);
+ EntityMove(6,"W30 L4 U1 F0");
+ Wait(5);
+ While(Face[6]!=0)
+ {
+  Wait(20);
+ }
+ stext(0,"Stay out of trouble now, ya",
+         "hear?",""); 
+ flags[31]=1;
+}
+
+event /* 5 */
+{
+ if(!flags[106])
+ {
+  if(!flags[150])
+  {
+   SoundEffect(8);
+  }
+  FakeBattle();
+ }
+}
+
+event /* 6 */
+{
+ if(flags[107]<=3 and flags[106])
+ {
+  stext(2,"My body suit can absorb the",
+          "sun's energy, but it fades",
+          "quickly.");
+  stext(2,"I shouldn't prepare to",
+          "ignite the machine until",
+          "all parts are in place.");
+  return;
+ }
+ if(!flags[112] and flags[106])
+ {
+  stext(2,"The sun in unusually bright",
+          "today. Let me absorb the",
+          "raw power into my suit...");
+ 
+  CameraTracking=0;
+  a=YWin;
+  Timer=0;
+  While(Timer<100)
+  {
+   YWin=a-(Timer/2);
+   Redraw();
+  }
+  Timer=0;
+  While(Timer<100)
+  {
+   PaletteMorph(63,63,0,Timer,63);
+  }
+  Timer=0;
+  While(Timer<100)
+  {
+   PaletteMorph(63,63,0,100-Timer,63);
+  }
+  Timer=0;
+  While(Timer<100)
+  {
+   YWin=a+50-(Timer/2);
+   Redraw();
+  }
+  CameraTracking=1;
+  stext(2,"I feel totally powered up!",
+          "Now I just need to touch the",
+          "cloning engine to start it!");
+  flags[112]=1;
+ }
+}

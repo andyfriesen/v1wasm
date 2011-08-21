@@ -3,7 +3,9 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdio.h>
+#include "stack.h"
 #include "engine.h"
+#include "main.h"
 #include "fs.h"
 #include "keyboard.h"
 #include "vc.h"
@@ -105,6 +107,8 @@ void GrabString(char* str) {
 }
 
 void ProcessVar0Assign() {
+    STACK;
+
     int t, w;
     unsigned char b;
 
@@ -138,6 +142,8 @@ void ProcessVar0Assign() {
 }
 
 void ProcessVar1Assign() {
+    STACK;
+
     int t, a, w;
     unsigned char b;
 
@@ -172,6 +178,8 @@ void ProcessVar1Assign() {
 }
 
 void ProcessVar2Assign() {
+    STACK;
+
     int t, a, c, w;
     unsigned char b;
 
@@ -462,8 +470,6 @@ void ProcessSwitch() {
 }
 
 void ExecuteScript(unsigned short int s) {
-    unsigned char c;
-
     basevc = mapvc;
     code = mapvc + scriptofstbl[s];
 
@@ -506,6 +512,8 @@ void ExecuteEffect(unsigned short int s) {
 }
 
 void ExecuteBlock() {
+    STACK;
+
     unsigned char c;
 
     while (1) {
@@ -553,6 +561,7 @@ void ExecuteBlock() {
         if (c == ENDSCRIPT) {
             break;
         }
+        err("Illegal opcode %i\n", c);
     }
 }
 

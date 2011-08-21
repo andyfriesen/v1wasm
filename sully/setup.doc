@@ -1,0 +1,158 @@
+Quick guide to using SETUP.CFG.
+===============================
+
+Available commands:
+joystick: 0 for disabled, 1 for enable. Default 0.
+sounddevice: 0 for autodetect, 1 for GUS, 2 for SoundBlaster, 3 for NoSound
+mixrate: somewhere between 11000 and 41000
+forcemono: forces mono sound output
+force8bit: forces 8-bit sound output
+dmabufsize: sets the DMA buffer size for SB output.
+interpolate: tells the sound driver to interpolate data. Higher sound quality
+             for a speed hit. (only applicable to SB cards)
+waitvrt: 0 for disabled, 1 for enables. Default 0. Use if the fade flickers
+         or if you get "shearing" on your video card. This mostly happens on
+         older computers, most newer machines are immune to the effects, and
+         as waiting can slow down the engine quite a bit, it defaults to
+         disabled.
+vspspeed: Drastically speeds up the foreground layer, but at the cost of
+          using twice as much VSP memory.
+end: ends the SETUP.CFG. IMPORTANT - engine will just poll endlessly unless
+     this is present.
+
+===========================================================================
+MEMORY ALLOCATION - You can now specify how much memory Verge allocates to
+certain areas. For instance, a VSP can now handle up to 65535 tiles. This
+means that a VSP that used all of that data could take up 16 megs. It would
+be ludicrous for me to allocate ALL of that data for VSPs when most VSPs
+wouldn't actually use more than 1000. This new set of commands allows you
+to tailor memory allocation needs specifically to certain game.
+
+vsp: Determines the size of VSP data buf. I'd recommend at least 256000.
+map: Determines the size of MAP data buf. I'd recommend around 150000, but
+     beware that this number is actually multiplied by 5 to compensate for
+     the total MAP info. (150000 would support a 300x500 map)
+mapvc: Buffer for map-based VC code. (Does not include combat VC code)
+       Around 50000 would be nice - perhaps more if a map contains a
+       LARGE amount of text.
+vcbuf: amount of memory allocated for VC Data Buffer, defaults to 250000.
+
+===========================================================================
+
+CONTROL COMMANDS: The controls are now configurable. Here's how to set them
+up currently.
+Up/Down/Left/Right buttons are NOT changable. :)
+
+However, Verge recognizes four "virtual" buttons. These are simply termed
+b1, b2, b3, b4. The general rule-of-thumb:
+
+b1 - Accept/activate/talk/etc.
+b2 - Cancel
+b3 - System Menu
+b4 - Main Menu
+
+You can set up which keys and joystick buttons really go to these buttons.
+The joystick set of commands are simple. For instance:
+
+jb1 4     Would set virtual "b1" to what's really joystick button 4.
+jb3 2     Would set virtual "b3" to what's really joystick button 2.
+
+The keyboard equivalents are similar. The commands are kb1,kb2,kb3,and kb4,
+as you would guess. However, the numbers they take are a bit different.
+These have to be the actual hardware index of the keys. Here's a table:
+
+ESC          EQU 1
+1            EQU 2
+2            EQU 3
+3            EQU 4
+4            EQU 5
+5            EQU 6
+6            EQU 7
+7            EQU 8
+8            EQU 9
+9            EQU 10
+0            EQU 11
+PLUS         EQU 13
+MINUS        EQU 12
+BACKSPACE    EQU 14
+TAB          EQU 15
+ENTER        EQU 28
+CTRL         EQU 29
+LEFT_SHIFT   EQU 42
+RIGHT_SHIFT  EQU 54
+STAR         EQU 55
+ALT          EQU 56
+SPACE        EQU 57
+CAPSLOCK     EQU 58
+NUMLOCK      EQU 69
+SCROLL_LOCK  EQU 70
+HOME         EQU 71
+UP           EQU 72
+PGUP         EQU 73
+PADMINUS     EQU 74
+LEFT         EQU 75
+PAD5         EQU 76
+RIGHT        EQU 77
+PADPLUS      EQU 78
+END          EQU 79
+DOWN         EQU 80
+PGDN         EQU 81
+INSERT       EQU 82
+DELETE       EQU 83
+MACRO        EQU 111
+F1           EQU 59
+F2           EQU 60
+F3           EQU 61
+F4           EQU 62
+F5           EQU 63
+F6           EQU 64
+F7           EQU 65
+F8           EQU 66
+F9           EQU 67
+F10          EQU 68
+F11          EQU 87
+F12          EQU 88
+COMMA        EQU 51
+PERIOD       EQU 52
+BACKSLASH    EQU 53
+SEMICOLON    EQU 39
+QUOTE        EQU 40
+LEFTBRACKET  EQU 26
+RIGHTBRACKET EQU 27
+컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴컴
+A            EQU 30
+B            EQU 48
+C            EQU 46
+D            EQU 32
+E            EQU 18
+F            EQU 33
+G            EQU 34
+H            EQU 35
+I            EQU 23
+J            EQU 36
+K            EQU 37
+L            EQU 38
+M            EQU 50
+N            EQU 49
+O            EQU 24
+P            EQU 25
+Q            EQU 16
+R            EQU 19
+S            EQU 31
+T            EQU 20
+U            EQU 22
+V            EQU 47
+W            EQU 17
+X            EQU 45
+Y            EQU 21
+Z            EQU 44
+
+Hope this helps. The defaults are that all joystick buttons are just b1=1,
+b2=2, etc. The current keyboard equivalents are:
+
+b1 = ENTER
+b2 = ALT
+b3 = ESC
+b4 = SPACE
+
+But of course these are all completely changable now. :)

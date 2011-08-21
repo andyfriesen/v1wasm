@@ -1,0 +1,1549 @@
+event /* 0 */
+{
+ flags[151]=0;
+ EnforceAnimation();
+ if(!flags[101])
+ {
+  flags[18]=2;
+  flags[19]=1;
+  flags[22]=1;
+  flags[95]=2;
+  flags[96]=4;
+  flags[98]=1;
+  flags[99]=1;
+  flags[101]=1;
+ }
+ if(flags[18]=3)
+ {
+  flags[18]=1;
+ }
+ /*
+ if(flags[18]=0)
+ {
+  AlterBTile(14,5,226,0);
+  AlterBTile(14,7,533,1);
+  AlterBTile(10,7,281,2);
+ }
+ */
+ if(flags[18]=1)
+ {
+  AlterBTile(14,6,226,0);
+  AlterBTile(14,7,533,1);
+  AlterBTile(10,7,464,2);
+ }
+ if(flags[19]=0)
+ {
+  AlterBTile(18,17,226,0);
+  AlterBTile(19,17,532,1);
+  AlterBTile(23,11,281,2);
+ }
+ if(flags[19]=2)
+ {
+  AlterBTile(20,17,226,0);
+  AlterBTile(19,17,532,1);
+  AlterBTile(23,11,464,2);
+ }
+ if(flags[19]=6)
+ {
+  AlterBTile(20,17,226,0);
+  AlterBTile(19,17,532,1);
+  AlterBTile(23,11,464,2);
+ }
+ if(flags[19]=3)
+ {
+  AlterBTile(21,17,226,0);
+  AlterBTile(19,17,532,1);
+  AlterBTile(23,11,463,2);
+ }
+ if(flags[19]=5)
+ {
+  AlterBTile(21,17,226,0);
+  AlterBTile(19,17,532,1);
+  AlterBTile(23,11,463,2);
+ }
+ if(flags[19]=4)
+ {
+  AlterBTile(22,17,226,0);
+  AlterBTile(19,17,532,1);
+  AlterBTile(23,11,284,2);
+ }
+ if(flags[20]=0)
+ {
+  AlterBTile(24,9,226,0);
+  AlterBTile(24,10,533,1);
+  AlterBTile(24,13,281,2);
+ }
+ if(flags[20]=2)
+ {
+  AlterBTile(24,11,226,0);
+  AlterBTile(24,10,533,1);
+  AlterBTile(24,13,284,2);
+ }
+ if(flags[21]=3)
+ {
+  flags[21]=1;
+ }
+ if(flags[21]=1)
+ {
+  AlterBTile(23,18,226,0);
+  AlterBTile(23,17,533,1);
+  AlterBTile(32,17,464,2);
+ }
+ if(flags[21]=2)
+ {
+  AlterBTile(23,19,226,0);
+  AlterBTile(23,17,533,1);
+  AlterBTile(32,17,284,2);
+ }
+ if(flags[22]=0)
+ {
+  AlterBTile(28,24,226,0);
+  AlterBTile(29,24,532,1);
+  AlterBTile(31,24,281,2);
+ }
+ if(flags[22]=2)
+ {
+  AlterBTile(30,24,226,0);
+  AlterBTile(29,24,532,1);
+  AlterBTile(31,24,284,2);
+ }
+ if(flags[95]=3)
+ {
+  flags[95]=1;
+ }
+ if(flags[95]=0)
+ {
+  AlterBTile(20,23,226,0);
+  AlterBTile(22,23,532,1);
+  AlterBTile(24,26,281,2);
+ }
+ if(flags[95]=1)
+ {
+  AlterBTile(21,23,226,0);
+  AlterBTile(22,23,532,1);
+  AlterBTile(24,26,464,2);
+ }
+ if(flags[96]=0)
+ {
+  AlterBTile(13,22,226,0);
+  AlterBTile(17,22,533,1);
+  AlterBTile(18,28,281,2);
+ }
+ if(flags[96]=7)
+ {
+  flags[96]=1;
+ }
+ if(flags[96]=6)
+ {
+  flags[96]=2;
+ }
+ if(flags[96]=5)
+ {
+  flags[96]=3;
+ }
+ if(flags[96]=1)
+ {
+  AlterBTile(14,22,226,0);
+  AlterBTile(17,22,533,1);
+  AlterBTile(18,28,462,2);
+ }
+ if(flags[96]=2)
+ {
+  AlterBTile(15,22,226,0);
+  AlterBTile(17,22,533,1);
+  AlterBTile(18,28,464,2);
+ }
+ if(flags[96]=3)
+ {
+  AlterBTile(16,22,226,0);
+  AlterBTile(17,22,533,1);
+  AlterBTile(18,28,463,2);
+ }
+ if(flags[97]=3)
+ {
+  flags[97]=1;
+ }
+ if(flags[97]=1)
+ {
+  AlterBTile(19,36,226,0);
+  AlterBTile(18,36,532,1);
+  AlterBTile(24,36,464,2);
+ }
+ if(flags[97]=2)
+ {
+  AlterBTile(20,36,226,0);
+  AlterBTile(18,36,532,1);
+  AlterBTile(24,36,284,2);
+ }
+ if(flags[98]=0)
+ {
+  AlterBTile(28,29,226,0);
+  AlterBTile(29,29,532,1);
+  AlterBTile(26,36,281,2);
+ }
+ if(flags[98]=2)
+ {
+  AlterBTile(30,29,226,0);
+  AlterBTile(29,29,532,1);
+  AlterBTile(26,36,284,2);
+ }
+ if(flags[99]=0)
+ {
+  AlterBTile(14,41,226,0);
+  AlterBTile(15,41,532,1);
+  AlterBTile(23,40,281,2);
+ }
+ if(flags[99]=2)
+ {
+  AlterBTile(16,41,226,0);
+  AlterBTile(15,41,532,1);
+  AlterBTile(23,40,284,2);
+ }
+ if(flags[100])
+ {
+  AlterBTile(20,46,226,0);
+  AlterBTile(20,47,533,1);
+  AlterBTile(20,45,284,2);
+  AlterBTile(19,47,284,2);
+ }
+ CallEvent(23,23,14,75);
+ CallEvent(23,24,22,75);
+ CallEvent(23,25,14,80);
+ CallEvent(23,26,22,80);
+ if(flags[28])
+ {
+  AlterBTile(18,100,195,1);
+  AlterBTile(18,101,195,1);
+  AlterBTile(18,102,195,1);
+ }
+ if(flags[30])
+ {
+  AlterBTile(18,91,226,0);
+  AlterBTile(18,92,226,0);
+ }
+ if(flags[141])
+ {
+  ScreenGradient=0;
+  Volume=q;
+  PlayMusic("BADEXPER.MOD");
+  AlterBTile(18,91,226,2);
+  AlterBTile(18,92,226,2);
+  Entity.LocX[5]-=20;
+  Entity.LocX[6]-=20;
+  AlterBTile(18,87,226,2);
+  RemoveCharacter(1);
+  AddCharacter(4);
+  SetFace(1,1);
+  CameraTracking=1;
+  Redraw();
+  FadeIn(30);
+  stext(4,"Lord Stan, you monster! You",
+          "shall never get away with",
+          "this!");
+  stext(6,"Nya ha ha! Quiet, you impudent",
+          "girl! You are the key to my",
+          "plan of global domination!");
+  stext(6,"I shall put you into stasis",
+          "and use this machine to",
+          "extract your DNA.");
+  stext(6,"You come from a family line",
+          "of great warriors. I will",
+          "be able to clone them!");
+  stext(6,"They will bend to my fiendish",
+          "will and this entire world",
+          "will belong to me! Mwa ha ha!");
+  SetFace(1,0);
+  stext(4,"Galfrey, how can you help him",
+          "with a mad plan like this?","");
+  stext(5,"Silence, wench! I have nothing",
+          "to say to you, or that maggot",
+          "boyfriend of yours.");
+  stext(4,"But I... wait a minute... you",
+          "look familiar. Oh my! You're",
+          "that one guy from school!");
+  stext(5,"Yes. I asked you out to our",
+          "senior prom, but *Darin* had",
+          "already asked you. Grr...");
+  stext(4,"You were a nice guy and all,",
+          "but... geez, get over it. Why",
+          "are you helping Lord Stan?");
+  Wait(100);
+  Face[6]=0;
+  Wait(100);
+  SpecialFrame[6]=25;
+  stext(5,"You cannot know how much pain",
+          "you caused me that night. I",
+          "had to seek some recourse.");
+  SpecialFrame[0]=23;
+  Wait(100);
+  SpecialFrame[0]=0;
+  stext(4,"Do you really think this whole",
+          "dark servant bit is impressing",
+          "me? Get a clue.");
+  Wait(100);
+  Face[6]=1;
+  SpecialFrame[6]=0;
+  stext(5,"I got all buffed up for you,",
+          "Crystal! We were going to have",
+          "a life together!");
+  stext(4,"Umm... hello? Did I even know",
+          "you back then? Just try and",
+          "get your life back together.");
+  Wait(100);
+  Face[6]=2;
+  Wait(100);
+  SpecialFrame[6]=29;
+  stext(5,"I'm afraid it's too late for",
+          "me, dear Crystal. My path lies",
+          "with darkness now.");
+  stext(6,"Are you two done making kissy",
+          "face yet? I'm almost ready to",
+          "initiate the process.");
+  stext(6,"The water I've been draining",
+          "from the earth and sky is",
+          "collecting underground.");
+  stext(6,"I shall boil the lands, and",
+          "lava shall devastate every",
+          "human civilization!");
+  stext(6,"My invincible soldiers from",
+          "Crystal's blood will build",
+          "a new utopia for me!");
+  stext(6,"Galfrey! We'll need that",
+          "Thermal Activator to wake her",
+          "up. Where is it?");
+  SpecialFrame[6]=10;
+  Wait(50);
+  Face[6]=1;
+  SpecialFrame[6]=0;
+  stext(5,"I had to sell it in Rodne,",
+          "remember? Evil empires don't",
+          "fund themselves, you know.");
+  stext(6,"Blast it, you dunderhead! I",
+          "guess we'll just worry about",
+          "that when we get there.");
+  stext(5,"Speaking of which, how does",
+          "that new emergency exit system",
+          "work again?");
+  stext(6,"I told you already! You have",
+          "to flip the levers in sequence",
+          "from left to right.");
+  stext(6,"If you flip the correct lever",
+          "in a row, then you will be",
+          "able to go to the next row.");
+  stext(6,"If you flip the wrong lever,",
+          "you'll need to go down the",
+          "catwalk to reset them.");
+  SetFace(1,1);
+  stext(4,"Darin will come for me, Lord",
+          "Stan! Your days are numbered.","");
+  stext(6,"Well, then perhaps you can",
+          "dream about him during your",
+          "long slumber. Nightie night!");
+  For(x,1,q,1)
+  {
+   Volume-=1;
+   Wait(1);
+  }
+  LayerVC=1;
+  SpecialFrame[0]=21;
+  SoundEffect(4);
+  VCPutPCX("SPARKLE7.PCX",155,79);
+  Wait(20);
+  VCClear();
+  VCPutPCX("SPARKLE8.PCX",155,79);
+  Wait(20);
+  VCClear();
+  VCPutPCX("SPARKLE7.PCX",155,79);
+  Wait(20);
+  VCClear();
+  VCPutPCX("SPARKLE8.PCX",155,79);
+  Wait(20);
+  VCClear();
+  SpecialFrame[0]=25;
+  stext(4,"Ahh! Wha... what are you doing",
+          "to me...? I feel so cold...","");
+  SoundEffect(4);
+  SpecialFrame[0]=24;
+  Timer=0;
+  While(Timer<100)
+  {
+   PaletteMorph(0,0,63,Timer,63);
+  }
+  SoundEffect(25);
+  DrawParty=0;
+  AlterBTile(18,91,285,2);
+  AlterBTile(18,92,287,2);
+  Redraw();
+  Wait(100);
+  Timer=0;
+  While(Timer<100)
+  {
+   PaletteMorph(0,0,63,100-Timer,63);
+  }
+  Wait(400);
+  flags[144]=1;
+  FadeOut(60);
+  SpecialFrame[0]=0;
+  CameraTracking=1;
+  Mapswitch("BUMVILLE.MAP",3,98,1);
+  }
+}
+
+event /* 1 */
+{
+ mapswitch("MOUNTAIN.MAP",21,6,0);
+}
+
+event /* 2 */
+{
+ ChainEvent(39,18,14,5,10,7);
+}
+
+event /* 3 */
+{
+ flags[19]+=1;
+ if(flags[19]=8)
+ {
+  flags[19]=0;
+ }
+ for(a,0,4,1)
+ {
+  AlterBTile(18+a,17,532,1);
+ }
+ if(!flags[4000])
+ {
+  b=flags[19];
+ }
+ if(b=5)
+ {
+  b=3;
+ }
+ if(b=6)
+ {
+  b=2;
+ }
+ if(b=7)
+ {
+  b=1;
+ }
+ AlterBTile(18+b,17,226,0);
+ if(b=0)
+ {
+  c=281;
+ }
+ if(b=1)
+ {
+  c=462;
+ }
+ if(b=2)
+ {
+  c=464;
+ }
+ if(b=3)
+ {
+  c=463;
+ }
+ if(b=4)
+ {
+  c=284;
+ }
+ AlterBTile(23,11,c,2);
+ SoundEffect(3);
+ WaitKeyUp();
+}
+
+event /* 4 */
+{
+ ChainEvent(39,20,24,9,24,13);
+}
+
+event /* 5 */
+{
+ ChainEvent(39,21,23,17,32,17);
+}
+
+event /* 6 */
+{
+ ChainEvent(40,22,28,24,31,24);
+}
+
+event /* 7 */
+{
+ Warp(42,44,0);
+ Banner("B1",3);
+}
+
+event /* 8 */
+{
+ Warp(58,44,0);
+ Banner("B1",3);
+}
+
+event /* 9 */
+{
+ Warp(14,12,0);
+}
+
+event /* 10 */
+{
+ Warp(30,12,0);
+}
+
+event /* 11 */
+{
+ warp(4,15,0);
+}
+
+event /* 12 */
+{
+ warp(18,108,0);
+ Banner("Thermal Chamber",3);
+}
+
+event /* 13 */
+{
+ warp(20,54,0);
+}
+
+event /* 14 */
+{
+ warp(1,6,0);
+}
+
+event /* 15 */
+{
+ warp(5,70,0);
+}
+
+event /* 16 */
+{
+ ChainEvent(22,23,14,75,1);
+}
+
+event /* 17 */
+{
+ ChainEvent(22,24,22,75,21);
+}
+
+event /* 18 */
+{
+ ChainEvent(22,25,14,80,26);
+}
+
+event /* 19 */
+{
+ ChainEvent(22,26,22,80,17);
+}
+
+event /* 20 */
+{
+ if(!flags[34])
+ {
+  stext(3,"Darin, I know more about magic",
+          "than I do about machines. We",
+          "shouldn't try to operate this.");
+  return;
+ }
+ if(!item(22) AND char(2) AND !flags[28])
+ {
+  stext(2,"Darin, let's go to my home in",
+          "Rodne. There's a Thermal",
+          "Activator in the basement.");
+  return;
+ }
+ if(!flags[28])
+ {
+  stext(2,"Here are controls for the",
+          "device. I can insert the",
+          "Thermal Activator here.");
+  DestroyItem(22,0);
+  stext(1,"Sara, will this work? It",
+          "will just melt the crystal",
+          "and Crystal will be OK?");
+  stext(2,"Umm... huh? Oh yeah, sure.",
+          "Let me just initialize the",
+          "machine... THERE!");
+  SoundEffect(12);
+  For(a,16,0,-1)
+  {
+   earthquake(a,0,20);
+  }
+  AlterBTile(12,92,289,2);
+  AlterBTile(13,92,289,2);
+  AlterBTile(14,92,289,2);
+  AlterBTile(15,92,289,2);
+  AlterBTile(16,92,289,2);
+  AlterBTile(17,92,289,2);
+  AlterBTile(19,92,293,2);
+  AlterBTile(20,92,293,2);
+  AlterBTile(21,92,293,2);
+  AlterBTile(22,92,293,2);
+  AlterBTile(23,92,293,2);
+  AlterBTile(24,92,293,2);
+  AlterBTile(18,94,296,2);
+  AlterBTile(18,95,296,2);
+  AlterBTile(18,96,296,2);
+  AlterBTile(18,100,195,1);
+  AlterBTile(18,101,195,1);
+  AlterBTile(18,102,195,1);
+  stext(2,"A ha! It worked. I knew I",
+          "wasn't a fool for taking shop",
+          "instead of Home Economics!");
+  stext(2,"Umm... oops.","","");
+  stext(1,"Oops?!","","");
+  stext(2,"It's no problem! I just",
+          "accidentally cut a minor",
+          "plasma conduit cable.");
+  stext(2,"It's surely nothing important",
+          "like the self-destruct control",
+          "or anything.");
+  stext(1,"But look, Sara! The commotion",
+          "created by the machine made",
+          "the walkway collapse!");
+  stext(2,"It's ok, Darin. We'll just",
+          "find some other way out.",
+          "RPG heroes always find a way.");
+  CameraTracking=0;
+  a=YWin;
+  Timer=0;
+  While(Timer<100)
+  {
+   YWin=a-Timer;
+   Redraw();
+  }
+  Timer=0;
+  While(timer<100)
+  {
+   PaletteMorph(40,40,0,Timer,63);
+  }
+  Entity.LocX[7]-=20;
+  AlterBTile(18,91,226,0);
+  AlterBTile(18,92,226,0);
+  SpecialFrame[7]=24;
+  Redraw();
+  Timer=0;
+  While(Timer<100)
+  {
+   PaletteMorph(40,40,0,100-Timer,63);
+  }
+  a=YWin;
+  Timer=0;
+  While(Timer<100)
+  {
+   YWin=a+Timer;
+   Redraw();
+  }
+  CameraTracking=1;
+  stext(1,"Look! The machine melted the",
+          "crystal around Crystal! Thank",
+          "you so much, Sara!");
+  flags[28]=1;
+ }
+}
+
+event /* 21 */
+{
+ if(flags[30])
+ {
+  return;
+ }
+ if(flags[28])
+ {
+  SpecialFrame[7]=25;
+  Wait(300);
+  SpecialFrame[7]=0;
+  Wait(100);
+  stext(4,"Whu... am I awake? Darin, is",
+          "that you?","");
+  SpecialFrame[7]=24;
+  Wait(30);
+  SpecialFrame[7]=0;
+  Wait(30);
+  SpecialFrame[7]=24;
+  Wait(30);
+  SpecialFrame[7]=0;
+  stext(1,"Crystal! I'm so glad you're",
+          "awake. I was worried about",
+          "you!");
+  SpecialFrame[7]=24;
+  Wait(30);
+  SpecialFrame[7]=0;
+  Wait(30);
+  SpecialFrame[7]=24;
+  Wait(30);
+  SpecialFrame[7]=0;
+  Wait(100);
+  SpecialFrame[7]=23;
+  Wait(100);
+  SpecialFrame[7]=22;
+  stext(4,"My vision is coming back...",
+          "I see you... and... and...",
+          "another woman?! Grr!");
+  AutoOn();
+  a=char(1)+94;
+  b=char(2)+94;
+  ObsMode[a]=1;
+  ObsMode[b]=1;
+  EntityMove(b,"X18");
+  While(MoveCode[b])
+  {
+   Wait(5);
+  }
+  EntityMove(7,"U1");
+  EntityMove(b,"U2");
+  While(MoveCode[b])
+  {
+   Wait(5);
+   Face[7]=0;
+  }
+  EntityMove(7,"L2");
+  EntityMove(b,"R2");
+  While(MoveCode[b])
+  {
+   Wait(5);
+   Face[7]=2;
+   Face[b]=3;
+  }
+  Wait(20);
+  SpecialFrame[b]=26;
+  stext(2,"Yo, take it easy, sister. If",
+          "it weren't for me, you'd be",
+          "stuck in that rock forever!");
+  SpecialFrame[7]=27;
+  stext(4,"Alright, listen up you little",
+          "wench. Darin is ALL mine, you",
+          "got that? You leave him alone.");
+  stext(2,"Bitch!","","");
+  Speed[7]=5;
+  Speed[b]=5;
+  SpecialFrame[a]=21;
+  SpecialFrame[7]=21;
+  SoundEffect(8);
+  EntityMove(7,"R2 L2");
+  EntityMove(b,"L2 R2");
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  stext(4,"Slut!","","");
+  SoundEffect(8);
+  EntityMove(7,"R2 L2");
+  EntityMove(b,"L2 R2");
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  stext(2,"Whore!","","");
+  SoundEffect(8);
+  EntityMove(7,"R2 L2");
+  EntityMove(b,"L2 R2");
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  stext(4,"Tramp!","","");
+  SoundEffect(8);
+  EntityMove(7,"R2 L2");
+  EntityMove(b,"L2 R2");
+  Wait(100);
+  Face[b]=0;
+  SpecialFrame[b]=0;
+  Face[a]=1;
+  SpecialFrame[a]=0;
+  stext(2,"Darin, are you sure we melted",
+          "the right crystal?","");
+  EntityMove(a,"X18 U2");
+  While(MoveCode[a])
+  {
+   Wait(20);
+  }
+  c=YWin;
+  CameraTracking=0;
+  Timer=0;
+  While(Timer<33)
+  {
+   YWin=c-Timer;
+   Redraw();
+  }
+  EntityMove(a,"F3 W60 F2 W60 F0");
+  While(MoveCode[a])
+  {
+   Wait(20);
+  }
+  stext(1,"Girls, girls, please. We have",
+          "to work together now. Try to",
+          "get along!");
+  Face[7]=0;
+  SpecialFrame[7]=0;
+  Wait(50);
+  SpecialFrame[7]=25;
+  Wait(100);
+  SpecialFrame[7]=27;
+  stext(4,"I suppose you're right... but",
+          "you better sleep with one eye",
+          "open, you hussy!");
+  SpecialFrame[7]=0;
+  stext(1,"Now it is time for us to go",
+          "to Castle Heck and defeat",
+          "Lord Stan once and for all!");
+  Face[7]=2;
+  stext(4,"Right. It's time we fight for",
+          "truth and justice in this",
+          "world! Count me in!");
+  Face[b]=3;
+  stext(2,"No enemy can stand in the",
+          "face of me! I shall fight to",
+          "my dying breath!");
+  stext(1,"Let's bravely march forth!",
+          "Come, troops! Out destination:",
+          "the dreaded Castle Heck.");
+  Speed[7]=3;
+  Speed[b]=3;
+  EntityMove(7,"R2");
+  EntityMove(b,"L2");
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  Warp(18,91,1);
+  GiveXP(4,92);
+  CameraTracking=1;
+  AutoOff();
+  AddCharacter(4);
+  Entity.LocX[7]+=20;
+  flags[30]=1;
+ }
+}
+
+event /* 22 */                                  // Master Chest Script
+{
+ if(!flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),280,2);
+  SoundEffect(3);
+  GiveItem(var(3));
+  flags[var(0)]=1;
+ }
+}
+
+event /* 23 */                                  // Master Chest Auto-Exec
+{
+ if(flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),280,2);
+ }
+}
+
+event /* 24 */                                  // Master Switch Script
+{
+}
+
+event /* 25 */                                  // Master Switch Auto-Exec
+{
+}
+
+event /* 26 */
+{
+ if(!flags[150])
+ {
+  SoundEffect(8);
+ }
+ FakeBattle();
+}
+
+event /* 27 */
+{
+ ChainEvent(40,95,20,23,24,26);
+}
+
+event /* 28 */
+{
+ flags[96]+=1;
+ if(flags[96]=8)
+ {
+  flags[96]=0;
+ }
+ for(a,0,4,1)
+ {
+  AlterBTile(13,22+a,533,1);
+ }
+ if(!flags[4000])
+ {
+  b=flags[96];
+ }
+ if(b=5)
+ {
+  b=3;
+ }
+ if(b=6)
+ {
+  b=2;
+ }
+ if(b=7)
+ {
+  b=1;
+ }
+ AlterBTile(13,22+b,226,0);
+ if(b=0)
+ {
+  c=281;
+ }
+ if(b=1)
+ {
+  c=462;
+ }
+ if(b=2)
+ {
+  c=464;
+ }
+ if(b=3)
+ {
+  c=463;
+ }
+ if(b=4)
+ {
+  c=284;
+ }
+ AlterBTile(18,28,c,2);
+ SoundEffect(3);
+ WaitKeyUp();
+}
+
+event /* 29 */
+{
+ ChainEvent(40,97,18,36,24,36);
+}
+
+event /* 30 */
+{
+ ChainEvent(40,98,28,29,26,36);
+}
+
+event /* 31 */
+{
+ ChainEvent(40,99,14,41,23,40);
+}
+
+event /* 32 */
+{
+ if(!flags[100])
+ {
+  SoundEffect(3);
+  AlterBTile(20,46,226,0);
+  AlterBTile(20,47,533,1);
+  AlterBTile(20,45,284,2);
+  AlterBTile(19,47,284,2);
+  if(facing(3))
+  {
+   warp(20,46,1);
+  }
+  WaitKeyUp();
+  flags[100]=1;
+  return;
+ }
+ if(flags[100])
+ {
+  SoundEffect(3);
+  AlterBTile(20,46,533,1);
+  AlterBTile(20,47,226,0);
+  AlterBTile(20,45,281,2);
+  AlterBTile(19,47,281,2);
+  if(facing(1))
+  {
+   Warp(20,47,1);
+  }
+  WaitKeyUp();
+  flags[100]=0;
+ }
+}
+
+event /* 33 */
+{
+ SoundEffect(7);
+ Timer=0;
+ Wait(5);
+ While(Timer<100 AND Timer>4)
+ {
+  PaletteMorph(63,63,63,100-Timer,63);
+ }
+ Banner("Save Point",3);
+ EnableSave();
+}
+
+event /* 34 */
+{
+ DisableSave();
+}
+
+event /* 35 */
+{
+ Warp(42,57,0);
+ Banner("B1",3);
+}
+
+event /* 36 */
+{
+ Warp(46,57,0);
+ Banner("B1",3);
+}
+
+event /* 37 */
+{
+ Warp(18,37,0);
+}
+
+event /* 38 */
+{
+ Warp(22,37,0);
+}
+
+event /* 39 */                                  // Master 3-Vert Switch
+{
+ flags[var(0)]+=1;
+ if(flags[var(0)]=4)
+ {
+  flags[var(0)]=0;
+ }
+ for(a,0,2,1)
+ {
+  AlterBTile(var(1),var(2)+a,533,1);
+ }
+ if(!flags[4000])
+ {
+  b==flags[var(0)];
+ }
+ if(b=3)
+ {
+  b=1;
+ }
+ AlterBTile(var(1),var(2)+b,226,0);
+ if(b=0)
+ {
+  c=281;
+ }
+ if(b=1)
+ {
+  c=464;
+ }
+ if(b=2)
+ {
+  c=284;
+ }
+ AlterBTile(var(3),var(4),c,2);
+ SoundEffect(3);
+ WaitKeyUp();
+}
+
+event /* 40 */                                  // Master 3-Horiz Switch
+{
+ flags[var(0)]+=1;
+ if(flags[var(0)]=4)
+ {
+  flags[var(0)]=0;
+ }
+ for(a,0,2,1)
+ {
+  AlterBTile(var(1)+a,var(2),532,1);
+ }
+ if(!flags[4000])
+ {
+  b=flags[var(0)];
+ }
+ if(b=3)
+ {
+  b=1;
+ }
+ AlterBTile(var(1)+b,var(2),226,0);
+ if(b=0)
+ {
+  c=281;
+ }
+ if(b=1)
+ {
+  c=464;
+ }
+ if(b=2)
+ {
+  c=284;
+ }
+ AlterBTile(var(3),var(4),c,2);
+ SoundEffect(3);
+ WaitKeyUp();
+}
+
+event /* 41 */
+{
+ if(!flags[123])
+ {
+  For(a,0,2,1)
+  {
+   SpecialFrame[a]=23;
+  }
+  Wait(200);
+  x=31;
+  Timer=0;
+  QuakeX=5;
+  QuakeY=5;
+  Quake=1;
+  LayerVC=1;
+  y=0;
+  For(a,0,2,1)
+  {
+   SpecialFrame[a]=21;
+  }
+  Wait(100);
+  For(a,0,2,1)
+  {
+   SpecialFrame[a]=0;
+  }
+  SpecialFrame[char(4)-1]=26;
+  stext(4,"Umm... what's going on, Sara?","","");
+  SpecialFrame[char(2)-1]=20;
+  Wait(50);
+  stext(2,"Tee hee. Maybe that plasma",
+          "conduit I severed was a bit",
+          "more important than I thought.");
+  SpecialFrame[char(2)-1]=0;
+  stext(4,"You *idiot*! Darin, let's get",
+          "out of here as soon as",
+          "possible!");
+  For(a,0,2,1)
+  {
+   SpecialFrame[a]=0;
+  }
+  flags[123]=1;
+  HookRetrace(42);
+ }
+}
+
+event /* 42 */
+{
+ if(timer>100)
+ {
+  AlterBTile(6,28,281,2);
+  if(y=0)
+  {
+   x--;
+   CallEvent(43);
+   SoundEffect(13);
+   ScreenGradient=1;
+   MapPaletteGradient(32,39,1,0);
+   timer=0;
+   y=1;
+   return;
+  }
+  if(y=1)
+  {
+   ScreenGradient=0;
+   y=0;
+   timer=0;
+   return;
+  }
+ }
+}
+
+event /* 43 */
+{
+ VCClear();
+ if(x=30)
+ {
+  VCText(5,190,"00:30");
+ }
+ if(x=29)
+ {
+  VCText(5,190,"00:29");
+ }
+ if(x=28)
+ {
+  VCText(5,190,"00:28");
+ }
+ if(x=27)
+ {
+  VCText(5,190,"00:27");
+ }
+ if(x=26)
+ {
+  VCText(5,190,"00:26");
+ }
+ if(x=25)
+ {
+  VCText(5,190,"00:25");
+ }
+ if(x=24)
+ {
+  VCText(5,190,"00:24");
+ }
+ if(x=23)
+ {
+  VCText(5,190,"00:23");
+ }
+ if(x=22)
+ {
+  VCText(5,190,"00:22");
+ }
+ if(x=21)
+ {
+  VCText(5,190,"00:21");
+ }
+ if(x=20)
+ {
+  VCText(5,190,"00:20");
+ }
+ if(x=19)
+ {
+  VCText(5,190,"00:19");
+ }
+ if(x=18)
+ {
+  VCText(5,190,"00:18");
+ }
+ if(x=17)
+ {
+  VCText(5,190,"00:17");
+ }
+ if(x=16)
+ {
+  VCText(5,190,"00:16");
+ }
+ if(x=15)
+ {
+  VCText(5,190,"00:15");
+ }
+ if(x=14)
+ {
+  VCText(5,190,"00:14");
+ }
+ if(x=13)
+ {
+  VCText(5,190,"00:13");
+ }
+ if(x=12)
+ {
+  VCText(5,190,"00:12");
+ }
+ if(x=11)
+ {
+  VCText(5,190,"00:11");
+ }
+ if(x=10)
+ {
+  VCText(5,190,"00:10");
+ }
+ if(x=9)
+ {
+  VCText(5,190,"00:09");
+ }
+ if(x=8)
+ {
+  VCText(5,190,"00:08");
+ }
+ if(x=7)
+ {
+  VCText(5,190,"00:07");
+ }
+ if(x=6)
+ {
+  VCText(5,190,"00:06");
+ }
+ if(x=5)
+ {
+  VCText(5,190,"00:05");
+ }
+ if(x=4)
+ {
+  VCText(5,190,"00:04");
+ }
+ if(x=3)
+ {
+  VCText(5,190,"00:03");
+ }
+ if(x=2)
+ {
+  VCText(5,190,"00:02");
+ }
+ if(x=1)
+ {
+  VCText(5,190,"00:01");
+ }
+ if(x=0)
+ {
+  VCText(5,190,"00:00");
+  HookRetrace(0);
+  q=volume;
+  Volume=0;
+  SoundEffect(21);
+  ScreenGradient=0;
+  For(x,1,100,1)
+  {
+   PaletteMorph(63,0,0,x,63);
+   Wait(1);
+  }
+  Wait(200);
+  Volume=q;
+  PaletteMorph(0,0,0,0,63);
+  ScreenGradient=0;
+  Quake=0;
+  VCClear();
+  layervc=0;
+  HookRetrace(0);
+  HookTimer(0);
+  Exit();
+ }
+}
+
+event /* 44 */
+{
+ if(flags[120]=1)
+ {
+  for(q,8,12,1)
+  {
+   AlterBTile(4,q,281,2);
+   flags[120]=0;
+  }
+ }
+ if(flags[121]=1)
+ {
+  for(q,8,12,1)
+  {
+   AlterBTile(7,q,281,2);
+   flags[121]=0;
+  }
+ }
+ if(flags[122]=1)
+ {
+  for(q,8,12,1)
+  {
+   AlterBTile(10,q,281,2);
+   flags[122]=0;
+  }
+ }
+ SoundEffect(3);
+ AlterBTile(6,28,284,2);
+ WaitKeyUp();
+}
+
+event /* 45 */
+{
+ if(!flags[120])
+ {
+  SoundEffect(3);
+  AlterBTile(4,9,284,2);
+  AlterBTile(14,8,533,1);
+  AlterBTile(14,7,226,1);
+  flags[120]=2;
+ }
+}
+
+event /* 46 */
+{
+ if(!flags[121] and flags[120]=2)
+ {
+  SoundEffect(3);
+  AlterBTile(7,12,284,2);
+  AlterBTile(14,7,533,1);
+  AlterBTile(14,6,226,1);
+  flags[121]=2;
+ }
+}
+
+event /* 47 */
+{
+ if(!flags[122] and flags[121]=2)
+ {
+  SoundEffect(3);
+  AlterBTile(10,11,284,2);
+  AlterBTile(14,6,533,1);
+  AlterBTile(14,5,226,0);
+  flags[122]=2;
+ }
+}
+
+event /* 48 */
+{
+ if(!flags[120])
+ {
+  SoundEffect(3);
+  For(q,8,12,1)
+  {
+   AlterBTile(4,q,284,2);
+  }
+  flags[120]=1;
+ }
+}
+
+event /* 49 */
+{
+ if(!flags[121] and flags[120]=2)
+ {
+  SoundEffect(3);
+  For(q,8,12,1)
+  {
+   AlterBTile(7,q,284,2);
+  }
+  flags[121]=1;
+ }
+}
+
+event /* 50 */
+{
+ if(!flags[122] and flags[121]=2)
+ {
+  SoundEffect(3);
+  For(q,8,12,1)
+  {
+   AlterBTile(10,q,284,2);
+  }
+  flags[122]=1;
+ }
+}
+
+
+event /* 51 */
+{
+ if(!flags[29])
+ {
+  AutoOn();
+  a=char(1)+94;
+  b=char(3)+94;
+  ObsMode[a]=1;
+  ObsMode[b]=1;
+  if(Entity.LocY[b]<Entity.LocY[a])
+  {
+   EntityMove(a,"U1");
+   EntityMove(b,"D1 F1");
+   Wait(100);
+  }
+  SpecialFrame[a]=21;
+  Wait(100);
+  SpecialFrame[a]=0;
+  EntityMove(a,"L1 U5");
+  EntityMove(b,"U1 R1 U5");
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  c=YWin;
+  CameraTracking=0;
+  Timer=0;
+  While(Timer<81)
+  {
+   YWin=c-Timer;
+   Redraw();
+  }
+  q=volume;
+  Timer=0;
+  While(Timer<q)
+  {
+   volume=q-Timer;
+  }
+  FadeOut(30);
+  LayerVC=1;
+  VCPutPCX("frozen.pcx",100,5);
+  Layer0=0;
+  Layer1=0;
+  DrawEntities=0;
+  Redraw();
+  FadeIn(30);
+  volume=q;
+  playmusic("CR_GUIT.S3M");
+  stext(1,"No! This can't be! Lord Stan",
+          "has imprisoned Crystal in",
+          "some sort of... crystal!");
+  stext(3,"This is tragic! Neat",
+          "translucency effect, though,",
+          "don't you think?");
+  stext(1,"He must be planning to keep",
+          "her here until he comes up",
+          "with an evil enough scheme.");
+  stext(1,"Do you suppose these strange",
+          "machines might be able to free",
+          "her, Dexter?");
+  stext(3,"Well, I don't know much about",
+          "engineering, but I have an",
+          "idea about how this works.");
+  stext(3,"But it would require a device",
+          "known as a Thermal Activator,",
+          "and I'm not sure what to do.");
+  FadeOut(30);
+  VCClear();
+  LayerVC=0;
+  Layer0=1;
+  Layer1=1;
+  DrawEntities=1;
+  Redraw();
+  FadeIn(30);
+  Speed[a]=3;
+  EntityMove(a,"F0 W50 D2");
+  Wait(20);
+  While(MoveCode[a])
+  {
+   Wait(20);
+  }
+  Wait(35);
+  SpecialFrame[a]=15;
+  Wait(50);
+  SpecialFrame[a]=28;
+  stext(1,"But we can't just leave her",
+          "like this, Dexter! There must",
+          "be a way.");
+  stext(3,"Well, it is said that there is",
+          "a machinist living in the",
+          "forest city of Rodne.");
+  Speed[b]=3;          
+  EntityMove(b,"L2 D1");
+  Wait(20);
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  stext(3,"Rodne is beyond the southern",
+          "edge of Raven Gulch. Shall we",
+          "go? We can find help there.");
+  stext(1,"Rodne? That's not... based on",
+          "some sort or Star Wars",
+          "location name, is it?");
+  stext(3,"Of course not.","","");
+  Face[a]=1;
+  SpecialFrame[a]=0;
+  stext(1,"Raven Gulch, eh? How will we",
+          "cross the chasm to reach the",
+          "southern ridge?");
+  stext(3,"That's no problem. I have a",
+          "ranger friend there. He will",
+          "let us cross.");
+  EntityMove(a,"U2 R1 F1");
+  Wait(20);
+  While(MoveCode[a])
+  {
+   Wait(20);
+  }
+  Wait(100);
+  SpecialFrame[a]=15;
+  Wait(30);
+  Face[a]=0;
+  SpecialFrame[a]=0;
+  Wait(30);
+  SpecialFrame[a]=25;
+  Wait(150);
+  SpecialFrame[a]=10;
+  Wait(30);
+  Face[a]=1;
+  SpecialFrame[a]=0;
+  playmusic("NONEXIST.MOD");
+  stext(1,"Alright, then. Let's go!",
+          "Crystal, sit tight. I'll be",
+          "back for you, I promise!");
+  SText(3,"I'm coming too!","","");
+  EntityMove(b,"U1 R1");
+  Wait(20);
+  While(MoveCode[b])
+  {
+   Wait(20);
+  }
+  AutoOff();
+  Warp(18,93,1);
+  CameraTracking=1;
+  Redraw();
+  flags[29]=1;
+ }
+}

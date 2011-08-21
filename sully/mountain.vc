@@ -1,0 +1,520 @@
+event /* 0 */
+{
+ flags[151]=0;
+ EnforceAnimation();
+ For(a,0,3,1)
+ {
+  b=a;
+  b+=b;
+  c=13;
+  c+=a;
+  d=3;
+  d+=b;
+  CallEvent(14,c,d,31);
+ }
+ if(flags[17])
+ {
+  Entity.locX[5]=85;
+ }
+ if(flags[123] AND !flags[140])
+ {
+  HookRetrace(0);
+  ScreenGradient=0;
+  VCClear();
+  q=Volume;
+  Volume=0;
+  Redraw();
+  FadeIn(30);
+  ChainEvent(30);
+ }
+ if(flags[140])
+ {
+  ChangeZone(20,5,0);
+  ChangeZone(23,5,0);
+  AlterFTile(21,3,301,1);
+  AlterFTile(22,3,302,1);
+  AlterFTile(20,4,301,1);
+  AlterBTile(21,4,199,1);
+  AlterBTile(22,4,199,1);
+  AlterFTile(23,4,302,1);
+  For(y,20,23,1)
+  {
+   AlterBTile(y,5,199,1);
+  }
+ }
+}
+
+event /* 1 */
+{
+ mapswitch("TEST.MAP",81,10,0);
+}
+
+event /* 2 */
+{
+ warp(12,70,0);
+}
+
+event /* 3 */
+{
+ warp(3,5,0);
+}
+
+event /* 4 */
+{
+ warp(12,90,0);
+}
+
+event /* 5 */
+{
+ warp(3,29,0);
+}
+
+event /* 6 */
+{
+ ChainEvent(13,13,3,31,32);
+}
+
+event /* 7 */
+{
+ ChainEvent(13,14,5,31,38);
+}
+
+event /* 8 */
+{
+ ChainEvent(13,15,7,31,12);
+}
+
+event /* 9 */
+{}
+
+event /* 10 */
+{
+ if(!flags[16])
+ {
+  AlterBTile(9,31,271,2);
+  SoundEffect(3);
+  Banner("Found 300 GP!",3);
+  GiveGP(300);
+  flags[16]=1;
+ }
+}
+
+event /* 11 */
+{
+ if(!flags[17])
+ {
+  stext(3,"Hello? Oh, Darin my good",
+          "friend! It's been such a long",
+          "time, hasn't it?");
+  stext(1,"Dexter! You're the last person",
+          "I expected to find here.","");
+  LayerVC=1;
+  VCPutPCX("dexter.pcx",80,30);
+  stext(3,"I left home after my father",
+          "disapproved of my studies. I",
+          "am searching for a sage.");
+  stext(3,"Bumsville no longer gets water",
+          "from the earth, and Rodne has",
+          "no water from the sky.");
+  stext(3,"I am hoping the sage in these",
+          "mountains may know who is",
+          "responsible.");
+  stext(3,"Darin, what are you doing",
+          "here? Don't you know that",
+          "hiking is dangerous?");
+  stext(1,"I'm exploring this world. I",
+          "am on a quest to defeat Lord",
+          "Stan and restore peace.");
+  stext(3,"I see... well, it's too risky",
+          "to tread around here by",
+          "yourself.");
+  stext(3,"My investigations have shown",
+          "some Lord Stan activity around",
+          "this area.");
+  stext(1,"Good. Then perhaps I can find",
+          "some clue or lead that will",
+          "help me in this quest.");
+  stext(3,"Then I'll come with you. You",
+          "can always use some extra",
+          "help!");
+  VCClear();
+  LayerVC=0;
+  stext(1,"That's a good idea, Dexter.",
+          "Thank you.","");
+  Speed[5]=2;
+  ObsMode[5]=1;
+  MoveCode[5]=0;
+  EntityMove(5,"L1");
+  Wait(5);
+  While(Entity.Moving[5])
+  {
+   Wait(5);
+  }
+  Entity.locX[5]=65;
+  AddCharacter(3);
+  flags[17]=1;
+ }
+}
+
+event /* 12 */
+{
+ mapswitch("LAB.MAP",0,0,0);
+}
+
+event /* 13 */                                  // Master Chest Script
+{
+ if(!flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),271,2);
+  SoundEffect(3);
+  GiveItem(var(3));
+  flags[var(0)]=1;
+ }
+}
+
+event /* 14 */                                  // Master Chest Auto-Exec
+{
+ if(flags[var(0)])
+ {
+  AlterBTile(var(1),var(2),271,2);
+ }
+}
+
+event /* 15 */
+{
+ if(!flags[150])
+ {
+  SoundEffect(8);
+ }
+ FakeBattle();
+}
+
+event /* 16 */
+{
+ SoundEffect(10);
+ Timer=0;
+ While(Timer<100)
+ {
+  PaletteMorph(20,20,63,100-timer,63);
+ }
+ HealAll();
+ stext(0,"HP/MP/Status restored!","","");
+}
+
+event /* 17 */
+{
+ SoundEffect(7);
+ Timer=0;
+ Wait(5);
+ While(Timer<100 and Timer>4)
+ {
+  PaletteMorph(63,63,63,100-Timer,63);
+ }
+ Banner("Save Point",3);
+ EnableSave();
+}
+
+event /* 18 */
+{
+ DisableSave();
+}
+
+event /* 19 */
+{
+ Warp(38,71,0);
+}
+
+event /* 20 */
+{
+ Warp(30,26,0);
+}
+
+event /* 21 */
+{
+ Warp(36,86,0);
+}
+
+event /* 22 */
+{
+ Warp(31,43,0);
+}
+
+event /* 23 */
+{
+ stext(0,"Chez Sage ---",
+         "Your one-stop forgotten mystic",
+         "lore shop!");
+}
+
+event /* 24 */
+{
+ if(flags[124] and !char(4))
+ {
+  stext(0,"I no longer wish to speak to",
+          "you unless you have a ponytail",
+          "chick or just won the lottery.");
+  return;
+ }
+ if(!flags[124] and char(3))
+ {
+  stext(0,"Eh? Who's there? I haven't had",
+          "a custo... er... visitor in",
+          "quite some time!");
+  stext(3,"Master Sage, my name is Dexter",
+          "and I study magic at the",
+          "university in Bumsville.");
+  stext(3,"I have come to seek your wise",
+          "counsel and partake of your",
+          "infinite and profound wisdom.");
+  stext(0,"Heh! Well, you seem like a",
+          "nice enough kid. Tell you",
+          "what...");
+  prompt(0,"You fork over 100 gold and",
+           "I'll tell you the secret of",
+           "the universe!",125,"Yes","No");
+  if(flags[125])
+  {
+   stext(0,"Well, your loss I suppose.","","");
+   return;
+  }
+  if(GP<100)
+  {
+   stext(0,"Are you trying to cheat me,",
+           "you no good kids? Begone!","");
+   return;
+  }
+  SoundEffect(14);
+  TakeGP(100);
+  stext(0,"Oh boy! Money! Mwa ha ha! I",
+          "mean, *cough* *ahem* yes, one",
+          "wise enlightenment coming up.");
+  stext(0,"Pay attention to the ancient",
+          "storytellers. They speak with",
+          "lore from ages past.");
+  stext(0,"The hidden meaning on some of",
+          "their stories just might save",
+          "your life one day!");
+  stext(3,"... That's it?! That's the",
+          "meaning of life?","");
+  stext(0,"Sorry. 100 gold for the",
+          "first minute, 20,000 gold",
+          "for each additional minute.");
+  stext(1,"20,000 gold?!","","");
+  stext(0,"Well, there is a 99% discount",
+          "for cheeky babes with pony",
+          "tails. Bye now!");
+  flags[124]=1;
+  return;
+ }
+ if(char(4))
+ {
+  stext(0,"Hey there, gorgeous! Is there",
+          "anything you want me to teach",
+          "you?");
+  stext(4,"Watch it, you old fart. I've",
+          "been known to strangle people",
+          "with these arm tassles!");
+  prompt(0,"For you, a special price. I'll",
+           "tell you about the greatest",
+           "secret for only 200 gold!",126,"Yes","No");
+  if(flags[126])
+  {
+   stext(0,"Aww... come on! Do you have",
+           "any idea how hard it is for",
+           "us philosophy majors to work?");
+   return;
+  }
+  if(GP<200)
+  {
+   stext(0,"You don't have enough money,",
+           "and you're too dumb to even",
+           "know it?");
+   stext(0,"Well, it's a good thing you",
+           "got looks, babe.","");
+   return;
+  }
+  SoundEffect(14);
+  TakeGP(200);
+  stext(0,"Thank you, kind people! I",
+          "shall quote from an ancient",
+          "Vicarian scroll...");
+  stext(0,"Many years ago, the ancient",
+          "gods found animals to be more",
+          "worthy of the earth.");
+  stext(0,"Humans were cursed with",
+          "stupidity and animals were",
+          "granted the Ultimate Power.");
+  stext(0,"The animals desired peace, and",
+          "decided not to use the",
+          "Ultimate Power.");
+  stext(0,"The animal tribe banished the",
+          "Ultimate Power to the earth,",
+          "so humans would never find it.");
+  stext(0,"However, one legend speaks of",
+          "an icon of honesty and truth",
+          "that controls this power.");
+  stext(0,"If a human could weild this",
+          "sacred relic, the power would",
+          "be wrested from the earth.");
+  stext(0,"Pretty cool, huh? Well, bye",
+          "now. Come again, ya hear?","");
+ }
+}
+
+event /* 25 */
+{
+ Warp(73,85,0);
+ Banner("Sanctuary",3);
+}
+
+event /* 26 */
+{
+ Warp(21,54,0);
+}
+
+event /* 27 */
+{
+ if(flags[123]=1 and !flags[139])
+ {
+  Right=1;
+  Up=0;
+  Down=0;
+  Left=0;
+ }
+}
+
+event /* 28 */
+{
+ if(flags[123]=1 and !flags[140])
+ {
+  flags[139]=1;
+  Left=1;
+  Up=0;
+  Down=0;
+  Right=0;
+ }
+}
+
+event /* 29 */
+{
+}
+
+event /* 30 */
+{
+ PartyMove("R11 L3");
+ For(x,0,2,1)
+ {
+  SpecialFrame[x]=21;
+ }
+ CameraTracking=0;
+ Timer=0;
+ a=XWin;
+ While(Timer<100)
+ {
+  XWin=a-Timer;
+  Redraw();
+ }
+ SoundEffect(12);
+ Wait(80);
+ For(a,1,29,2)
+ {
+  flags[1000+a]=random(100,180);
+  flags[1001+a]=random(30,110);
+ }
+ VCLoadPCX("POP01.PCX",0);
+ VCLoadPCX("POP02.PCX",256);
+ VCLoadPCX("POP03.PCX",512);
+ For(a,1,34,2)
+ {
+  For(b,1,30,2)
+  {
+   SoundEffect(19);
+   if(a>=b)
+   {
+   flags[1030+b]+=1;
+   }
+  }
+  For(c,1031,1061,2)
+  {
+   if(flags[c]=1)
+   {
+    VCTBlitImage(flags[c-30],flags[c-29],16,16,0);
+   }
+   if(flags[c]=2)
+   {
+    VCTBlitImage(flags[c-30],flags[c-29],16,16,256);
+   }
+   if(flags[c]=3)
+   {
+    VCTBlitImage(flags[c-30],flags[c-29],16,16,512);
+   }
+  }
+  Wait(30);
+  VCClear();
+ }
+ VCClear();
+ Redraw();
+ SoundEffect(21);
+ Timer=0;
+ While(timer<100)
+ {
+  PaletteMorph(63,0,0,Timer,63);
+ }
+ AlterFTile(21,3,301,1);
+ AlterFTile(22,3,302,1);
+ AlterFTile(20,4,301,1);
+ AlterBTile(21,4,199,1);
+ AlterBTile(22,4,199,1);
+ AlterFTile(23,4,302,1);
+ For(y,20,23,1)
+ {
+  AlterBTile(y,5,199,1);
+ }
+ ChangeZone(20,5,0);
+ ChangeZone(23,5,0);
+ Quake=0;
+ Redraw();
+ Timer=0;
+ While(Timer<100)
+ {
+  PaletteMorph(63,0,0,100-Timer,63);
+ }
+ a=XWin;
+ Timer=0;
+ While(Timer<100)
+ {
+  XWin=a+Timer;
+  Redraw();
+ }
+ CameraTracking=1;
+ PlayMusic("NONEXIST.MOD");
+ Volume=q;
+ PlayMusic("DREAMS2.S3M");
+ For(x,0,2,1)
+ {
+  SpecialFrame[x]=0;
+ }
+ SetFace(1,2);
+ SetFace(2,3);
+ SetFace(3,3);
+ LayerVC=0;
+ Wait(25);
+ stext(1,"Whew, that was close! Is",
+         "everyone OK?","");
+ stext(4,"Hooray! We destroyed Lord",
+         "Stan's evil laboratory!","");
+ stext(2,"We?! Excuse me, but I believe",
+         "it was me who did all the work",
+         "back there.");
+ stext(4,"Work?! You nearly got us all",
+         "killed, you airhead! You are",
+         "lucky Darin puts up with you.");
+ stext(1,"With his lab destroyed, Stan",
+         "might do something crazy. We",
+         "better hurry to the Castle.");
+ CancelFade=1;
+ For(x,1001,1063,1)
+ {
+  flags[x]=0;
+ }
+}

@@ -1,0 +1,505 @@
+  ========================================
+
+    The VERGE Frequently Asked Questions
+                 5-14-98
+    
+  ========================================
+
+  Updated by McGrue@juno.com
+
+  *****************
+  *-General Stuff-*
+  *****************
+
+  ======================================
+  Q: How do I get started with VERGE?
+  ======================================
+
+  A: If you just want to be able to play already released games, all you
+  usually need to do is download the particular game, and open the MAIN.EXE
+  file.  Occasionally, somone will rename this file to the name of thier
+  game, so if you cannot find MAIN, look for another program file with the
+  title of the game in it.
+
+  If you want to create a game, you should download VERGE.ZIP, MAPED.ZIP,
+  and VERGEDEV.ZIP.  These files contain all of the vital components you
+  need to run and make VERGE games.  VERGE.ZIP also includes the pack-in
+  demo, which can be looked at with the dev-tools to see how things are
+  done in VC.  I would suggest first playing the game to see what VERGE is
+  capable of, and then reading the documentation.
+
+  ======================================
+  Q. Where is the documentation?
+  ======================================
+
+  A:The docs are found in the form of two files: VERGEDOC.TXT, which is a
+  basic editing manual, and VERGEC.TXT, which is a list of VergeC commands
+  with examples.  Both files are found within VERGE.ZIP, which is available
+  at the VERGE Repository. The VERGE Repository is located at:
+
+  http://verge.vivid.com
+
+  Also included in this file are the VERGE main executables, and the most
+  current version of Hahn's pack-in demo, which can show VERGE's abilitys
+  to anyone intrested.
+
+  ======================================
+  Q. I can't hear any sound.
+  ======================================
+
+  A: Be sure your BLASTER variable is set properly. Verge uses the BLASTER
+     environment variable to detect port, irq and dma settings. If it isn't
+     set at all, it won't even be able to detect your SoundBlaster.
+
+  ======================================
+  Q. The sound works, but is really choppy, or it skips, or it occasionally
+     randomly crashes or does other weird things.
+  ======================================
+
+  A: You probably have your sound quality too high. Verge is known to do
+     strange things when it can't keep up with the music mixing. The
+     following SETUP.CFG has been proven to work on a 486/33 with
+     SB16, and should work on most any computer:
+
+     sounddevice 0
+     force8bit
+     mixrate 22100
+     dmabufsize 4096
+     joystick 1
+     jb2 3
+     jb3 2
+     end
+
+     Be sure the "interpolate" is NOT in your SETUP.CFG if you have music
+     speed problems. Interpolation increases the sound quality but for a
+     considerable speed hit. Incidentally, I can get 60fps on my 486/66
+     with 8 megs of RAM with my Gravis UltraSound, at full mixing quality.
+  :)
+
+  ======================================
+  Q. When will VERGE be done?
+  ======================================
+
+  A: Hah, as if I know. Haven't you learned by now that the release date of
+  software exponentially increases porportionally to how much the authors
+  try to set a release date? :)
+
+  Both Verge 1.0, and Verge 2.0 shall be completed. The developers have spoken.
+
+  ======================================
+  Q. How much does VERGE cost?
+  ======================================
+
+  A: Here's the full legal spiel. (from vecna's own mouth)
+
+  "VERGE is free for non-commercial use. VERGE is Copyright (C)1997,1998 by
+  BJ Eirich (vecna), with the exception of the sound code, which is a
+  modified version of MikMod 2.09, written by MikMak. Thecurrent pack in
+  demo was done by Brian Peterson (Hahn), including the art inside it,
+  except or the speech portraits and manga cels which were drawn by Miko.
+
+  I am not liable for the contents of any games written using VERGE. I am
+  not liable if VERGE blows up your computer (never known to happen), or if it
+  crashes your computer (known to happen), or if it corrupts your hard
+  drive (only known to happen to me while debugging :|), or any other damage.
+  It's ALPHA software, so use at your own risk.  Satisfaction guaranteed or
+  your money back (which is exactly $0). :)
+
+  You may NOT include VERGE in any CDROM, shareware collection, etc without
+  my written permission. You can mirror the packages on the VERGE web site
+  provided they are unmodified. Realistically, I don't care that much about
+  this, I'm just covering my legal behind.
+
+  You may NOT sell any games created with VERGE without my permission. I'm
+  willing to be reasonable about this, but my intent is to generate FREE
+  RPGs over the internet, and I would prefer the vast majority of VERGE RPGs
+  be free.
+
+  I'd rather NOT get paid for VERGE, and NOT have to pay for RPGs made with
+  it.
+
+  If a group of people wanted to get together and try to create a
+  commercial quality RPG using VERGE, I wouldn't have a problem with that, 
+  but some deal would have to be worked out before hand. Ie, I'm going to 
+  charge SOMETHING for that, but what exactly that is I don't know yet, so 
+  you'll need to contact me.
+
+  I personally am hoping for more free RPGs, but if there is a really high
+  quality RPG being produced that people think has commercial potential,
+  I'd be willing to make custom engine modifications, etc to help the project
+  along.  (Mind you, the commercial game market of the computer world is 
+  gruelingly cruel. It'd have to be one REALLY high-quality RPG.)"
+
+  Now, even though vecna has realeased what source code for VERGE 1.0 he had,
+  he does still retain full rights to the code.  This means, if you want to 
+  modify the code at the most basic levels, toward the end of creating a 
+  specialized VERGE game, or if you want to look at the code to learn a few 
+  tricks of the trade, then feel free.  However, if you take the code with the 
+  intent of creating a VERGE-like creation system, you will be breaking the
+  law. Definatly a no-no.  Kapeesh?
+
+ ======================================
+  Q. Will there ever be a Windows port?
+  ======================================
+
+  A: Sure will be. VERGE was originally meant to avoid Bill Gate's tyrannical 
+  and Borg-like ways, but resistance is proving to be futile.  More and more
+  computer users are lacking in DOS knowledge, turning into a culture of 
+  point-and-clicking zombies. To accomodate them, as well as letting midi 
+  support and Hi-color become viable for verge, Verge 2.0 will have a Win95
+  version.
+
+  ======================================
+  Q. What about other ports to systems like Linux, OS/2, Macintosh, etc?
+  ======================================
+
+  A: Although vecna was always intrested in a Linux port, he couldn't even
+  get Linux as an OS to get running on his machine.  As far as it is known,
+  only DOS shall have a version of VERGE 1.0, although there may be
+  dev-tools made for other platforms...but the Verge 1.0 itself, for now, will
+  be DOS-only.
+  
+  Verge 2.0, currently being headed by vecna, is planned for release on both
+  DOS and Win95 platforms.  It will not be released until it has been fully
+  created and tested, though, so you will have to wait a bit ;)
+
+  ======================================
+  Q. When will X be added?
+     Are you planning on implementing Y?
+  ======================================
+
+  A: Well, the verge-dev team is open for suggestion, but we will blatently
+  ignore any suggestion that has been made thousands of times before, and
+  said 'no' to each time. If you come up with an intresting feature that
+  might be able to be implemented, like a potential VC command or some
+  such, it couldn't hurt to ask. You may end up contributing something very
+  handy to the community ;)
+
+  ======================================
+  Q: What is VERGE Online?
+  ======================================
+
+  A: Verge Online is a future project that all of the dev-team is looking 
+  forward to greatly.  It will be a graphical MUD similar to Ultima Online, 
+  excepting that it will be in the Console RPG style, and won't be as bad as
+  UO. Although nothing is set in stone as of yet, there probably will be a
+  yearly charge to allow for server maintainence, and to buy new servers.
+  This charge will be very affordable, and much better than paying monthly
+  like for UO.
+
+  ======================================
+  Q. Is MAPSIZE really safe?
+  ======================================
+
+  General disclaimer: Back the map up first.
+
+  A: In a nutshell, MAPSIZE is -always- safe to run on non-parallaxing
+  MAPs. You do want to be careful you don't cut off parts of the map you 
+  wanted to keep, but aside from that you shouldn't have any problems.
+
+  Parallaxing maps are -tricky-, but if you know what you're doing, you can
+  use MAPSIZE on them. However, I really would recommend making a backup
+  before using it. The problem is that one layer may need to go farther than
+  another layer.
+
+  ======================================
+  Q. I'd like to install DJGPP. What files do I need?
+  ======================================
+
+  Okay, here's how you install DJGPP. First of all, you need to download
+  it.
+
+  The official page is at http://www.delorie.com. Another great reference
+  page is at http://www.rt66.com/~brennan/djgpp. The files you NEED to compile
+  C programs:
+
+  bnu27b.zip    Binary utilities like the assembler, linker, etc.
+  djdev201.zip  The DJGPP specific development files.
+  gcc2721b.zip  The GCC compiler itself.
+  mak375b.zip   The GNU MAKE program. Borland MAKE won't work.
+
+  Other files I recommend:
+
+  csdpmi3b.zip  DPMI provider
+  mpl105b.zip   EXE packer.
+  rhide13b.zip  A Borland-like IDE for DJGPP based on Turbo Vision.
+
+  Installing:
+
+  1) Make a \DJGPP directory. I *REALLY* recommend not using another name.
+  2) Unzip each of these files using -d (expand directories) into \DJGPP.
+  3) Add the following line to your AUTOEXEC.BAT file: (Note the forward
+  slashes)
+     set djgpp=/djgpp/djgpp.env
+  4) Add \DJGPP\BIN into your PATH.
+  5) Reboot, and you're ready to roll.
+
+  ======================================
+  Q. What files are absolutely needed for a VERGE game to run?
+  ======================================
+
+  (ie, what files do I need to pack in a ZIP if I want to distribute my
+  game)
+
+  The following files are required by VERGE and can't really be modified:
+  CWSDPMI.EXE
+  MAIN.EXE
+  TRANS.TBL
+
+  The following files are required by the basic VERGE system but can be
+  modified:
+  SETUP.CFG  
+  SAVEGAME.MNU
+  LOADGAME.MNU
+  DELGAME.MNU
+  * Any PCX files referrenced by the MNU files.
+  BOX.RAW
+  VERGE.PAL
+  STARTUP.SCR
+  * All music files and PCX files referenced by STARTUP.SCR
+
+  Required data files:
+  You will need these files for the game to run, but they will probably
+  have been heavily edited by the time you are getting your demo together.
+  PARTY.DAT
+  ITEMS.DAT
+  ITEMICON.DAT
+  MISCICON.DAT
+  MAIN.SFX
+  * All WAVs referenced by MAIN.SFX
+  SPEECH.SPC
+  MAIN.FNT
+  SMALL.FNT
+  EFFECTS.VCS (generated from EFFECTS.VC, which is not required)
+
+  Game data files:
+  These files will vary depending on your maps and characters. As of the
+  date this doc was written, you must have a TEST.MAP to start in.
+  .MAP files
+  .WAV files
+  .CHR files
+  .CR2 files
+  .MOD/S3M/XM files
+  .VSP files
+
+  ======================================
+  Q. Can I customize the VERGE palette?
+  ======================================
+
+  I would *SUGGEST* using the default VERGE palette. Strongly. But, if you
+  MUST change it, here's how.
+
+  First of all, you will need to create a new palette. I -REALLY- must
+  stress that you should keep the grey gradients and blue gradients the same
+  and in the same places, or else the greyscale savegames and blue menus 
+  will NOT look correct in the new palette. Eventually when the source code is
+  released you can change how the grey/blue transparencies are calculated, 
+  but for the moment, leave those. The rest of the palette is fair game.
+
+  Then you will need to create a VERGE.PAL of that palette. VERGE.PAL is
+  just a binary dump of the palette - any really good paint program should 
+  support a palette dump (not PSP, it has a goofy format), if not I'll make 
+  some sort of palette dumping program and stick it in DEVUTIL.
+
+  Once you have a new VERGE.PAL, you will need to put a copy of it in the
+  directory with MAIN.EXE, and in the directory with PCX2VSP.EXE. Any new
+  VSPs
+  you make will be mapped to the new palette. You'll need to redraw ALL the
+  graphics, including character graphics, icons, etc. None of the programs
+  besides PCX2VSP force the palette matching, so that shouldn't be a
+  problem.
+
+  You will also need to generate a new TRANS.TBL. To do that, runs
+  TRANS.EXE and
+  copy the resulting TRANS.TBL over the old one.
+
+  ******************
+  *-troubleshooting*
+  ******************
+
+  ======================================
+  Q: How do I open MapEd? I'm not too familiar with DOS...
+  ======================================
+
+  A:Well, first, you need to get to the dos prompt. You can accomplish this
+  in Windows 95 by going to the 'programs' section of the start menu, and
+  clicking on the 'M-S DOS prompt' choice.  When you have done that, you
+  will be facing a funny black screen with some text on it. 
+  Congradulations! You are in the DOS shell!
+  Now you need to get to your verge directory.  you can do this by typing
+  "cd (driveletter)\(directory name)". So if your verge directory was named
+  'Verge' and was on the C drive, you would type "cd c:\verge". Make sure
+  to hit the return key after typing this.  If you did it correctly, a new
+  line should appear on the left side of the bottom of the screen that
+  looks like:
+
+   C:\verge\>  
+
+  ....or whatever the directory's name is on your computer.
+  You're almost done :)  Now, to load a map into maped, you must type
+  "Maped (mapname.map)". So, if you wanted to load Island.Map, you would
+  type "Maped island.map".  Press enter, and you should enter the magical
+  realm of Maped! Happy Vergeing!
+  Note: A map file must be in the same directory as MapEd for you to load
+  it into MapEd.
+
+  ======================================
+  Q: Whenever I load up a map, or when I move to a certain point of the
+  map, VERGE crashes with a page fault! What's wrong?
+  ======================================
+
+  A:You are probably facing the southern-border bug, more commonly called
+  the 'Tarkuss' bug, after the verger who first found it.  Try increasing
+  the map's size by twenty or thirty tiles in each direction, using the
+  Mapsize.exe utility.
+
+  ======================================
+  Q: Whenever I try to load up a game, Verge shuts me out and "WAV load
+  error" appears at the top of my screen. What's wrong?
+  ======================================
+
+  A: Something isnt loading right in the sound effects department.  It
+  could be a .wav file with an improper format, or a bad filename in the
+  Main.sfx file. You might have to change the .Wav, or edit main.sfx.
+
+  ======================================
+  Q: Whenever I try to load a game, Verge shuts me out and "Bad Module
+  format" appears at the top of my screen. What's wrong?
+  ======================================
+
+  A: Somewhere in the game, something is trying to play a file that isnt in
+  the .XM, .S3M, or .MOD formats.  Verge only can play music modules of
+  these types.  Any attempt to play different music types will cause this
+  error message to appear.
+
+  ***************
+  *-Online Help-*
+  ***************
+
+  ======================================
+  Q: I have a problem with verge, and I read this FAQ, but my problem hasnt
+  been answered! what do I do?
+  ======================================
+
+  A: Well, first of all, read VERGEDOC.TXT, which is included in the
+  VERGE.ZIP file, which is downloadable at the VERGE Repository
+  (http://verge.vivid.com).  If your problem is VergeC related, be sure
+  also to read through VERGEC.TXT, found in the same file as VERGEDOC.TXT.
+  (Hey, even I have to refer to these things from time to time, so don't
+  think that you're above it ;)  
+
+  If you still are having trouble after reading these files, try asking the
+  question on the VERGE Discussion Board, also found at the VERGE Repository.
+  Remember that It'll take time for people to come to the
+  board, read your message, and reply to it, so dont get angry if nobody
+  has answered five minutes after you posted. Have patience!
+
+  * A note to new vergers.  If you do not read the documentation, and ask a
+  question that is covered in detail in the docs, there are members of the
+  community that will take this opportunity to yell and scream a lot at
+  you...It's almost inevitible that some people will :( That is why I
+  recommend reading the docs as your first course of action. Just trying to
+  prevent some pain ;)
+
+  If all else fails, you could always try going into the verge chat room
+  and asking for help....But remember, nobody is obligated to help you in
+  the chat room.  The chat room's purpose is to relax and talk to other
+  vergers, supposedly after a long day of making games ;)  If asking a
+  question, do so in a polite manner.  If you start insulting people in the
+  room, you are liable to be kicked or banned from the room. And besides,
+  if you ask your question politely, there's a better chance that
+  someone'll answer you :)
+
+  ======================================
+  Q: Where is the verge chat room?
+  ======================================
+
+  A: #verge is located on espernet.  Connect through dream.esper.net (port
+  5555), or dwango.esper.net (port 5555), or any of the other espernet
+  servers.   
+
+  ======================================
+  Q: What do I use to connect to espernet with?
+  ======================================
+
+  A: You would need an IRC client, such as mIRC, XiRCON, or ViRC.  Follow
+  these links, and you can learn more about these programs, as well as
+  download copys of them.
+
+  ======================================
+  Q: What is the dev-board?
+  ======================================
+
+  A: The dev-board is a tool to ask questions and share ideas  with the
+  rest of the VERGE community. It can be a great asset, but it should not
+  be misused.
+  
+  There are currently 3 different boards. A general Disscusion board, a 
+  Developers board, and a Help board. The Dev and Help boards are strictly 
+  on-topic: any off-topic messages can be reprimanded stiffly.  The General 
+  Disscusion board is more relaxed, but flames and spamming will not be 
+  tolerated.
+
+  ======================================
+  Q: What constitutes 'mis-use' of the dev-board?
+  ======================================
+
+  A: Doing things such as insulting someone or something outright is wrong.
+  Spamming of any kind is frowned upon.  Using the board to talk about
+  subjects that have nothing to do with VERGE, or roleplaying games should
+  be avoided, too.
+
+  ======================================
+  Q: What is proper use of the board?
+  ======================================
+
+  A: Proper use would be to post a well-meaning question that has you
+  baffled, to announce a demo being released, to offer services as an
+  artist/musician/coder to anyone willing, a request for such services, or
+  to throw around ideas.  Please note that most people only want to know
+  -when- a demo or realease is out, and it is generally hated when someone
+  posts about how they will have a game sometime in the future, but not at
+  the moment.  If you are announcing a game, you will be better recieved if
+  you have a demo to go along with your announcement.
+
+  ******************************
+  *-Miscellaneous Other Things-*
+  ******************************
+
+  ======================================
+  Q: What exactly does 'VERGE' stand for?
+  ======================================
+
+  A: VERGE stands for Vecna's Extraordinary Roleplaying Game Engine. It was
+  started by vecna over a year and a half ago with the vision of a future
+  where 2-D tile-based RPGs would not be an endangered species, but be
+  freely available to be made and played for all time to come :)
+
+  ======================================
+  Q: Who is this vecna fellow?
+  ======================================
+
+  A: This man known as vecna is the creator of VERGE. In fact, without him,
+  It'd only be an ERGE ;)  For the record, vecna is spelled with a lower-case
+  'v', unless beginning a sentance. His nick has nothing to do with any 
+  references to a Lich named Vecna in AD&D, or any other reference to the name
+  ...it just sounded cool ;)
+
+
+  ======================================
+  Q: Who is this Dev team?
+  ======================================
+
+  A: There are currently two dev-teams...One creating Verge 1.0, and one 
+  creating Verge 2.0...the Verge 1 effort is being headed by Ric and NichG,
+  and the Verge 2 effort is headed by vecna.  Both are always looking for 
+  people with programming know-how, and the desire to help in the project. 
+  Of particular use would be those with Audio programming skills.
+
+
+  ======================================
+  ======================================
+  If there is anything you think should be added to this faq, feel free to
+  E-mail me at McGrue@juno.com with the header "VERGE FAQ"... 
+
+  Hope this FAQ answered some of your Questions :)  

@@ -9,6 +9,7 @@
 #include "vc.h"
 #include "menu.h"
 #include "menu2.h"
+#include "stack.h"
 #include "main.h"
 #include "battle.h"
 #include "ricvc.h"
@@ -18,6 +19,9 @@
 #include "xbigdvc.h"
 #include "render.h"
 #include "vga.h"
+#include "fs.h"
+
+using namespace verge;
 
 /*  -- Added by Ric --
  * Added internal functions:
@@ -476,12 +480,12 @@ void EnforceAnimation() {
              (keyboard_map[SCAN_DEL]))
                 err("Exiting: CTRL-ALT-DEL pressed.");
 
-         f=fopen(&vsp0name,"rb");
+         f=vopen(&vsp0name,"rb");
          fseek(f, 770, 0);
-         fread(&i, 1, 2, f);
-         fread(vsp0, i, 256, f);
-         fread(&va0, 1, 800, f);
-         fclose(f);
+         vread(&i, 1, 2, f);
+         vread(vsp0, i, 256, f);
+         vread(&va0, 1, 800, f);
+         vclose(f);
          setTimerCount(0);
          z++;
        }
@@ -847,13 +851,13 @@ void EnableMenu() {
 }
 
 void Wait() {
-    short int delaytime, ct2;
+    auto delaytime = ResolveOperand();
+    short ct2 = 0;
 
-    delaytime = ResolveOperand();
     setTimerCount(0);
-    ct2 = 0;
+    int now = 1;
 main_loop:
-    while (getTimerCount() != 0) {
+    while (now = getTimerCount()) {
         decTimerCount();
         ct2++;
         check_tileanimation();
@@ -1000,14 +1004,12 @@ void ForceEquip() {
 }
 
 void GiveXP() {
-    int c, amt, fa, nx;
-
-    c = ResolveOperand() - 1;
-    amt = ResolveOperand();
-    fa = pstats[c].exp + amt;
+    auto c = ResolveOperand() - 1;
+    auto amt = ResolveOperand();
+    auto fa = pstats[c].exp + amt;
 
     while (pstats[c].exp != fa) {
-        nx = pstats[c].nxt - pstats[c].exp;
+        auto nx = pstats[c].nxt - pstats[c].exp;
         if (amt >= nx) {
             pstats[c].exp += nx;
             amt -= nx;
@@ -1115,29 +1117,32 @@ int CharPos(char p1) {
 
 void ChangeCHR() {
     int l;
-    FILE* f;
+    VFILE* f;
 
     l = ResolveOperand();
     GrabString(pstats[l - 1].chrfile);
     unsigned char* img = chrs + (CharPos(l) * 15360);
-    f = fopen(pstats[l - 1].chrfile, "rb");
-    fread(img, 1, 15360, f);
-    fclose(f);
+    f = vopen(pstats[l - 1].chrfile, "rb");
+    vread(img, 1, 15360, f);
+    vclose(f);
 }
 
 void VCPutPCX() {
-    int x, y, i;
-
+    STACK;
     GrabString(stringbuffer);
-    x = ResolveOperand();
-    y = ResolveOperand();
+    STACK;
+    int x = ResolveOperand();
+    STACK;
+    int y = ResolveOperand();
+    printf("VCPutPCX(f=%s, x=%i, y=%i)", stringbuffer, x, y);
+
     LoadPCXHeaderNP(stringbuffer);
 
-    for (i = 0; i < depth; i++) {
+    for (auto i = 0; i < depth; i++) {
         auto vidoffset = ((i + y) * 320) + x;
         ReadPCXLine(vidoffset, vcscreen);
     }
-    fclose(pcxf);
+    vclose(pcxf);
 }
 
 void HookTimer() {
@@ -1161,7 +1166,7 @@ void VCLoadPCX() {
         int vidoffset = (i * width) + ofs;
         ReadPCXLine(vidoffset, (unsigned char*)vcdatabuf);
     }
-    fclose(pcxf);
+    vclose(pcxf);
 }
 
 void VCcopysprite(int x, int y, int width, int height, char* spr) {
@@ -1636,21 +1641,22 @@ void VCTextNum() {
 
 void VCLoadRaw() {
     int vcofs, fofs, flen;
-    FILE* f;
+    VFILE* f;
 
     GrabString(stringbuffer);
     vcofs = ResolveOperand();
     fofs = ResolveOperand();
     flen = ResolveOperand();
 
-    f = fopen(stringbuffer, "rb");
-    fseek(f, fofs, 0);
-    fread(vcdatabuf + vcofs, flen, 1, f);
-    fclose(f);
+    f = vopen(stringbuffer, "rb");
+    vseek(f, fofs, 0);
+    vread(vcdatabuf + vcofs, flen, 1, f);
+    vclose(f);
 }
 
 void ExecLibFunc(unsigned char func) {
-    printf("vc::ExecLibFunc(%i)\n", func);
+    STACK;
+    printf("ExecLibFunc %i\n", func);
     switch (func) {
     case 1:
         MapSwitch();
