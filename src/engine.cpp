@@ -365,6 +365,9 @@ void load_map(char* fname) {
     }
     vseek(vsp, 2, 0);
     vread(pal, 1, 768, vsp);
+    for (auto q = 0; q < 768; ++q) {
+        pal[q] <<= 2;
+    }
     vread(&numtiles, 1, 2, vsp);
 
     // -- aen; 31/May/98 -- dynamic map mem allocation

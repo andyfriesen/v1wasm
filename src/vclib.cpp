@@ -369,7 +369,6 @@ void FadeIn() {
         int i = (t * 64) / s;
         set_intensity(i);
     }
-
     set_intensity(63);
 }
 
@@ -1615,6 +1614,7 @@ void VCLoadRaw() {
 void ExecLibFunc(unsigned char func) {
     STACK;
     printf("ExecLibFunc %i\n", func);
+
     switch (func) {
     case 1:
         MapSwitch();
