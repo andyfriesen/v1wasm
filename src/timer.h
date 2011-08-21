@@ -7,4 +7,5 @@ extern unsigned char an, tickctr, sec, min, hr;
 
 void setTimerCount(int value);
 void decTimerCount();
+void incTimerCount();
 int getTimerCount();

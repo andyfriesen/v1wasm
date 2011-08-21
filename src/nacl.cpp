@@ -19,11 +19,12 @@
 #include "ppapi/cpp/size.h"
 #include "ppapi/cpp/var.h"
 
+#include "fs.h"
 #include "main.h"
 #include "nacl.h"
 #include "render.h"
+#include "timer.h"
 #include "vc.h"
-#include "fs.h"
 
 void MiscSetup();
 void PutOwnerText();
@@ -302,6 +303,13 @@ struct V1naclInstance
         return true;
     }
 
+    void tick(int32_t) {
+        incTimerCount();
+
+        auto cb = ccfactory.NewCallback(&V1naclInstance::tick);
+        module->core()->CallOnMainThread(10, cb);
+    }
+
     void fileSystemIsOpen(int32_t result) {
         if (result != 0) {
             printf("FileSystem::Open failed %i\n", result);
@@ -324,6 +332,8 @@ struct V1naclInstance
 
            auto result = pthread_create(&thread, 0, &_run, this);
            assert(0 == result && "pthread_create failed");
+
+           tick(0);
        }
     }
 

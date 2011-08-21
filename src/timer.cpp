@@ -42,17 +42,23 @@ namespace {
 }
 
 int time() {
-    return timer_count++;
+    return timer_count;
 }
 
 void setTimerCount(int offset) {
-    timer_count_offset = offset;
+    timer_count = offset;
+}
+
+// Don't do anything fancy here: this function runs on a different thread.
+// -- andy 21 August 2011
+void incTimerCount() {
+    timer_count++;
 }
 
 void decTimerCount() {
-    timer_count_offset++;
+    timer_count--;
 }
 
 int getTimerCount() {
-    return time() - timer_count_offset;
+    return time();
 }

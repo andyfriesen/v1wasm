@@ -361,8 +361,7 @@ void AlterParallax() {
 }
 
 void FadeIn() {
-    int s = ResolveOperand();
-#if 0
+    const auto s = ResolveOperand();
     const auto startTime = getTimerCount();
     int t = 0;
     while (t < s) {
@@ -370,24 +369,21 @@ void FadeIn() {
         int i = (t * 64) / s;
         set_intensity(i);
     }
-#endif
 
     set_intensity(63);
 }
 
 void FadeOut() {
-    int s = ResolveOperand();
-#if 0
+    const auto s = ResolveOperand();
     const auto startTime = getTimerCount();
     int t = 0;
     while (t < s) {
         t = getTimerCount() - startTime;
-        int i = (getTimerCount() * 64) / s;
+        int i = (t * 64) / s;
         i = 64 - i;
         set_intensity(i);
     }
     set_intensity(0);
-#endif
 }
 
 void RemoveCharacter() {
@@ -468,28 +464,6 @@ drawloop:
 }
 
 void EnforceAnimation() {
-    /* -- ric:10/May/98 --
-     * Temporarily removed to see if the bug this "fixes" still exists
-    FILE *f;
-    short int i,z;
-
-    z=0;
-    while (!va0[0].delay || z<2)
-       {  if ((keyboard_map[SCAN_ALT]) &&
-             (keyboard_map[SCAN_CTRL]) &&
-             (keyboard_map[SCAN_DEL]))
-                err("Exiting: CTRL-ALT-DEL pressed.");
-
-         f=vopen(&vsp0name,"rb");
-         fseek(f, 770, 0);
-         vread(&i, 1, 2, f);
-         vread(vsp0, i, 256, f);
-         vread(&va0, 1, 800, f);
-         vclose(f);
-         setTimerCount(0);
-         z++;
-       }
-    */
 }
 
 void WaitKeyUp() {
@@ -1079,10 +1053,11 @@ drawloop:
     }
 }
 
-extern unsigned char pal[768], pal2[768];
+extern unsigned char pal[768];
 
 void PaletteMorph() {
     int r, g, b, percent, intensity, i, wr, wg, wb;
+    unsigned char pal2[768];
 
     r = ResolveOperand();
     g = ResolveOperand();

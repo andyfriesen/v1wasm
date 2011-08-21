@@ -70,7 +70,8 @@ void set_palette(unsigned char* pall) {
 void get_palette() {
 }
 
-void set_intensity(unsigned int n) {
+void set_intensity(unsigned n) {
+    n = std::min<unsigned>(n, 63);
     for (auto i = 0; i < 256 * 3; ++i) {
         pal2[i] = (pal[i] * n) / 63;
     }
@@ -159,6 +160,19 @@ void copytile(int x, int y, char *spr)
 */
 
 void copytile(int x, int y, unsigned char* spr) {
+    const auto width = 16;
+    auto height = 16;
+    auto p = virscr + y * 320 + x;
+    while (height) {
+        for (int w = 0; w < width; ++w) {
+            auto c = *spr++;
+            if (c) {
+                p[w] = c;
+            }
+        }
+        p += 320;
+        --height;
+    }
 #if 0
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"
@@ -246,6 +260,19 @@ void grabregion(int x, int y, int width, int height, unsigned char* spr) {
 }
 
 void tcopytile(int x, int y, unsigned char* spr, unsigned char* matte) {
+    const auto width = 16;
+    auto height = 16;
+    auto p = virscr + y * 320 + x;
+    while (height) {
+        for (int w = 0; w < width; ++w) {
+            auto c = *spr++;
+            if (c) {
+                p[w] = c;
+            }
+        }
+        p += 320;
+        --height;
+    }
 #if 0
     asm("movl $16, %%ecx                  \n\t"
         "movl %2, %%esi                   \n\t"
