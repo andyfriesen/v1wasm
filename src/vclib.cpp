@@ -1056,29 +1056,13 @@ drawloop:
 extern unsigned char pal[768];
 
 void PaletteMorph() {
-    int r, g, b, percent, intensity, i, wr, wg, wb;
-    unsigned char pal2[768];
+    auto r = ResolveOperand();
+    auto g = ResolveOperand();
+    auto b = ResolveOperand();
+    auto percent = 100 - ResolveOperand();
+    auto intensity = ResolveOperand();
 
-    r = ResolveOperand();
-    g = ResolveOperand();
-    b = ResolveOperand();
-    percent = 100 - ResolveOperand();
-    intensity = ResolveOperand();
-
-    for (i = 0; i < 256; i++) {
-        wr = pal[(i * 3)];
-        wg = pal[(i * 3) + 1];
-        wb = pal[(i * 3) + 2];
-
-        wr = ((wr * percent) + (r * (100 - percent))) / 100;
-        wg = ((wg * percent) + (g * (100 - percent))) / 100;
-        wb = ((wb * percent) + (b * (100 - percent))) / 100;
-
-        pal2[(i * 3)] = wr * intensity / 63;
-        pal2[(i * 3) + 1] = wg * intensity / 63;
-        pal2[(i * 3) + 2] = wb * intensity / 63;
-    }
-    set_palette(pal2);
+    paletteMorph(r, g, b, percent, intensity);
 }
 
 int CharPos(char p1) {

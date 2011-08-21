@@ -60,16 +60,34 @@ void dump_palette(unsigned char* palette) {
     printf("\n");
 }
 
-void set_palette(unsigned char* pall) {
-    if (pall[767] == 0x3F) {
-        dump_palette(pall);
+namespace {
+    void set_palette(unsigned char* pall) {
+        std::copy(pall, pall + sizeof(pal), realPalette);
     }
 
-    std::copy(pall, pall + sizeof(pal), realPalette);
+    void get_palette() {
+        std::copy(realPalette, realPalette + 768, pal);
+    }
 }
 
-void get_palette() {
-    std::copy(realPalette, realPalette + 768, pal);
+void paletteMorph(int r, int g, int b, int percent, int intensity) {
+    unsigned char pal2[768];
+
+    for (auto i = 0; i < 256; i++) {
+        auto wr = pal[(i * 3)];
+        auto wg = pal[(i * 3) + 1];
+        auto wb = pal[(i * 3) + 2];
+
+        wr = ((wr * percent) + (r * (100 - percent))) / 100;
+        wg = ((wg * percent) + (g * (100 - percent))) / 100;
+        wb = ((wb * percent) + (b * (100 - percent))) / 100;
+
+        pal2[(i * 3)] = wr * intensity / 63;
+        pal2[(i * 3) + 1] = wg * intensity / 63;
+        pal2[(i * 3) + 2] = wb * intensity / 63;
+    }
+
+    set_palette(pal2);
 }
 
 void set_intensity(unsigned n) {
@@ -392,47 +410,6 @@ unsigned char greyxlatbl[256];        // Grey transparencyfield
 unsigned char scrnxlatbl[256];        // screen transparencyfield
 unsigned char* transparencytbl;       // full transparency table (64k)
 
-unsigned char match(char r, char g, char b) {
-    int vr, vg, vb, tab, tabpt, i, thistab;
-    // This routine provides the color matching to the VERGE palette.
-
-    tab = 255;
-    tabpt = 1;
-
-    for (i = 1; i < 255; i++) {
-        vr = vergepal[i * 3];
-        vg = vergepal[(i * 3) + 1];
-        vb = vergepal[(i * 3) + 2];
-
-        thistab = abs(vr - r);
-        thistab += abs(vg - g);
-        thistab += abs(vb - b);
-        if (thistab < tab) {
-            tab = thistab;
-            tabpt = i;
-        }
-    }
-
-    return tabpt;
-}
-
-void BuildTable(char r, char g, char b, char* dest) {
-    int i;
-    unsigned char wr, wg, wb;
-
-    for (i = 0; i < 256; i++) {
-        wr = vergepal[(i * 3)];         // set wr,wg,wb with source colors
-        wg = vergepal[(i * 3) + 1];
-        wb = vergepal[(i * 3) + 2];
-
-        wr = (wr + r) / 2;              // average values to compute final RGB
-        wg = (wg + g) / 2;
-        wb = (wb + b) / 2;
-
-        dest[i] = match(wr, wg, wb);    // find closest match
-    }
-}
-
 void ColorScale(unsigned char* dest, int st, int fn, int inv) {
     int i, intensity;
 
@@ -450,15 +427,9 @@ void ColorScale(unsigned char* dest, int st, int fn, int inv) {
 }
 
 void PreCalc_TransparencyFields() {
-    int i;
-
     // First read the VERGE palette from verge.pal
-
     auto f = vopen("VERGE.PAL", "rb");
     vread(vergepal, 1, 768, f);
-    for (auto q = 0; q < 768; q++) {
-        vergepal[q] *= 4;
-    }
     vclose(f);
     transparencytbl = (unsigned char*)valloc(65536, "transparencytbl");
 
@@ -473,27 +444,6 @@ void PreCalc_TransparencyFields() {
     vread(transparencytbl, 1, 65535, f);
     vclose(f);
 }
-/*
-void ColorField(int x1, int y1, int x2, int y2, unsigned char *colortbl)
-{ int x,y;
-  unsigned char c;
-
-  for (y=y1; y<y2; y++)
-      for (x=x1; x<x2; x++)
-          {
-            c=virscr[(y*352)+x];
-            c=((x-x1)*32)/(x2-x1);
-            while(c>111 || c<88)
-             {
-              while(c>111)
-                c-=(c-111)<<1;
-              while(c<88)
-                c+=(88-c)<<1;
-             }
-            virscr[(y*352)+x]=c;
-          }
-}
-*/
 
 void ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
 #if 0
@@ -529,7 +479,7 @@ void Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
     unsigned int j, i, jz, iz;
     unsigned char c, d;
 
-    for (j = 0; j < height; j++)
+    for (j = 0; j < height; j++) {
         for (i = 0; i < width; i++) {
             jz = j + y1;
             iz = i + x1;
@@ -539,13 +489,14 @@ void Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
                 virscr[(jz * 352) + iz] = transparencytbl[(d * 256) + c];
             }
         }
+    }
 }
 
 void _Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
     unsigned int j, i, jz, iz;
     unsigned char c, d;
 
-    for (j = 0; j < height; j++)
+    for (j = 0; j < height; j++) {
         for (i = 0; i < width; i++) {
             jz = j + y1;
             iz = i + x1;
@@ -555,6 +506,7 @@ void _Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
                 virscr[(jz * 352) + iz] = transparencytbl[(c * 256) + d];
             }
         }
+    }
 }
 
 // Font routines
@@ -625,7 +577,7 @@ void gotoxy(int x, int y) {
     y1 = y;
 }
 
-void printstring(char* str) {
+void printstring(const char* str) {
     int i;
     char c;
 
@@ -663,7 +615,7 @@ mainloop:
     }
 }
 
-void bigprintstring(char* str) {
+void bigprintstring(const char* str) {
     int i;
     char c;
 
@@ -715,7 +667,7 @@ void dec_to_asciiz(int num, char* buf) {
 #endif
 }
 
-void textwindow(char portrait, char* str1, char* str2, char* str3) {
+void textwindow(char portrait, const char* str1, const char* str2, const char* str3) {
     tcopysprite(20, 114, 32, 32, speech + (portrait * 1024));
     putbox();
     gotoxy(25, 155);

@@ -73,8 +73,6 @@ void MiscSetup() {
 }
 
 void PutOwnerText() {
-    int i;
-
     printf("VERGE - System version 18.May.99\n");
     printf("Copyright (C)1997 vecna\n");
     printf("\n");
@@ -83,14 +81,6 @@ void PutOwnerText() {
     printf("vecna, hahn, zeromus, McGrue, Locke, aen, Ric, NichG, xBig_D\n");
     printf("--\n");
     printf("Additional modifications by andy\n");
-
-    delay(500);
-
-    get_palette();
-    for (i = 63; i >= 0; i--) {
-        set_intensity(i);
-        delay(10);
-    }
 }
 
 void InitPStats() {
