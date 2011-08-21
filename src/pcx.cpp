@@ -80,12 +80,6 @@ void LoadPCXHeader(char* fname) {
     vread(pal, 1, 768, pcxf);
     vseek(pcxf, 128L, SEEK_SET);
     bytes = bytes_per_line;
-
-    printf("LoadPCX %s (%i, %i)\n", fname, width, depth);
-
-    for (i = 0; i < 768; i++) {
-        pal[i] = pal[i] >> 2;
-    }
 }
 
 void LoadPCXHeaderNP(char* fname) {
@@ -117,7 +111,7 @@ void LoadPCXHeaderNP(char* fname) {
 void loadpcx(char* fname, unsigned char* dest) {
     LoadPCXHeader(fname);
 
-    for (i = 0; i < depth; i++) {
+    for (auto i = 0; i < depth; i++) {
         vidoffset = 5648 + (i * 352);
         ReadPCXLine(dest);
     }

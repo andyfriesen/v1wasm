@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <string>
 #include <memory>
+#include <stdexcept>
+#include <pthread.h>
 #include "ppapi/c/ppb_file_io.h"
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
@@ -17,13 +19,14 @@
 #include "ppapi/cpp/var.h"
 
 #include "main.h"
+#include "nacl.h"
 #include "render.h"
 #include "vc.h"
 #include "fs.h"
 
 void MiscSetup();
 void PutOwnerText();
-void initvga(pp::Graphics2D* g2d, pp::ImageData* bb);
+void initvga(IFramebuffer* fb);
 void InitItems();
 
 struct Downloader {
@@ -225,23 +228,24 @@ private:
     pp::CompletionCallback onComplete;
 };
 
-struct V1naclInstance : public pp::Instance {
-    explicit V1naclInstance(PP_Instance instance)
+struct V1naclInstance
+    : public pp::Instance
+    , IFramebuffer
+{
+    explicit V1naclInstance(PP_Instance instance, pp::Module* module)
         : pp::Instance(instance)
+        , module(module)
         , ccfactory(this)
         , fileSystem(this, PP_FILESYSTEMTYPE_LOCALTEMPORARY)
         , gameDownloader(this, &fileSystem)
         , graphics(0)
         , backBuffer(0)
-    {}
+    {
+        pthread_mutex_init(&bbMutex, 0);
+    }
 
     virtual ~V1naclInstance() {
     }
-
-#if 0
-    void DidChangeView(const pp::Rect& position, const pp::Rect& clip) {
-    }
-#endif
 
     virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
         graphics = new pp::Graphics2D(this, pp::Size(320, 240), true);
@@ -277,15 +281,25 @@ struct V1naclInstance : public pp::Instance {
     }
 
     void downloadComplete(int32_t result) {
-        if (result != PP_OK) {
+       if (result != PP_OK) {
             printf("Download failed :(\n");
             return;
-        }
-        printf("Download complete!  Starting...\n");
+       } else {
+           printf("Download complete!  Starting...\n");
 
+           auto result = pthread_create(&thread, 0, &_run, this);
+       }
+    }
+
+    static void* _run(void* ctx) {
+        auto self = reinterpret_cast<V1naclInstance*>(ctx);
+        return self->run();
+    }
+
+    void* run() {
         MiscSetup();
         PutOwnerText();
-        initvga(graphics, backBuffer);
+        initvga(this);
         InitItems();
 
         while (1) {
@@ -303,15 +317,70 @@ struct V1naclInstance : public pp::Instance {
 
             StartupScript();
         }
+        return 0;
+    }
+
+    uint32_t _8to32(unsigned char c, unsigned char* pal) {
+        return 0xFF000000
+            | pal[c * 3] << 24
+            | pal[c * 3 + 1] << 16
+            | pal[c * 3 + 2];
+    }
+
+    virtual void vgadump(unsigned char* framebuffer, unsigned char* palette) {
+        printf("vgadump\n");
+
+        if (0 != pthread_mutex_lock(&bbMutex)) {
+            assert(!"Failed to acquire mutex\n");
+        }
+
+        auto src = framebuffer;
+        uint32_t* dst = (uint32_t*)backBuffer->data();
+        assert(0 == (backBuffer->stride() % sizeof(uint32_t)));
+        const auto stride = backBuffer->stride() / sizeof(uint32_t);
+
+        for (int y = 0; y < YRES; ++y) {
+            for (int x = 0; x < XRES; ++x) {
+                dst[x] = _8to32(*src, palette);
+                //printf("%i,%i = %i / %08X\n", x, y, *src, dst[x]);
+                src++;
+            }
+            dst += stride;
+        }
+
+        module->core()->CallOnMainThread(0, pp::CompletionCallback(&V1naclInstance::_present, this));
+    }
+
+    static void _present(void* data, int32_t blah) {
+        auto self = static_cast<V1naclInstance*>(data);
+        self->present();
+    }
+
+    void present() {
+        graphics->PaintImageData(*backBuffer, pp::Point());
+        pp::CompletionCallback cb = ccfactory.NewCallback(&V1naclInstance::presentComplete);
+        graphics->Flush(cb);
+    }
+
+    void presentComplete(int32_t result) {
+        if (0 != pthread_mutex_unlock(&bbMutex)) {
+            printf("Failed to release mutex\n");
+        }
     }
 
 private:
+    enum { XRES = 320, YRES = 200 };
+
+    pp::Module* module;
     pp::CompletionCallbackFactory<V1naclInstance> ccfactory;
     pp::FileSystem fileSystem;
     GameDownloader gameDownloader;
 
     pp::Graphics2D* graphics;
     pp::ImageData* backBuffer;
+
+    pthread_t thread;
+    pthread_mutex_t bbMutex;
 };
 
 class V1naclModule : public pp::Module {
@@ -320,7 +389,7 @@ public:
     virtual ~V1naclModule() {}
 
     virtual pp::Instance* CreateInstance(PP_Instance instance) {
-        return new V1naclInstance(instance);
+        return new V1naclInstance(instance, this);
     }
 };
 

@@ -60,7 +60,7 @@ namespace verge {
         switch (offset) {
             case SEEK_SET: pos = size_t(std::max<int>(0, origin)); break;
             case SEEK_CUR: pos += origin; break;
-            case SEEK_END: pos = size_t(std::max<int>(0, data.size() - origin)); break;
+            case SEEK_END: pos = size_t(std::max<int>(0, data.size() + origin)); break;
         }
         if (pos > data.size()) {
             pos = 0;

@@ -18,14 +18,16 @@
 #include "vga.h"
 #include "main.h"
 #include "fs.h"
+#include "nacl.h"
 
 using namespace verge;
 
 #include "engine.h" // for valloc()
 
 namespace {
-    pp::Graphics2D* graphics;
-    pp::ImageData* backBuffer;
+    IFramebuffer* framebuffer = 0;
+
+    unsigned char realPalette[256 * 3];
 
     const int XRES = 320;
     const int YRES = 200;
@@ -46,25 +48,36 @@ void wait() {
     // vsync?
 }
 
+void dump_palette(unsigned char* palette) {
+    for (auto q = 0; q < 256; ++q) {
+        auto p = palette + q * 3;
+        printf("%02X%02X%02X", p[0], p[1], p[2]);
+        if ((q % 16) == 15) {
+            printf("\n");
+        } else {
+            printf(", ");
+        }
+    }
+    printf("\n");
+}
+
 void set_palette(unsigned char* pall) {
-    std::copy(pall, pall + sizeof(pal), pal);
+    std::copy(pall, pall + sizeof(pal), realPalette);
 }
 
 void get_palette() {
 }
 
 void set_intensity(unsigned int n) {
-    int i;
-    for (i = 767; i >= 0; --i) {
-        pal2[i] = (pal[i] * n) >> 6;
+    for (auto i = 0; i < 256 * 3; ++i) {
+        pal2[i] = pal[i] * n;
     }
     set_palette(pal2);
-    //vgadump();
+    vgadump();
 }
 
-void initvga(pp::Graphics2D* g2d, pp::ImageData* bb) {
-    graphics = g2d;
-    backBuffer = bb;
+void initvga(IFramebuffer* fb) {
+    framebuffer = fb;
 }
 
 void closevga() {
@@ -76,33 +89,10 @@ void quick_killgfx() {
 void quick_restoregfx() {
 }
 
-unsigned _8to32(unsigned char c) {
-    return 0xFF000000
-        | pal[c * 3] << 24
-        | pal[c * 3 + 1] << 16
-        | pal[c * 3 + 2];
-}
-
 void vgadump() {
-    if (waitvrt) {
-        wait();
+    if (framebuffer) {
+        framebuffer->vgadump(virscr, realPalette);
     }
-
-    auto src = virscr;
-    uint32_t* dst = (uint32_t*)backBuffer->data();
-    assert(0 == (backBuffer->stride() % sizeof(uint32_t)));
-    const auto stride = backBuffer->stride() / sizeof(uint32_t);
-
-    for (int y = 0; y < YRES; ++y) {
-        for (int x = 0; x < XRES; ++x) {
-            dst[x] = _8to32(*src++);
-        }
-        dst += stride;
-    }
-
-    graphics->PaintImageData(*backBuffer, pp::Point());
-    pp::CompletionCallback cb = pp::BlockUntilComplete();
-    graphics->Flush(cb);
 }
 
 void setpixel(int x, int y, char c) {

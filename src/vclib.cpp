@@ -358,6 +358,7 @@ void AlterParallax() {
 
 void FadeIn() {
     int s = ResolveOperand();
+#if 0
     const auto startTime = getTimerCount();
     int t = 0;
     while (t < s) {
@@ -365,12 +366,14 @@ void FadeIn() {
         int i = (t * 64) / s;
         set_intensity(i);
     }
+#endif
 
     set_intensity(63);
 }
 
 void FadeOut() {
     int s = ResolveOperand();
+#if 0
     const auto startTime = getTimerCount();
     int t = 0;
     while (t < s) {
@@ -380,6 +383,7 @@ void FadeOut() {
         set_intensity(i);
     }
     set_intensity(0);
+#endif
 }
 
 void RemoveCharacter() {

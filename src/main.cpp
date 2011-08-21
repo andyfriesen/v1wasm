@@ -518,7 +518,6 @@ drawloop:
     }
 
 inputloop:
-    printf("inputloop\n");
     readcontrols();
     if (down) {
         cursel++;

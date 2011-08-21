@@ -2,6 +2,7 @@
 namespace pp {
     class ImageData;
 }
+struct IFramebuffer;
 
 // vga.h
 void closevga();
@@ -42,3 +43,5 @@ extern unsigned char pal[768];
 
 extern unsigned char menuxlatbl[256], greyxlatbl[256], scrnxlatbl[256], *transparencytbl;
 extern char oc;
+
+void dump_palette(unsigned char*);
