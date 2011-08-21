@@ -12,6 +12,7 @@
 #include "ppapi/cpp/file_ref.h"
 #include "ppapi/cpp/file_io.h"
 #include "ppapi/cpp/url_request_info.h"
+#include "ppapi/cpp/input_event.h"
 #include "ppapi/cpp/url_loader.h"
 #include "ppapi/cpp/graphics_2d.h"
 #include "ppapi/cpp/image_data.h"
@@ -28,6 +29,23 @@ void MiscSetup();
 void PutOwnerText();
 void initvga(IFramebuffer* fb);
 void InitItems();
+
+struct ScopedLock {
+    ScopedLock(pthread_mutex_t& m)
+        : mutex(m)
+    {
+        auto result = pthread_mutex_lock(&mutex);
+        assert(0 == result && "Unable to lock mutex");
+    }
+
+    ~ScopedLock() {
+        auto result = pthread_mutex_unlock(&mutex);
+        assert(0 == result && "Unable to unlock mutex");
+    }
+
+private:
+    pthread_mutex_t& mutex;
+};
 
 struct Downloader {
     explicit Downloader(pp::Instance* instance)
@@ -242,6 +260,10 @@ struct V1naclInstance
         , backBuffer(0)
     {
         pthread_mutex_init(&bbMutex, 0);
+        pthread_mutex_init(&inputMutex, 0);
+
+        RequestInputEvents(PP_INPUTEVENT_CLASS_MOUSE);
+        RequestFilteringInputEvents(PP_INPUTEVENT_CLASS_KEYBOARD);
     }
 
     virtual ~V1naclInstance() {
@@ -267,6 +289,32 @@ struct V1naclInstance
         return true;
     }
 
+    virtual bool HandleInputEvent(const pp::InputEvent& event) {
+        verge::InputEvent ie;
+
+        switch (event.GetType()) {
+            case PP_INPUTEVENT_TYPE_KEYDOWN:
+                ie.type = verge::EventType::KeyDown;
+                break;
+            case PP_INPUTEVENT_TYPE_KEYUP:
+                ie.type = verge::EventType::KeyUp;
+                break;
+            default:
+                // Don't care.
+                return false;
+        }
+
+        pp::KeyboardInputEvent kie(event);
+        ie.keyCode = kie.GetKeyCode();
+
+
+
+        ScopedLock sl(inputMutex);
+        eventQueue.push_back(ie);
+
+        return true;
+    }
+
     void fileSystemIsOpen(int32_t result) {
         if (result != 0) {
             printf("FileSystem::Open failed %i\n", result);
@@ -288,6 +336,7 @@ struct V1naclInstance
            printf("Download complete!  Starting...\n");
 
            auto result = pthread_create(&thread, 0, &_run, this);
+           assert(0 == result && "pthread_create failed");
        }
     }
 
@@ -325,6 +374,13 @@ struct V1naclInstance
             | pal[c * 3] << 16
             | pal[c * 3 + 1] << 8
             | pal[c * 3 + 2];
+    }
+
+    virtual void getInputEvents(std::vector<verge::InputEvent>& events) {
+        ScopedLock sl(inputMutex);
+
+        events.swap(eventQueue);
+        eventQueue.resize(0);
     }
 
     virtual void vgadump(unsigned char* framebuffer, unsigned char* palette) {
@@ -378,9 +434,11 @@ private:
 
     pp::Graphics2D* graphics;
     pp::ImageData* backBuffer;
+    std::vector<verge::InputEvent> eventQueue;
 
     pthread_t thread;
     pthread_mutex_t bbMutex;
+    pthread_mutex_t inputMutex;
 };
 
 class V1naclModule : public pp::Module {

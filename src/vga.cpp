@@ -24,9 +24,11 @@ using namespace verge;
 
 #include "engine.h" // for valloc()
 
-namespace {
-    IFramebuffer* framebuffer = 0;
+namespace verge {
+    IFramebuffer* plugin = 0;
+}
 
+namespace {
     unsigned char realPalette[256 * 3];
 
     const int XRES = 320;
@@ -77,7 +79,7 @@ void set_intensity(unsigned int n) {
 }
 
 void initvga(IFramebuffer* fb) {
-    framebuffer = fb;
+    plugin = fb;
 }
 
 void closevga() {
@@ -90,51 +92,29 @@ void quick_restoregfx() {
 }
 
 void vgadump() {
-    if (framebuffer) {
-        framebuffer->vgadump(virscr, realPalette);
+    if (plugin) {
+        plugin->vgadump(virscr, realPalette);
     }
 }
 
 void setpixel(int x, int y, char c) {
-#if 0
-    asm ("movl %1, %%eax                 \n\t"
-         "imul $352, %%eax               \n\t"
-         "addl %0, %%eax                 \n\t"
-         "addl _virscr, %%eax            \n\t"
-         "movl %%eax, %%edi              \n\t"
-         "movb %2, %%al                  \n\t"
-         "stosb                          \n\t"
-         :
-         :"m" (x), "m" (y), "m" (c)
-         : "eax", "edi", "cc" );
-#endif
+    virscr[y * 320 + x] = c;
 }
 
 void vline(int x, int y, int y2, char c) {
-    int i;
+    auto p = virscr + y * 320 + x;
 
-    for (i = 0; i < (y2 - y); i++) {
-        setpixel(x, (y + i), c);
+    for (auto i = 0; i < (y2 - y); i++) {
+        *p = c;
+        p += 320;
     }
-
 }
 
 void hline(int x, int y, int x2, char c) {
-#if 0
-    asm ("movl %2, %%ecx                 \n\t"
-         "subl %0, %%ecx                 \n\t"
-         "movl %1, %%eax                 \n\t"
-         "imul $352, %%eax               \n\t"
-         "addl %0, %%eax                 \n\t"
-         "addl _virscr, %%eax            \n\t"
-         "movl %%eax, %%edi              \n\t"
-         "movb %3, %%al                  \n\t"
-         "repz                           \n\t"
-         "stosb                          \n\t"
-         :
-         : "m" (x), "m" (y), "m" (x2), "m" (c)
-         : "eax", "edi", "ecx", "cc" );
-#endif
+    auto p = virscr + y * 320;
+    for (auto i = x; i < x2; ++i) {
+        p[i] = c;
+    }
 }
 
 void box(int x, int y, int x2, int y2, char color) {
@@ -302,37 +282,19 @@ void tcopytile(int x, int y, unsigned char* spr, unsigned char* matte) {
 #endif
 }
 
+// TODO: Clipping?
 void tcopysprite(int x, int y, int width, int height, unsigned char* spr) {
-#if 0
-    asm("movl %3, %%ecx                   \n\t"
-        "movl %4, %%esi                   \n\t"
-        "tcsl0:                                 \n\t"
-        "movl %1, %%eax                   \n\t"
-        "imul $352, %%eax                 \n\t"
-        "addl %0, %%eax                   \n\t"
-        "addl _virscr, %%eax              \n\t"
-        "movl %%eax, %%edi                \n\t"
-        "movl %2, %%edx                   \n\t"
-        "drawloop:                              \n\t"
-        "lodsb                            \n\t"
-        "orb %%al, %%al                   \n\t"
-        "jz nodraw                        \n\t"
-        "stosb                            \n\t"
-        "decl %%edx                       \n\t"
-        "jz endline                       \n\t"
-        "jmp drawloop                     \n\t"
-        "nodraw:                                \n\t"
-        "incl %%edi                       \n\t"
-        "decl %%edx                       \n\t"
-        "jnz drawloop                     \n\t"
-        "endline:                               \n\t"
-        "incl %1                          \n\t"
-        "decl %%ecx                       \n\t"
-        "jnz tcsl0                        \n\t"
-        :
-        : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
-        : "eax", "edx", "esi", "edi", "ecx", "cc" );
-#endif
+    auto p = virscr + y * 320 + x;
+    while (height) {
+        for (int w = 0; w < width; ++w) {
+            auto c = *spr++;
+            if (c) {
+                p[w] = c;
+            }
+        }
+        p += 320;
+        --height;
+    }
 }
 
 void fin() {

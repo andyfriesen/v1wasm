@@ -542,7 +542,7 @@ inputloop:
     if (!b1) {
         goto inputloop;
     }
-    if (!cursel) {
+    if (cursel == 0) {
         StartNewGame("TEST.MAP");
     }
     if (cursel == 1) {

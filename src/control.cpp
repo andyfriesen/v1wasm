@@ -2,7 +2,9 @@
 // Handles keyboard/joystick interfaces into a unified system.
 // Copyright (C)1997 BJ Eirich
 
+#include <map>
 #include <stdio.h>
+#include "nacl.h"
 #include "main.h"
 #include "keyboard.h"
 
@@ -36,7 +38,25 @@ void ScreenShot();
 void readbuttons();
 void readjoystick();
 
+namespace verge {
+    extern IFramebuffer* plugin;
+    std::map<DOMScanCode, VScanCode> scanMap;
+}
+
+void readKeyboard() {
+    std::vector<verge::InputEvent> events;
+    verge::plugin->getInputEvents(events);
+
+    for (auto i = events.begin(); i != events.end(); ++i) {
+        auto xl = verge::scanMap[DOMScanCode(i->keyCode)];
+
+        keyboard_map[xl] = i->type == verge::EventType::KeyDown;
+    }
+}
+
 void initcontrols(char joystk) {
+    verge::scanMap[DOMScanCode::VK_UP] = SCAN_UP;
+    verge::scanMap[DOMScanCode::VK_DOWN] = SCAN_DOWN;
 }
 
 void readb() {
@@ -73,6 +93,8 @@ void readb() {
 }
 
 void readcontrols() {
+    readKeyboard();
+
     int i;
     if (j) {
         readjoystick();
