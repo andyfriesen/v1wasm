@@ -1,10 +1,8 @@
 
-namespace pp {
-    class ImageData;
-}
+#pragma once
+
 struct IFramebuffer;
 
-// vga.h
 void closevga();
 void quick_killgfx();
 void quick_restoregfx();
@@ -45,3 +43,10 @@ extern unsigned char menuxlatbl[256], greyxlatbl[256], scrnxlatbl[256], *transpa
 extern char oc;
 
 void dump_palette(unsigned char*);
+
+const int XRES = 320;
+const int YRES = 200;
+const int BACKBUFFER_PITCH = 352;
+inline unsigned char* getScreenPointer(int x, int y) {
+    return virscr + (y + 16) * BACKBUFFER_PITCH + x + 16;
+}

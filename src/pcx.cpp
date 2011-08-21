@@ -111,7 +111,7 @@ void loadpcx(char* fname, unsigned char* dest) {
     LoadPCXHeader(fname);
 
     for (auto i = 0; i < depth; i++) {
-        auto vidoffset = i * 320;
+        auto vidoffset = 5648 + i * BACKBUFFER_PITCH;
         ReadPCXLine(vidoffset, dest);
     }
 

@@ -31,13 +31,10 @@ namespace verge {
 namespace {
     unsigned char realPalette[256 * 3];
 
-    const int XRES = 320;
-    const int YRES = 200;
     const int BACKBUFFER_SIZE = 90000; // More than we need, but random other things seem to depend on this figure.
 }
 
 unsigned char pal[768];
-unsigned char pal2[768];
 extern char waitvrt, fade, cancelfade, *strbuf;
 
 unsigned char* fnt, *fnt2, *tbox, *n;
@@ -64,13 +61,20 @@ void dump_palette(unsigned char* palette) {
 }
 
 void set_palette(unsigned char* pall) {
+    if (pall[767] == 0x3F) {
+        dump_palette(pall);
+    }
+
     std::copy(pall, pall + sizeof(pal), realPalette);
 }
 
 void get_palette() {
+    std::copy(realPalette, realPalette + 768, pal);
 }
 
 void set_intensity(unsigned n) {
+    unsigned char pal2[256 * 3];
+
     n = std::min<unsigned>(n, 63);
     for (auto i = 0; i < 256 * 3; ++i) {
         pal2[i] = (pal[i] * n) / 63;
@@ -93,26 +97,39 @@ void quick_restoregfx() {
 }
 
 void vgadump() {
-    if (plugin) {
-        plugin->vgadump(virscr, realPalette);
+    if (!plugin) {
+        return;
     }
+
+    unsigned char bb[BACKBUFFER_SIZE];
+    auto dest = bb;
+    auto src = getScreenPointer(0, 0);
+    for (auto y = 0; y < YRES; ++y) {
+        for (auto x = 0; x < XRES; ++x) {
+            dest[x] = src[x];
+        }
+        dest += XRES;
+        src += BACKBUFFER_PITCH;
+    }
+
+    plugin->vgadump(bb, realPalette);
 }
 
 void setpixel(int x, int y, char c) {
-    virscr[y * 320 + x] = c;
+    virscr[y * BACKBUFFER_PITCH + x] = c;
 }
 
 void vline(int x, int y, int y2, char c) {
-    auto p = virscr + y * 320 + x;
+    auto p = virscr + y * BACKBUFFER_PITCH + x;
 
     for (auto i = 0; i < (y2 - y); i++) {
         *p = c;
-        p += 320;
+        p += BACKBUFFER_PITCH;
     }
 }
 
 void hline(int x, int y, int x2, char c) {
-    auto p = virscr + y * 320;
+    auto p = virscr + y * BACKBUFFER_PITCH;
     for (auto i = x; i < x2; ++i) {
         p[i] = c;
     }
@@ -162,7 +179,7 @@ void copytile(int x, int y, char *spr)
 void copytile(int x, int y, unsigned char* spr) {
     const auto width = 16;
     auto height = 16;
-    auto p = virscr + y * 320 + x;
+    auto p = virscr + y * BACKBUFFER_PITCH + x;
     while (height) {
         for (int w = 0; w < width; ++w) {
             auto c = *spr++;
@@ -170,7 +187,7 @@ void copytile(int x, int y, unsigned char* spr) {
                 p[w] = c;
             }
         }
-        p += 320;
+        p += BACKBUFFER_PITCH;
         --height;
     }
 #if 0
@@ -262,7 +279,7 @@ void grabregion(int x, int y, int width, int height, unsigned char* spr) {
 void tcopytile(int x, int y, unsigned char* spr, unsigned char* matte) {
     const auto width = 16;
     auto height = 16;
-    auto p = virscr + y * 320 + x;
+    auto p = virscr + y * BACKBUFFER_PITCH + x;
     while (height) {
         for (int w = 0; w < width; ++w) {
             auto c = *spr++;
@@ -270,7 +287,7 @@ void tcopytile(int x, int y, unsigned char* spr, unsigned char* matte) {
                 p[w] = c;
             }
         }
-        p += 320;
+        p += BACKBUFFER_PITCH;
         --height;
     }
 #if 0
@@ -311,7 +328,7 @@ void tcopytile(int x, int y, unsigned char* spr, unsigned char* matte) {
 
 // TODO: Clipping?
 void tcopysprite(int x, int y, int width, int height, unsigned char* spr) {
-    auto p = virscr + y * 320 + x;
+    auto p = virscr + y * BACKBUFFER_PITCH + x;
     while (height) {
         for (int w = 0; w < width; ++w) {
             auto c = *spr++;
@@ -319,7 +336,7 @@ void tcopysprite(int x, int y, int width, int height, unsigned char* spr) {
                 p[w] = c;
             }
         }
-        p += 320;
+        p += BACKBUFFER_PITCH;
         --height;
     }
 }
@@ -439,6 +456,9 @@ void PreCalc_TransparencyFields() {
 
     auto f = vopen("VERGE.PAL", "rb");
     vread(vergepal, 1, 768, f);
+    for (auto q = 0; q < 768; q++) {
+        vergepal[q] *= 4;
+    }
     vclose(f);
     transparencytbl = (unsigned char*)valloc(65536, "transparencytbl");
 

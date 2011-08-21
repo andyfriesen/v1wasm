@@ -1109,7 +1109,6 @@ void VCPutPCX() {
     int x = ResolveOperand();
     STACK;
     int y = ResolveOperand();
-    printf("VCPutPCX(f=%s, x=%i, y=%i)", stringbuffer, x, y);
 
     LoadPCXHeaderNP(stringbuffer);
 
