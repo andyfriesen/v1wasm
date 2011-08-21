@@ -4,9 +4,12 @@
 
 #include <stdio.h>
 #include "engine.h"
+#include "fs.h"
 #include "keyboard.h"
 #include "vc.h"
 #include "vclib.h"
+
+using namespace verge;
 
 extern char* strbuf;
 extern int vcbufm;
@@ -39,21 +42,21 @@ void InitVCMem() {
     //magicvc = (char*)valloc(50000, "magicvc");
 }
 
-void LoadVC(FILE* f) {
+void LoadVC(VFILE* f) {
     int b, e, mapvcs;
 
-    fread(&numscripts, 1, 4, f);
-    fread(&scriptofstbl, 4, numscripts, f);
+    vread(&numscripts, 1, 4, f);
+    vread(&scriptofstbl, 4, numscripts, f);
 
     // -- aen; 31/May/98 -- otf (on the fly) mem allocation
-    b = ftell(f);           // get beginning offset of map vc code
-    fseek(f, 0, SEEK_END);  // seek to end of map vc code
-    e = ftell(f);           // get end offset of map vc code
-    fseek(f, b, SEEK_SET);  // reset file pos
+    b = vtell(f);           // get beginning offset of map vc code
+    vseek(f, 0, SEEK_END);  // seek to end of map vc code
+    e = vtell(f);           // get end offset of map vc code
+    vseek(f, b, SEEK_SET);  // reset file pos
     mapvcs = e - b + 1;     // calc total map vc code size (in bytes)
     vfree(mapvc);           // free mapvc mem (if necessary)
     mapvc = (char*)valloc(mapvcs, "LoadVC:mapvc"); // allocate necessary mapvc mem
-    fread(mapvc, mapvcs, 1, f); // read in the map vc code from disk
+    vread(mapvc, mapvcs, 1, f); // read in the map vc code from disk
 }
 
 unsigned char GrabC() {

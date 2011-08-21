@@ -307,8 +307,6 @@ struct V1naclInstance
         pp::KeyboardInputEvent kie(event);
         ie.keyCode = kie.GetKeyCode();
 
-
-
         ScopedLock sl(inputMutex);
         eventQueue.push_back(ie);
 

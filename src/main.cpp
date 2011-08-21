@@ -94,7 +94,8 @@ void PutOwnerText() {
 }
 
 void InitPStats() {
-    VFILE* pdat, *cdat;
+    VFILE* pdat;
+    VFILE* cdat;
     char i;
     pdat = vopen("PARTY.DAT", "r");
     if (!pdat) {

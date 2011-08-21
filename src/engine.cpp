@@ -7,6 +7,7 @@
 #include "control.h"
 #include "entity.h"
 #include "engine.h"
+#include "fs.h"
 #include "keyboard.h"
 #include "main.h"
 #include "menu.h"
@@ -15,6 +16,8 @@
 #include "timer.h"
 #include "ricvc.h"
 #include "vga.h"
+
+using namespace verge;
 
 // ============================ Data ============================
 
@@ -81,7 +84,8 @@ unsigned char* itemicons, *chr2;       // more graphic ptrs
  */
 short int flags[16000];              // misc flags
 
-FILE* map, *vsp;                       // file handles
+VFILE* map;
+VFILE* vsp;                       // file handles
 char mapname[13], musname[13];         // map/music filenames
 char vsp0name[13], levelname[30];      // vsp filename / level name
 unsigned char layerc;
@@ -111,7 +115,7 @@ extern int msofstbl[100];
 extern int vspm; // -- aen; 30/May/98 -- no longer used; see load_map().
 //extern int mapm; // -- aen; 30/May/98 -- no longer used; see load_map().
 
-void LoadVC(FILE* map);
+void LoadVC(VFILE* map);
 void CalcVSPMask();
 
 // ============================ Code ============================
@@ -176,26 +180,27 @@ void allocbuffers() {
 }
 
 void addcharacter(int i) {
-    FILE* chrf, *p;
+    VFILE* chrf;
+    VFILE* p;
     int b;
 
     numchars++;
     partyidx[numchars - 1] = i;
-    p = fopen("PARTY.DAT", "r");
+    p = vopen("PARTY.DAT", "r");
     if (!p) {
-        err("Fatal error: PARTY.DAT not found");
+        err("addCharacter(): Fatal error: PARTY.DAT not found");
     }
-    fscanf(p, "%s", strbuf);
+    vscanf(p, "%s", strbuf);
     tchars = atoi(strbuf);
     if (i > atoi(strbuf)) {
         err("addcharacter(): index out of range");
     }
     for (b = 1; b < i; b++) {
-        fscanf(p, "%s", strbuf);
-        fscanf(p, "%s", strbuf);
-        fscanf(p, "%s", strbuf);
+        vscanf(p, "%s", strbuf);
+        vscanf(p, "%s", strbuf);
+        vscanf(p, "%s", strbuf);
     }
-    fscanf(p, "%s", strbuf);
+    vscanf(p, "%s", strbuf);
 
     party[0].chrindex = 0;
 
@@ -237,32 +242,32 @@ void addcharacter(int i) {
     lastmoves[3] = 0;
     lastmoves[4] = 0;
     lastmoves[5] = 0;
-    chrf = fopen(pstats[i - 1].chrfile, "rb");
+    chrf = vopen(pstats[i - 1].chrfile, "rb");
     if (!chrf) {
         err("addcharacter(): CHR file not found");
     }
-    fread(chrs + ((numchars - 1) * 15360), 1, 15360, chrf);
-    fclose(chrf);
+    vread(chrs + ((numchars - 1) * 15360), 1, 15360, chrf);
+    vclose(chrf);
 
-    fscanf(p, "%s", strbuf);
-    fclose(p);
-    chrf = fopen(strbuf, "rb");
+    vscanf(p, "%s", strbuf);
+    vclose(p);
+    chrf = vopen(strbuf, "rb");
     if (!chrf) {
         err("addcharacter(): CR2 file not found");
     }
-    fread(chr2 + ((numchars - 1) * 9216), 1, 9216, chrf);
-    fclose(chrf);
+    vread(chr2 + ((numchars - 1) * 9216), 1, 9216, chrf);
+    vclose(chrf);
 }
 
 void LoadCHRList() {
     int i;
-    FILE* f;
+    VFILE* f;
 
     for (i = 0; i < 20; i++)
         if (strlen(chrlist[i].fname)) {
-            f = fopen(chrlist[i].fname, "rb");
-            fread(chrs + ((i + 5) * 15360), 30, 512, f);
-            fclose(f);
+            f = vopen(chrlist[i].fname, "rb");
+            vread(chrs + ((i + 5) * 15360), 30, 512, f);
+            vclose(f);
         }
 }
 
@@ -272,45 +277,45 @@ void load_map(char* fname) {
 
     memcpy(mapname, fname, 13);
 
-    map = fopen(fname, "rb");
+    map = vopen(fname, "rb");
     if (!map) {
         err("Could not open specified MAP file.");
     }
 
-    fread(&b, 1, 1, map);
+    vread(&b, 1, 1, map);
     if (b != 4) {
-        err("*error* Incorrect MAP version.");
+        err("*error* Incorrect MAP version %i.", b);
     }
 
-    fread(vsp0name, 1, 13, map);
-    fread(musname, 1, 13, map);
+    vread(vsp0name, 1, 13, map);
+    vread(musname, 1, 13, map);
 
-    fread(&layerc, 1, 1, map);
-    fread(&pmultx, 1, 1, map);
+    vread(&layerc, 1, 1, map);
+    vread(&pmultx, 1, 1, map);
     pmulty = pmultx;
-    fread(&pdivx, 1, 1, map);
+    vread(&pdivx, 1, 1, map);
     pdivy = pdivx;
 
-    fread(levelname, 1, 30, map);
+    vread(levelname, 1, 30, map);
 
-    fread(&showname, 1, 1, map);
-    fread(&saveflag, 1, 1, map);
+    vread(&showname, 1, 1, map);
+    vread(&saveflag, 1, 1, map);
 
-    fread(&startx, 1, 2, map);
-    fread(&starty, 1, 2, map);
+    vread(&startx, 1, 2, map);
+    vread(&starty, 1, 2, map);
 
-    fread(&hide, 1, 1, map);
-    fread(&warp, 1, 1, map);
+    vread(&hide, 1, 1, map);
+    vread(&warp, 1, 1, map);
 
-    fread(&xsize, 1, 2, map);
-    fread(&ysize, 1, 2, map);
+    vread(&xsize, 1, 2, map);
+    vread(&ysize, 1, 2, map);
 
-    fread(&b, 1, 1, map);
+    vread(&b, 1, 1, map);
     if (b) {
         err("*error* MAP compression not yet supported.");
     }
 
-    fread(map0, 1, 27, map); // skip buffer
+    vread(map0, 1, 27, map); // skip buffer
 
     // -- aen; 30/May/98 -- dynamic map mem allocation
     // free previously allocate layer/info map mem (if necessary)
@@ -322,17 +327,17 @@ void load_map(char* fname) {
     map1 = (unsigned short*)valloc((xsize * ysize) * 2, "load_map:map1");
     mapp = (unsigned char*)valloc((xsize * ysize), "load_map:mapp");
 
-    fread(map0, xsize, ysize * 2, map); // read in background layer
-    fread(map1, xsize, ysize * 2, map); // read in foreground layer
-    fread(mapp, xsize, ysize, map);   // read in zone info/obstruction layer
+    vread(map0, xsize, ysize * 2, map); // read in background layer
+    vread(map1, xsize, ysize * 2, map); // read in foreground layer
+    vread(mapp, xsize, ysize, map);   // read in zone info/obstruction layer
 
-    fread(&zone, 1, sizeof(zone), map);
-    fread(&chrlist, 13, 100, map);      // read in chr list
+    vread(&zone, 1, sizeof(zone), map);
+    vread(&chrlist, 13, 100, map);      // read in chr list
 
     LoadCHRList();
 
-    fread(&entities, 1, 4, map);
-    fread(&party[5], 88, entities, map);
+    vread(&entities, 1, 4, map);
+    vread(&party[5], 88, entities, map);
 
     for (i = 5; i < entities + 5; i++) {
         party[i].cx = party[i].x;
@@ -341,37 +346,37 @@ void load_map(char* fname) {
         party[i].y = party[i].y * 16;
     }
 
-    fread(&nummovescripts, 1, 1, map);
-    fread(&i, 1, 4, map);
-    fread(&msofstbl, 4, nummovescripts, map);
-    fread(msbuf, 1, i, map);
+    vread(&nummovescripts, 1, 1, map);
+    vread(&i, 1, 4, map);
+    vread(&msofstbl, 4, nummovescripts, map);
+    vread(msbuf, 1, i, map);
 
     entities += 5;
 
     LoadVC(map);
-    fclose(map);
+    vclose(map);
 
     if (strlen(musname)) {
         playsong(musname);
     }
 
     // load the .VSP file
-    vsp = fopen(vsp0name, "rb");
+    vsp = vopen(vsp0name, "rb");
     if (!vsp) {
         err("Could not open specified VSP file.");
     }
-    fseek(vsp, 2, 0);
-    fread(pal, 1, 768, vsp);
-    fread(&numtiles, 1, 2, vsp);
+    vseek(vsp, 2, 0);
+    vread(pal, 1, 768, vsp);
+    vread(&numtiles, 1, 2, vsp);
 
     // -- aen; 31/May/98 -- dynamic map mem allocation
     vfree(vsp0);
     vspm = numtiles << 8;
     vsp0 = (unsigned char*)valloc(vspm, "load_map:vsp0");
 
-    fread(vsp0, 1, vspm, vsp);
-    fread(&va0, 1, sizeof(va0), vsp);
-    fclose(vsp);
+    vread(vsp0, 1, vspm, vsp);
+    vread(&va0, 1, sizeof(va0), vsp);
+    vclose(vsp);
 
     for (i = 0; i < 2048; i++) {
         tileidx[i] = i;
@@ -859,32 +864,32 @@ void CreateSaveImage(unsigned char* buf) {
 }
 
 void SaveGame(char* fn) {
-    FILE* f;
+    VFILE* f;
     unsigned char cz;
     unsigned char temp[2560];
 
-    f = fopen(fn, "wb");
+    f = vopen(fn, "wb");
     cz = mapp[(((party[0].y / 16) * xsize) + (party[0].x / 16))] >> 1;
-    fwrite(&zone[cz].savedesc, 1, 30, f);
+    vwrite(&zone[cz].savedesc, 1, 30, f);
     cz = partyidx[0] - 1;
-    fwrite(&pstats[cz].name, 1, 9, f);
-    fwrite(&pstats[cz].lv, 1, 4, f);
-    fwrite(&pstats[cz].curhp, 1, 8, f);
-    fwrite(&gp, 1, 4, f);
-    fwrite(&hr, 1, 1, f);
-    fwrite(&min, 1, 1, f);
-    fwrite(&sec, 1, 1, f);
-    fwrite(&numchars, 1, 1, f);
-    fwrite(&menuactive, 1, 1, f);
+    vwrite(&pstats[cz].name, 1, 9, f);
+    vwrite(&pstats[cz].lv, 1, 4, f);
+    vwrite(&pstats[cz].curhp, 1, 8, f);
+    vwrite(&gp, 1, 4, f);
+    vwrite(&hr, 1, 1, f);
+    vwrite(&min, 1, 1, f);
+    vwrite(&sec, 1, 1, f);
+    vwrite(&numchars, 1, 1, f);
+    vwrite(&menuactive, 1, 1, f);
     CreateSaveImage((unsigned char*)&temp);
-    fwrite(&temp, 1, 2560, f);
-    fwrite(&mapname, 1, 13, f);
-    fwrite(&party, 1, sizeof party, f);
-    fwrite(&partyidx, 1, 5, f);
-    fwrite(&flags, 1, 32000, f);
-    fwrite(&tchars, 1, 1, f);
-    fwrite(&pstats, 1, sizeof pstats, f);
-    fclose(f);
+    vwrite(&temp, 1, 2560, f);
+    vwrite(&mapname, 1, 13, f);
+    vwrite(&party, 1, sizeof party, f);
+    vwrite(&partyidx, 1, 5, f);
+    vwrite(&flags, 1, 32000, f);
+    vwrite(&tchars, 1, 1, f);
+    vwrite(&pstats, 1, sizeof pstats, f);
+    vclose(f);
 }
 
 void startmap(char* fname) {

@@ -57,6 +57,10 @@ void readKeyboard() {
 void initcontrols(char joystk) {
     verge::scanMap[DOMScanCode::VK_UP] = SCAN_UP;
     verge::scanMap[DOMScanCode::VK_DOWN] = SCAN_DOWN;
+    verge::scanMap[DOMScanCode::VK_LEFT] = SCAN_LEFT;
+    verge::scanMap[DOMScanCode::VK_RIGHT] = SCAN_RIGHT;
+    verge::scanMap[DOMScanCode::VK_ENTER] = SCAN_ENTER;
+    verge::scanMap[DOMScanCode::VK_ESCAPE] = SCAN_ESC;
 }
 
 void readb() {
