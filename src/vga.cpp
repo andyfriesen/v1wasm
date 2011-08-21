@@ -172,28 +172,6 @@ void box(int x, int y, int x2, int y2, char color) {
     }
 }
 
-/*
-void copytile(int x, int y, char *spr)
-{ asm("movl $16, %%edx                  \n\t"
-      "movl %2, %%esi                   \n\t"
-      "movl %1, %%edi                   \n\t"
-      "imul $352, %%edi                 \n\t"
-      "addl %0, %%edi                   \n\t"
-      "addl _virscr, %%edi              \n\t"
-"ctl0:                                  \n\t"
-      "movsl                            \n\t"
-      "movsl                            \n\t"
-      "movsl                            \n\t"
-      "movsl                            \n\t"
-      "addl $336, %%edi                 \n\t"
-      "decl %%edx                       \n\t"
-      "jnz ctl0                         \n\t"
-      :
-      : "m" (x), "m" (y), "m" (spr)
-      : "edx","esi","edi","cc" );
-}
-*/
-
 void copytile(int x, int y, unsigned char* spr) {
     const auto width = 16;
     auto height = 16;
@@ -243,6 +221,14 @@ void copytile(int x, int y, unsigned char* spr) {
 }
 
 void copysprite(int x, int y, int width, int height, unsigned char* spr) {
+    auto p = virscr + y * BACKBUFFER_PITCH + x;
+    while (height) {
+        for (int w = 0; w < width; ++w) {
+            p[w] = *spr++;
+        }
+        p += BACKBUFFER_PITCH;
+        --height;
+    }
 #if 0
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%esi                   \n\t"

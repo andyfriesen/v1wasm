@@ -1127,6 +1127,14 @@ void VCLoadPCX() {
 }
 
 void VCcopysprite(int x, int y, int width, int height, char* spr) {
+    auto p = vcscreen + y * XRES + x;
+    while (height) {
+        for (int w = 0; w < width; ++w) {
+            p[w] = *spr++;
+        }
+        p += XRES;
+        --height;
+    }
 #if 0
     asm("movl %3, %%edx                   \n\t"
         "movl %4, %%esi                   \n\t"
@@ -1153,6 +1161,17 @@ void VCcopysprite(int x, int y, int width, int height, char* spr) {
 }
 
 void VCtcopysprite(int x, int y, int width, int height, unsigned char* spr) {
+    auto p = vcscreen + y * XRES + x;
+    while (height) {
+        for (int w = 0; w < width; ++w) {
+            auto c = *spr++;
+            if (c) {
+                p[w] = c;
+            }
+        }
+        p += XRES;
+        --height;
+    }
 #if 0
     asm("movl %3, %%ecx                   \n\t"
         "movl %4, %%esi                   \n\t"
@@ -1205,6 +1224,10 @@ void VCClear() {
 }
 
 void VChline(int x, int y, int x2, char c) {
+    auto p = vcscreen + y * XRES;
+    for (auto i = x; i < x2; ++i) {
+        p[i] = c;
+    }
 #if 0
     asm ("movl %2, %%ecx                 \n\t"
          "subl %0, %%ecx                 \n\t"
