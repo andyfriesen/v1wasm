@@ -33,8 +33,7 @@ PlayFli()
   {
   for (i2=0; i2<depth; i2++)
   {
-     vidoffset=(i2*width);
-     ReadPCXLine(vcdatabuf);
+     ReadPCXLine(i2 * width, vcdatabuf);
   }
   VCtcopysprite(0,0,320,200,vcdatabuf+(i*64000));
   drawmap();
@@ -360,8 +359,7 @@ void PlayVAS() {
     sizeoff = sizex * sizey; //calc offset vals
 
     for (i2 = 0; i2 < depth; i2++) {
-        vidoffset = (i2 * width);
-        ReadPCXLine((unsigned char*)vcdatabuf);
+        ReadPCXLine(i2 * width, (unsigned char*)vcdatabuf);
     }
     fclose(pcxf);
 

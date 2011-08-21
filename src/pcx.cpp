@@ -30,10 +30,9 @@ char filler[58];
 unsigned short int width, depth;
 unsigned short int bytes, i;
 unsigned char c, run, ss = 0;
-unsigned int vidoffset;
 VFILE* pcxf;
 
-void ReadPCXLine(unsigned char* dest) {
+void ReadPCXLine(int vidoffset, unsigned char* dest) {
     int n = 0;
 
     do {
@@ -112,8 +111,8 @@ void loadpcx(char* fname, unsigned char* dest) {
     LoadPCXHeader(fname);
 
     for (auto i = 0; i < depth; i++) {
-        vidoffset = 5648 + (i * 352);
-        ReadPCXLine(dest);
+        auto vidoffset = i * 320;
+        ReadPCXLine(vidoffset, dest);
     }
 
     vclose(pcxf);

@@ -1134,8 +1134,8 @@ void VCPutPCX() {
     LoadPCXHeaderNP(stringbuffer);
 
     for (i = 0; i < depth; i++) {
-        vidoffset = ((i + y) * 320) + x;
-        ReadPCXLine(vcscreen);
+        auto vidoffset = ((i + y) * 320) + x;
+        ReadPCXLine(vidoffset, vcscreen);
     }
     fclose(pcxf);
 }
@@ -1158,8 +1158,8 @@ void VCLoadPCX() {
     LoadPCXHeaderNP(stringbuffer);
 
     for (i = 0; i < depth; i++) {
-        vidoffset = (i * width) + ofs;
-        ReadPCXLine((unsigned char*)vcdatabuf);
+        int vidoffset = (i * width) + ofs;
+        ReadPCXLine(vidoffset, (unsigned char*)vcdatabuf);
     }
     fclose(pcxf);
 }

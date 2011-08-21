@@ -70,7 +70,7 @@ void get_palette() {
 
 void set_intensity(unsigned int n) {
     for (auto i = 0; i < 256 * 3; ++i) {
-        pal2[i] = pal[i] * n;
+        pal2[i] = (pal[i] * n) / 63;
     }
     set_palette(pal2);
     vgadump();

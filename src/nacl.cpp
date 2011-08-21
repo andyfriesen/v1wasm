@@ -322,8 +322,8 @@ struct V1naclInstance
 
     uint32_t _8to32(unsigned char c, unsigned char* pal) {
         return 0xFF000000
-            | pal[c * 3] << 24
-            | pal[c * 3 + 1] << 16
+            | pal[c * 3] << 16
+            | pal[c * 3 + 1] << 8
             | pal[c * 3 + 2];
     }
 
