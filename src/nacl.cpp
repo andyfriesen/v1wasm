@@ -186,7 +186,7 @@ struct GameDownloader {
         auto next = manifest.back();
         printf("next asset is '%s'\n", next.c_str());
         manifest.pop_back();
-        auto url = "http://localhost:5013/v1/sully/" + next;
+        auto url = "sully/" + next;
         auto cc = ccFactory.NewCallback(&GameDownloader::gotFile, next);
         downloader.reset(new Downloader(instance));
         downloader->get(url, cc);

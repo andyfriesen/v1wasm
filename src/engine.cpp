@@ -68,9 +68,9 @@ int gp;                                // party's gold (or meseta, s, $, etc)
 
 unsigned short int vadelay[100];       // delay counter
 
-unsigned short int* map0 = NULL;      // map data pointers
-unsigned short int* map1 = NULL;
-unsigned char* mapp = NULL;
+std::vector<short> map0; // Tile data
+std::vector<short> map1;
+std::vector<char> mapp;
 
 unsigned char* vsp0, *chrs;      // graphic data pointers
 unsigned char* itemicons, *chr2;       // more graphic ptrs
@@ -276,7 +276,6 @@ void load_map(char* fname) {
     int i;
 
     memcpy(mapname, fname, 13);
-
     map = vopen(fname, "rb");
     if (!map) {
         err("Could not open specified MAP file %s.", fname);
@@ -317,17 +316,13 @@ void load_map(char* fname) {
 
     // -- aen; 30/May/98 -- dynamic map mem allocation
     // free previously allocate layer/info map mem (if necessary)
-    vfree(map0);
-    vfree(map1);
-    vfree(mapp);
-    // allocate exact amount of mem needed
-    map0 = (unsigned short*)valloc((xsize * ysize) * 2, "load_map:map0");
-    map1 = (unsigned short*)valloc((xsize * ysize) * 2, "load_map:map1");
-    mapp = (unsigned char*)valloc((xsize * ysize), "load_map:mapp");
+    map0.resize(xsize * ysize);
+    map1.resize(xsize * ysize);
+    mapp.resize(xsize * ysize);
 
-    vread(map0, xsize, ysize * 2, map); // read in background layer
-    vread(map1, xsize, ysize * 2, map); // read in foreground layer
-    vread(mapp, xsize, ysize, map);   // read in zone info/obstruction layer
+    vread(&map0[0], xsize, ysize * 2, map); // read in background layer
+    vread(&map1[0], xsize, ysize * 2, map); // read in foreground layer
+    vread(&mapp[0], xsize, ysize, map);   // read in zone info/obstruction layer
 
     vread(&zone, 1, sizeof(zone), map);
     vread(&chrlist, 13, 100, map);      // read in chr list
