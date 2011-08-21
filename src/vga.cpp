@@ -24,6 +24,8 @@ using namespace verge;
 
 #include "engine.h" // for valloc()
 
+void PreCalc_TransparencyFields();
+
 namespace verge {
     IFramebuffer* plugin = 0;
 }
@@ -102,6 +104,7 @@ void set_intensity(unsigned n) {
 }
 
 void initvga(IFramebuffer* fb) {
+    PreCalc_TransparencyFields();
     plugin = fb;
 }
 
@@ -112,6 +115,10 @@ void quick_killgfx() {
 }
 
 void quick_restoregfx() {
+}
+
+void vgaclear() {
+    memset(virscr, 0, BACKBUFFER_SIZE);
 }
 
 void vgadump() {
@@ -462,19 +469,28 @@ void ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
 }
 
 void Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
-    unsigned int j, i, jz, iz;
-    unsigned char c, d;
-
-    for (j = 0; j < height; j++) {
-        for (i = 0; i < width; i++) {
-            jz = j + y1;
-            iz = i + x1;
-            c = virscr[(jz * 352) + iz];
-            d = src[(j * width) + i];
+    printf("TcopySprite(%i, %i, %i, %i)", x1, y1, width, height);
+    /*for (auto j = 0; j < height; j++) {
+        for (auto i = 0; i < width; i++) {
+            auto jz = j + y1;
+            auto iz = i + x1;
+            auto c = virscr[(jz * 352) + iz];
+            auto d = src[(j * width) + i];
             if (d) {
                 virscr[(jz * 352) + iz] = transparencytbl[(d * 256) + c];
             }
         }
+    }*/
+    auto p = virscr + y1 * BACKBUFFER_PITCH + x1;
+    while (height) {
+        for (int w = 0; w < width; ++w) {
+            auto c = *src++;
+            if (c) {
+                p[w] = transparencytbl[c * 256 + p[w]];;
+            }
+        }
+        p += BACKBUFFER_PITCH;
+        --height;
     }
 }
 
@@ -628,6 +644,7 @@ void putbox() {
 }
 
 void dec_to_asciiz(int num, char* buf) {
+    sprintf(buf, "%i", num);
 #if 0
     asm ("movl $10, %%ebx              \n\t"
          "movl %0, %%eax               \n\t"

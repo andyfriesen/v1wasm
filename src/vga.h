@@ -6,6 +6,7 @@ struct IFramebuffer;
 void closevga();
 void quick_killgfx();
 void quick_restoregfx();
+void vgaclear();
 void vgadump();
 void setpixel(int x, int y, char c);
 void hline(int x, int y, int dist, char c);

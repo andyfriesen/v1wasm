@@ -30,7 +30,10 @@ int cenx, ceny;                       // stick-center values
 int upb, downb, leftb, rightb;        // barriers for axis determination
 
 // --- Control masks
-char kb1, kb2, kb3, kb4;              // keyboard definable controls.
+int kb1 = SCAN_ENTER;
+int kb2 = SCAN_ALT;
+int kb3 = SCAN_ESC;
+int kb4 = SCAN_SPACE;
 char jb1, jb2, jb3, jb4;              // joystick definable controls.
 
 void ScreenShot();
@@ -61,6 +64,8 @@ void initcontrols(char joystk) {
     verge::scanMap[DOMScanCode::VK_RIGHT] = SCAN_RIGHT;
     verge::scanMap[DOMScanCode::VK_ENTER] = SCAN_ENTER;
     verge::scanMap[DOMScanCode::VK_ESCAPE] = SCAN_ESC;
+    verge::scanMap[DOMScanCode::VK_SPACE] = SCAN_SPACE;
+    verge::scanMap[DOMScanCode::VK_META] = SCAN_ALT;
 }
 
 void readb() {

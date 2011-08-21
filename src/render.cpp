@@ -30,7 +30,7 @@ unsigned char layer1trans = 0, layervctrans = 0, layervc2trans = 0;
 
 int quake = 0, quakex, quakey, qswitch = 0; // render-quake flags
 int screengradient = 0;                // fullscreen mappalettegradient
-void (*DrawLayer1) (int xw, int yw);    // DrawLayer1 "driver"-style ptr
+void (*DrawLayer1) (int xw, int yw) = 0;    // DrawLayer1 "driver"-style ptr
 
 void DrawLayer1NoSpeed(int xw, int yw);     // DrawLayer1 funcs pre-defines
 void DrawLayer1Speed(int xw, int yw);       // DrawLayer1 funcs pre-defines
@@ -67,7 +67,7 @@ void CalcVSPMask() {
 
 void drawchar(int i, int xw, int yw) {
     unsigned char* img;
-    char fr;
+    char fr = 0;
     int dx, dy, drawmode = 0;
 
     dx = party[i].x - xw + 16;
@@ -276,7 +276,7 @@ void drawmap() {
     if (layer0) {
         DrawLayer0(xwin, ywin);
     } else {
-        memset(virscr + 5648, 0, 70368);
+        vgaclear();
     }
     if (layervc == 3) {
         drawvclayer();
@@ -336,8 +336,7 @@ void drawmaploc(int xw, int yw) {
 }
 
 void DrawLayer0(int xw, int yw) {
-    unsigned char* img;
-    int i, j, oxw, oyw;
+    int oxw, oyw;
 
     if ((!layerc) || (layerc == 1) || (layerc == 3)) {
         oxw = xw;
@@ -353,16 +352,16 @@ void DrawLayer0(int xw, int yw) {
     xofs = (16 - (oxw & 15));
     yofs = (16 - (oyw & 15));
 
-    for (i = 0; i < 14; i++)
-        for (j = 0; j < 21; j++) {
-            img = vsp0 + (tileidx[map0[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
+    for (auto i = 0; i < 14; i++)
+        for (auto j = 0; j < 21; j++) {
+            auto tileIndex = map0[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)];
+            auto img = vsp0 + (tileidx[tileIndex] << 8);
             copytile((j << 4) + xofs, (i << 4) + yofs, img);
         }
 }
 
 void DrawLayer1Trans(int xw, int yw) {
-    unsigned char* img;
-    int i, j, oxw, oyw;
+    int oxw, oyw;
 
     if (layerc < 3) {
         oxw = xw;
@@ -378,13 +377,15 @@ void DrawLayer1Trans(int xw, int yw) {
     xofs = (16 - (oxw & 15));
     yofs = (16 - (oyw & 15));
 
-    for (i = 0; i < 14; i++)
-        for (j = 0; j < 21; j++) {
-            img = vsp0 + (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
-            if (img != vsp0) {
+    for (auto i = 0; i < 14; i++) {
+        for (auto j = 0; j < 21; j++) {
+            auto tileIndex = map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)];
+            if (tileIndex != 0) {
+                auto img = vsp0 + (tileidx[tileIndex] << 8);
                 Tcopysprite((j << 4) + xofs, (i << 4) + yofs, 16, 16, img);
             }
         }
+    }
 }
 
 void _DrawLayer1Trans(int xw, int yw) {
@@ -416,8 +417,7 @@ void _DrawLayer1Trans(int xw, int yw) {
 
 
 void DrawLayer1NoSpeed(int xw, int yw) {
-    unsigned char* img;
-    int i, j, oxw, oyw;
+    int oxw, oyw;
 
     if (layer1trans == 1) {
         DrawLayer1Trans(xw, yw);
@@ -443,18 +443,18 @@ void DrawLayer1NoSpeed(int xw, int yw) {
     xofs = (16 - (oxw & 15));
     yofs = (16 - (oyw & 15));
 
-    for (i = 0; i < 14; i++)
-        for (j = 0; j < 21; j++) {
-            img = vsp0 + (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
+    for (auto i = 0; i < 14; i++) {
+        for (auto j = 0; j < 21; j++) {
+            auto img = vsp0 + (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
             if (img != vsp0) {
                 tcopysprite((j << 4) + xofs, (i << 4) + yofs, 16, 16, img);
             }
         }
+    }
 }
 
 void DrawLayer1Speed(int xw, int yw) {
-    unsigned char* img;
-    int i, j, oxw, oyw, a;
+    int oxw, oyw;
 
     if (layer1trans == 1) {
         DrawLayer1Trans(xw, yw);
@@ -480,14 +480,15 @@ void DrawLayer1Speed(int xw, int yw) {
     xofs = (16 - (oxw & 15));
     yofs = (16 - (oyw & 15));
 
-    for (i = 0; i < 14; i++)
-        for (j = 0; j < 21; j++) {
-            a = (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
-            img = vsp0 + a;
+    for (auto i = 0; i < 14; i++) {
+        for (auto j = 0; j < 21; j++) {
+            auto a = (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
+            auto img = vsp0 + a;
             if (img != vsp0) {
                 tcopytile((j << 4) + xofs, (i << 4) + yofs, img, vspmask + a);
             }
         }
+    }
 }
 
 // ============================= Animation code ==========================

@@ -29,7 +29,6 @@ int vcbufm;
 char playing = 0;
 char playingsong[13];
 
-extern char kb1, kb2, kb3, kb4;
 extern char jb1, jb2, jb3, jb4;
 
 unsigned char mp_volume;
@@ -192,10 +191,6 @@ void sound_init()
     vcbufm = 250000;
     //mapm=150000; // -- aen; 30/May/09 -- no longer used; see load_map().
 
-    kb1 = 28;
-    kb2 = 56;
-    kb3 = 1;
-    kb4 = 57;
     jb1 = 1;
     jb2 = 2;
     jb3 = 3;
