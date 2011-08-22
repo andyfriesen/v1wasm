@@ -145,7 +145,7 @@ struct GameDownloader {
         printf("Fetching manifest\n");
         downloader.reset(new Downloader(instance));
         auto cc = ccFactory.NewCallback(&GameDownloader::gotManifest);
-        downloader->get("http://localhost:5013/v1/sully/manifest.txt", cc);
+        downloader->get("sully/manifest.txt", cc);
     }
 
     void gotManifest(int32_t result) {

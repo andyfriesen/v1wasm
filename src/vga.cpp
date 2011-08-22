@@ -193,38 +193,6 @@ void copytile(int x, int y, unsigned char* spr) {
         p += BACKBUFFER_PITCH;
         --height;
     }
-#if 0
-    asm("movl $16, %%ecx                  \n\t"
-        "movl %2, %%esi                   \n\t"
-        "movl %1, %%edi                   \n\t"
-        "imul $352, %%edi                 \n\t"
-        "addl %0, %%edi                   \n\t"
-        "addl _virscr, %%edi              \n\t"
-        " ctl0:                                 \n\t"
-        "movl (%%edi), %%eax              \n\t"
-        "andl $0, %%eax                   \n\t"
-        "orl  (%%esi), %%eax              \n\t"
-        "movl %%eax, (%%edi)              \n\t"
-        "movl 4(%%edi), %%eax             \n\t"
-        "andl $0, %%eax                   \n\t"
-        "orl  4(%%esi), %%eax             \n\t"
-        "movl %%eax, 4(%%edi)             \n\t"
-        "movl 8(%%edi), %%eax             \n\t"
-        "andl $0, %%eax                   \n\t"
-        "orl  8(%%esi), %%eax             \n\t"
-        "movl %%eax, 8(%%edi)             \n\t"
-        "movl 12(%%edi), %%eax            \n\t"
-        "andl $0, %%eax                   \n\t"
-        "orl  12(%%esi), %%eax            \n\t"
-        "movl %%eax, 12(%%edi)            \n\t"
-        "addl $16, %%esi                  \n\t"
-        "addl $352, %%edi                 \n\t"
-        "decl %%ecx                       \n\t"
-        "jnz ctl0                         \n\t"
-        :
-        : "m" (x), "m" (y), "m" (spr)
-        : "eax", "ecx", "esi", "edi", "cc" );
-#endif
 }
 
 void copysprite(int x, int y, int width, int height, unsigned char* spr) {
@@ -236,29 +204,6 @@ void copysprite(int x, int y, int width, int height, unsigned char* spr) {
         p += BACKBUFFER_PITCH;
         --height;
     }
-#if 0
-    asm("movl %3, %%edx                   \n\t"
-        "movl %4, %%esi                   \n\t"
-        "csl0:                                  \n\t"
-        "movl %1, %%eax                   \n\t"
-        "imul $352, %%eax                 \n\t"
-        "addl %0, %%eax                   \n\t"
-        "addl _virscr, %%eax              \n\t"
-        "movl %%eax, %%edi                \n\t"
-        "movl %2, %%ecx                   \n\t"
-        "shrl $1, %%ecx                   \n\t"
-        "jnc csl1                         \n\t"
-        "movsb                            \n\t"
-        "csl1:                                  \n\t"
-        "repz                             \n\t"
-        "movsw                            \n\t"
-        "incl %1                          \n\t"
-        "decl %%edx                       \n\t"
-        "jnz csl0                         \n\t"
-        :
-        : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
-        : "eax", "edx", "esi", "edi", "ecx", "cc" );
-#endif
 }
 
 void grabregion(int x, int y, int width, int height, unsigned char* spr) {
@@ -301,40 +246,6 @@ void tcopytile(int x, int y, unsigned char* spr, unsigned char* matte) {
         p += BACKBUFFER_PITCH;
         --height;
     }
-#if 0
-    asm("movl $16, %%ecx                  \n\t"
-        "movl %2, %%esi                   \n\t"
-        "movl %1, %%edi                   \n\t"
-        "imul $352, %%edi                 \n\t"
-        "addl %0, %%edi                   \n\t"
-        "addl _virscr, %%edi              \n\t"
-        "movl %3, %%edx                   \n\t"
-        "tctl0:                                 \n\t"
-        "movl (%%edi), %%eax              \n\t"
-        "andl (%%edx), %%eax              \n\t"
-        "orl  (%%esi), %%eax              \n\t"
-        "movl %%eax, (%%edi)              \n\t"
-        "movl 4(%%edi), %%eax             \n\t"
-        "andl 4(%%edx), %%eax             \n\t"
-        "orl  4(%%esi), %%eax             \n\t"
-        "movl %%eax, 4(%%edi)             \n\t"
-        "movl 8(%%edi), %%eax             \n\t"
-        "andl 8(%%edx), %%eax             \n\t"
-        "orl  8(%%esi), %%eax             \n\t"
-        "movl %%eax, 8(%%edi)             \n\t"
-        "movl 12(%%edi), %%eax            \n\t"
-        "andl 12(%%edx), %%eax            \n\t"
-        "orl  12(%%esi), %%eax            \n\t"
-        "movl %%eax, 12(%%edi)            \n\t"
-        "addl $16, %%esi                  \n\t"
-        "addl $352, %%edi                 \n\t"
-        "addl $16, %%edx                  \n\t"
-        "decl %%ecx                       \n\t"
-        "jnz tctl0                        \n\t"
-        :
-        : "m" (x), "m" (y), "m" (spr), "m" (matte)
-        : "eax", "ecx", "edx", "esi", "edi", "cc" );
-#endif
 }
 
 // TODO: Clipping?
@@ -439,33 +350,16 @@ void PreCalc_TransparencyFields() {
 }
 
 void ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
-#if 0
-    asm( "movl %3, %%edx                   \n\t"
-         "subl %1, %%edx                   \n\t"   // get height
-         "movl %4, %%esi                   \n\t"
-         "acf0:                                  \n\t"
-         "movl %1, %%edi                   \n\t"
-         "imul $352, %%edi                 \n\t"
-         "addl %0, %%edi                   \n\t"
-         "addl _virscr, %%edi              \n\t"
-         "movl %2, %%ecx                   \n\t"
-         "subl %0, %%ecx                   \n\t"  // get width
-         "acf1:                                  \n\t"
-         "movl $0, %%eax                   \n\t"
-         "movb (%%edi), %%al               \n\t"
-         "addl %%esi, %%eax                \n\t"
-         "movb (%%eax), %%bl               \n\t"
-         "movb %%bl, (%%edi)               \n\t"
-         "incl %%edi                       \n\t"
-         "decl %%ecx                       \n\t"
-         "jnz acf1                         \n\t"
-         "incl %1                          \n\t"
-         "decl %%edx                       \n\t"
-         "jnz acf0                         \n\t"
-         :
-         : "m" (x), "m" (y), "m" (x2), "m" (y2), "m" (tbl)
-         : "eax", "ebx", "ecx", "edx", "esi", "edi", "cc" );
-#endif
+    auto height = y2 - y;
+    const auto width = x2 - x;
+
+    auto *ptr = getScreenPointer(x - 16, y - 16);
+    while (height--) {
+        for (auto i = 0; i < width; i++) {
+            ptr[i] = tbl[ptr[i]];
+        }
+        ptr += BACKBUFFER_PITCH;
+    }
 }
 
 void Tcopysprite(int x1, int y1, int width, int height, unsigned char* src) {
@@ -633,29 +527,6 @@ void putbox() {
 
 void dec_to_asciiz(int num, char* buf) {
     sprintf(buf, "%i", num);
-#if 0
-    asm ("movl $10, %%ebx              \n\t"
-         "movl %0, %%eax               \n\t"
-         "movl %1, %%edi               \n\t"
-         "xor %%ecx, %%ecx             \n\t"
-         "dtal0:                               \n\t"
-         "xor %%edx, %%edx             \n\t"
-         "div %%ebx                    \n\t"
-         "pushw %%dx                   \n\t"
-         "incl %%ecx                   \n\t"
-         "orl %%eax, %%eax             \n\t"
-         "jnz dtal0                    \n\t"
-         "dtal1:                               \n\t"
-         "popw %%ax                    \n\t"
-         "addb $48, %%al               \n\t"
-         "stosb                        \n\t"
-         "loop dtal1                   \n\t"
-         "xor %%al, %%al               \n\t"
-         "stosb                        \n\t"
-         :
-         : "m" (num), "m" (buf)
-         : "eax", "ebx", "edi", "ecx", "cc" );
-#endif
 }
 
 void textwindow(char portrait, const char* str1, const char* str2, const char* str3) {

@@ -1135,29 +1135,6 @@ void VCcopysprite(int x, int y, int width, int height, char* spr) {
         p += XRES;
         --height;
     }
-#if 0
-    asm("movl %3, %%edx                   \n\t"
-        "movl %4, %%esi                   \n\t"
-        "csl0:                                  \n\t"
-        "movl %1, %%eax                   \n\t"
-        "imul $320, %%eax                 \n\t"
-        "addl %0, %%eax                   \n\t"
-        "addl _vcscreen, %%eax            \n\t"
-        "movl %%eax, %%edi                \n\t"
-        "movl %2, %%ecx                   \n\t"
-        "shrl $1, %%ecx                   \n\t"
-        "jnc csl1                         \n\t"
-        "movsb                            \n\t"
-        "csl1:                                  \n\t"
-        "repz                             \n\t"
-        "movsw                            \n\t"
-        "incl %1                          \n\t"
-        "decl %%edx                       \n\t"
-        "jnz csl0                         \n\t"
-        :
-        : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
-        : "eax", "edx", "esi", "edi", "ecx", "cc" );
-#endif
 }
 
 void VCtcopysprite(int x, int y, int width, int height, unsigned char* spr) {
@@ -1172,38 +1149,6 @@ void VCtcopysprite(int x, int y, int width, int height, unsigned char* spr) {
         p += XRES;
         --height;
     }
-#if 0
-    asm("movl %3, %%ecx                   \n\t"
-        "movl %4, %%esi                   \n\t"
-        "tcsl0:                                 \n\t"
-        "movl %1, %%eax                   \n\t"
-        "imul $320, %%eax                 \n\t"
-        "addl %0, %%eax                   \n\t"
-        "addl _vcscreen, %%eax              \n\t"
-        "movl %%eax, %%edi                \n\t"
-        "movl %2, %%edx                   \n\t"
-        "drawloop:                              \n\t"
-        "lodsb                            \n\t"
-        "orb %%al, %%al                   \n\t"
-        "jz nodraw                        \n\t"
-        "stosb                            \n\t"
-        "decl %%edx                       \n\t"
-        "orl %%edx, %%edx                 \n\t"
-        "jz endline                       \n\t"
-        "jmp drawloop                     \n\t"
-        "nodraw:                                \n\t"
-        "incl %%edi                       \n\t"
-        "decl %%edx                       \n\t"
-        "orl %%edx, %%edx                 \n\t"
-        "jnz drawloop                     \n\t"
-        "endline:                               \n\t"
-        "incl %1                          \n\t"
-        "decl %%ecx                       \n\t"
-        "jnz tcsl0                        \n\t"
-        :
-        : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
-        : "eax", "edx", "esi", "edi", "ecx", "cc" );
-#endif
 }
 
 void VCBlitImage() {
@@ -1228,22 +1173,6 @@ void VChline(int x, int y, int x2, char c) {
     for (auto i = x; i < x2; ++i) {
         p[i] = c;
     }
-#if 0
-    asm ("movl %2, %%ecx                 \n\t"
-         "subl %0, %%ecx                 \n\t"
-         "movl %1, %%eax                 \n\t"
-         "imul $320, %%eax               \n\t"
-         "addl %0, %%eax                 \n\t"
-         "addl _vcscreen, %%eax          \n\t"
-         "movl %%eax, %%edi              \n\t"
-         "movb %3, %%al                  \n\t"
-         "repz                           \n\t"
-         "stosb                          \n\t"
-         :
-         : "m" (x), "m" (y), "m" (x2), "m" (c)
-         : "eax", "edi", "ecx", "cc" );
-
-#endif
 }
 
 void VCClearRegion() {
