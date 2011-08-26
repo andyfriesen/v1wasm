@@ -31,6 +31,8 @@ namespace verge {
         int seek(long int offset, int origin);
         int tell();
 
+        std::string getData();
+
     private:
         FileMode mode;
         DataVec data;
@@ -40,15 +42,13 @@ namespace verge {
 
     struct FS {
         friend class File;
-        //explicit FS(pp::Instance* instance);
 
         FilePtr open(const std::string& filename, FileMode mode);
 
         void set(const std::string& filename, DataVec data);
 
-    //private:
+    private:
         std::map<std::string, FilePtr> files;
-        //pp::Instance* instance;
     };
 
     // API

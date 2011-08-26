@@ -126,7 +126,8 @@ parseloop:
     vclose(f);
 
     for (i = 0; i < 4; i++) {
-        if (!(f = vopen(savename[i], "rb"))) {
+        f = vopen(savename[i], "r");
+        if (!f) {
             gotoxy(menus[i].posx + 100, menus[i].posy + 10);
             menus[i].linktype = 0;
             printstring("- NOT USED -");
@@ -193,8 +194,8 @@ parseloop:
             tcopysprite(menus[i].posx + 32, menus[i].posy, 16, 32, tbuf + 1024);
             tcopysprite(menus[i].posx + 48, menus[i].posy, 16, 32, tbuf + 1536);
             tcopysprite(menus[i].posx + 64, menus[i].posy, 16, 32, tbuf + 2048);
+            vclose(f);
         }
-        vclose(f);
     }
 
     int mpos = 0;
@@ -211,9 +212,11 @@ parseloop:
     if (!r) {
         fin();
     }
-    if (r) while (b1) {
+    if (r) {
+        while (b1) {
             readcontrols();
         }
+    }
 
 inputloop:
     readcontrols();

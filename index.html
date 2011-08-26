@@ -7,21 +7,47 @@
     V1naclModule = null;  // Global application object.
     statusText = 'NO-STATUS';
 
+    function pushSave(index) {
+        var state = localStorage.getItem('save' + index);
+        if (state) {
+            console.log('state' + index + ': ' + state.toSource());
+            V1naclModule.postMessage('setSave' + index + ':' + state);
+        } else {
+            console.log('No state for slot ' + index);
+        }
+    }
+
     // When the NaCl module has loaded, hook up an event listener to handle
     // messages coming from it via PPB_Messaging.PostMessage() (in C) or
     // pp::Instance.PostMessage() (in C++), and indicate success.
     function moduleDidLoad() {
-      V1naclModule = document.getElementById('v1nacl');
-      V1naclModule.addEventListener('message', handleMessage, false);
-      updateStatus('SUCCESS');
-    }
+        V1naclModule = document.getElementById('v1nacl');
+        V1naclModule.addEventListener('message', handleMessage, false);
+        updateStatus('SUCCESS');
+
+        pushSave(0);
+        pushSave(1);
+        pushSave(2);
+        pushSave(3);
+   }
 
     // The 'message' event handler.  This handler is fired when the NaCl module
     // posts a message to the browser by calling PPB_Messaging.PostMessage()
     // (in C) or pp::Instance.PostMessage() (in C++).  This implementation
     // simply displays the content of the message in an alert panel.
     function handleMessage(message_event) {
-      alert(message_event.data);
+        var d = message_event.data;
+        if (/^save0:/.match(d)) {
+            localStorage.setItem('save0', d.substr(6));
+        } else if (/^save1:/.match(d)) {
+            localStorage.setItem('save1', d.substr(6));
+        } else if (/^save2:/.match(d)) {
+            localStorage.setItem('save2', d.substr(6));
+        } else if (/^save3:/.match(d)) {
+            localStorage.setItem('save3', d.substr(6));
+        } else {
+            alert(d);
+        }
     }
 
     // If the page loads before the Native Client module loads, then set the

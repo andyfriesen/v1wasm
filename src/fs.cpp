@@ -74,6 +74,11 @@ namespace verge {
         return pos;
     }
 
+    std::string File::getData() {
+        std::string result(data.begin(), data.end());
+        return result;
+    }
+
     /*
     FS::FS(pp::Instance* instance)
         : instance(instance)
@@ -119,6 +124,7 @@ namespace verge {
     }
 
     void vclose(VFILE* f) {
+        assert(f && "Attempt to close 0 handle");
         f->close();
     }
 

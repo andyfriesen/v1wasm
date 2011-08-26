@@ -207,29 +207,15 @@ void copysprite(int x, int y, int width, int height, unsigned char* spr) {
 }
 
 void grabregion(int x, int y, int width, int height, unsigned char* spr) {
-#if 0
-    asm("movl %3, %%edx                   \n\t"
-        "movl %4, %%edi                   \n\t"
-        "grl0:                                  \n\t"
-        "movl %1, %%eax                   \n\t"
-        "imul $352, %%eax                 \n\t"
-        "addl %0, %%eax                   \n\t"
-        "addl _virscr, %%eax              \n\t"
-        "movl %%eax, %%esi                \n\t"
-        "movl %2, %%ecx                   \n\t"
-        "shrl $1, %%ecx                   \n\t"
-        "jnc grl1                         \n\t"
-        "movsb                            \n\t"
-        "grl1:                                  \n\t"
-        "repz                             \n\t"
-        "movsw                            \n\t"
-        "incl %1                          \n\t"
-        "decl %%edx                       \n\t"
-        "jnz grl0                         \n\t"
-        :
-        : "m" (x), "m" (y), "m" (width), "m" (height), "m" (spr)
-        : "eax", "edx", "esi", "edi", "ecx", "cc" );
-#endif
+    auto src = getScreenPointer(x - 16, y - 16);
+    auto dest = spr;
+
+    while (height--) {
+        for (auto i = 0; i < width; ++i) {
+            *dest++ = src[i];
+        }
+        src += BACKBUFFER_PITCH;
+    }
 }
 
 void tcopytile(int x, int y, unsigned char* spr, unsigned char* matte) {
@@ -353,7 +339,7 @@ void ColorField(int x, int y, int x2, int y2, unsigned char* tbl) {
     auto height = y2 - y;
     const auto width = x2 - x;
 
-    auto *ptr = getScreenPointer(x - 16, y - 16);
+    auto ptr = getScreenPointer(x - 16, y - 16);
     while (height--) {
         for (auto i = 0; i < width; i++) {
             ptr[i] = tbl[ptr[i]];

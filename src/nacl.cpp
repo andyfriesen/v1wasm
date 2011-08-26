@@ -142,7 +142,6 @@ struct GameDownloader {
 
     void start(pp::CompletionCallback oc) {
         onComplete = oc;
-        printf("Fetching manifest\n");
         downloader.reset(new Downloader(instance));
         auto cc = ccFactory.NewCallback(&GameDownloader::gotManifest);
         downloader->get("sully/manifest.txt", cc);
@@ -172,7 +171,6 @@ struct GameDownloader {
 
     void appendToManifest(const std::string& s) {
         if (s.length() > 0) {
-            printf("manifest\t'%s'\n", s.c_str());
             manifest.push_back(s);
         }
     }
@@ -184,7 +182,6 @@ struct GameDownloader {
         }
 
         auto next = manifest.back();
-        printf("next asset is '%s'\n", next.c_str());
         manifest.pop_back();
         auto url = "sully/" + next;
         auto cc = ccFactory.NewCallback(&GameDownloader::gotFile, next);
@@ -221,8 +218,6 @@ struct GameDownloader {
             printf("FileIO::Write failed result=%i\n", writeResult);
             return;
         }
-
-        auto bytesWritten = writeResult;
 
         getNextFile();
     }
@@ -289,6 +284,16 @@ struct V1naclInstance
             case PP_INPUTEVENT_TYPE_KEYUP:
                 ie.type = verge::EventType::KeyUp;
                 break;
+            case PP_INPUTEVENT_TYPE_UNDEFINED:
+            case PP_INPUTEVENT_TYPE_MOUSEDOWN:
+            case PP_INPUTEVENT_TYPE_MOUSEUP:
+            case PP_INPUTEVENT_TYPE_MOUSEMOVE:
+            case PP_INPUTEVENT_TYPE_MOUSEENTER:
+            case PP_INPUTEVENT_TYPE_MOUSELEAVE:
+            case PP_INPUTEVENT_TYPE_WHEEL:
+            case PP_INPUTEVENT_TYPE_RAWKEYDOWN:
+            case PP_INPUTEVENT_TYPE_CHAR:
+            case PP_INPUTEVENT_TYPE_CONTEXTMENU:
             default:
                 // Don't care.
                 return false;
@@ -320,7 +325,25 @@ struct V1naclInstance
         gameDownloader.start(cb);
     }
 
+    // FIXME: This races with engine initialization.
+    // We should probably wait on a "start" message before spinning off the game thread
+    // to fix this.
     virtual void HandleMessage(const pp::Var& var_message) {
+        auto sm(var_message.AsString());
+        auto slice(sm.substr(0, 9));
+        auto saveData(sm.substr(9));
+
+        if (slice == "setSave0:") {
+            verge::vset("SAVEDAT.000", verge::DataVec(saveData.begin(), saveData.end()));
+        } else if (slice == "setSave1:") {
+            verge::vset("SAVEDAT.001", verge::DataVec(saveData.begin(), saveData.end()));
+        } else if (slice == "setSave2:") {
+            verge::vset("SAVEDAT.002", verge::DataVec(saveData.begin(), saveData.end()));
+        } else if (slice == "setSave3:") {
+            verge::vset("SAVEDAT.003", verge::DataVec(saveData.begin(), saveData.end()));
+        } else {
+            printf("Got a message! '%s'\n", slice.c_str());
+        }
     }
 
     void downloadComplete(int32_t result) {
@@ -380,8 +403,26 @@ struct V1naclInstance
         eventQueue.resize(0);
     }
 
-    virtual void vgadump(unsigned char* framebuffer, unsigned char* palette) {
+    struct PersistSaveRequestData {
+        V1naclInstance* instance;
+        const std::string fileName;
+        const std::string saveData;
 
+        PersistSaveRequestData(V1naclInstance* instance, const std::string& fileName, const std::string& saveData)
+            : instance(instance)
+            , fileName(fileName)
+            , saveData(saveData)
+        { }
+    };
+
+    // Caution: Should only be called by the game thread
+    virtual void persistSave(const std::string& fileName, const std::string& saveData) {
+        auto psr = new PersistSaveRequestData(this, fileName, saveData);
+        module->core()->CallOnMainThread(0, pp::CompletionCallback(&V1naclInstance::_persistSave, psr));
+    }
+
+    // Caution: Should only be called by the game thread
+    virtual void vgadump(unsigned char* framebuffer, unsigned char* palette) {
         if (0 != pthread_mutex_lock(&bbMutex)) {
             assert(!"Failed to acquire mutex\n");
         }
@@ -400,6 +441,18 @@ struct V1naclInstance
         }
 
         module->core()->CallOnMainThread(0, pp::CompletionCallback(&V1naclInstance::_present, this));
+    }
+
+private:
+    static void _persistSave(void* data, int32_t blah) {
+        auto psr = static_cast<PersistSaveRequestData*>(data);
+        psr->instance->reallyPersistSave(psr->fileName, psr->saveData);
+        delete psr;
+    }
+
+    void reallyPersistSave(const std::string& fileName, const std::string& saveData) {
+        pp::Var m("setSave0:" + saveData);
+        PostMessage(m);
     }
 
     static void _present(void* data, int32_t blah) {

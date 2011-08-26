@@ -16,6 +16,7 @@
 #include "timer.h"
 #include "ricvc.h"
 #include "vga.h"
+#include "nacl.h"
 
 using namespace verge;
 
@@ -859,6 +860,10 @@ void CreateSaveImage(unsigned char* buf) {
     }
 }
 
+namespace verge {
+    extern IFramebuffer* plugin;
+}
+
 void SaveGame(char* fn) {
     VFILE* f;
     unsigned char cz;
@@ -886,6 +891,13 @@ void SaveGame(char* fn) {
     vwrite(&tchars, 1, 1, f);
     vwrite(&pstats, 1, sizeof pstats, f);
     vclose(f);
+
+    // NaCl
+    {
+        auto f = vopen(fn, "r");
+        verge::plugin->persistSave(fn, f->getData());
+        vclose(f);
+    }
 }
 
 void startmap(char* fname) {
