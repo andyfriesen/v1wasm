@@ -1,8 +1,9 @@
 
 #include <cstdio>
-#include <string>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <pthread.h>
 #include "ppapi/c/ppb_file_io.h"
 #include "ppapi/cpp/instance.h"
@@ -25,6 +26,7 @@
 #include "render.h"
 #include "timer.h"
 #include "vc.h"
+#include "base64.h"
 
 void MiscSetup();
 void PutOwnerText();
@@ -325,24 +327,43 @@ struct V1naclInstance
         gameDownloader.start(cb);
     }
 
+    std::vector<std::string> saveGameBase64;
+
     // FIXME: This races with engine initialization.
     // We should probably wait on a "start" message before spinning off the game thread
     // to fix this.
     virtual void HandleMessage(const pp::Var& var_message) {
-        auto sm(var_message.AsString());
-        auto slice(sm.substr(0, 9));
-        auto saveData(sm.substr(9));
+        saveGameBase64.resize(4);
 
-        if (slice == "setSave0:") {
-            verge::vset("SAVEDAT.000", verge::DataVec(saveData.begin(), saveData.end()));
-        } else if (slice == "setSave1:") {
-            verge::vset("SAVEDAT.001", verge::DataVec(saveData.begin(), saveData.end()));
-        } else if (slice == "setSave2:") {
-            verge::vset("SAVEDAT.002", verge::DataVec(saveData.begin(), saveData.end()));
-        } else if (slice == "setSave3:") {
-            verge::vset("SAVEDAT.003", verge::DataVec(saveData.begin(), saveData.end()));
-        } else {
-            printf("Got a message! '%s'\n", slice.c_str());
+        auto sm(var_message.AsString());
+        auto p = sm.find(':');
+        auto command = sm.substr(0, p);
+        auto index = sm.substr(p + 1)[0] - '0';
+
+        printf("HandleMessage %s\n", sm.substr(0, 80).c_str());
+
+        if (index < 0 || index > 3) {
+            printf("Bad command index %i\n", index);
+            return;
+        }
+
+        if (command == "clear") {
+            saveGameBase64.at(index).clear();
+        } else if (command == "append") {
+            // sm[p] == ':'
+            // sm[p + 1] == 0, 1, 2, or 3
+            // sm[p + 2] == ':'
+            // sm[p + 3] == first byte of base64'd gunk
+            saveGameBase64.at(index).append(sm.substr(p + 3));
+        } else if (command == "close") {
+            std::string fname("SAVEDAT.00");
+            fname += char('0' + index);
+
+            const auto de64 = base64::decode(saveGameBase64.at(index));
+
+            printf("Got savegame %s from localStorage.  %i bytes\n", fname.c_str(), de64.length());
+            verge::vset(fname.c_str(), verge::DataVec(de64.begin(), de64.end()));
+            saveGameBase64.at(index).clear();
         }
     }
 
@@ -406,7 +427,7 @@ struct V1naclInstance
     struct PersistSaveRequestData {
         V1naclInstance* instance;
         const std::string fileName;
-        const std::string saveData;
+        std::string saveData;
 
         PersistSaveRequestData(V1naclInstance* instance, const std::string& fileName, const std::string& saveData)
             : instance(instance)
@@ -450,9 +471,33 @@ private:
         delete psr;
     }
 
-    void reallyPersistSave(const std::string& fileName, const std::string& saveData) {
-        pp::Var m("setSave0:" + saveData);
-        PostMessage(m);
+    void reallyPersistSave(const std::string& fileName, std::string& saveData) {
+        // HACK:
+        int index = 5;
+        auto lastChar = fileName[fileName.length() - 1];
+        if (lastChar >= '0' && lastChar <= '3') {
+            index = lastChar - '0';
+        } else {
+            printf("reallyPersistSave bad fname %s index %i\n", fileName.c_str(), index);
+            return;
+        }
+
+        auto b64(base64::encode(saveData));
+
+        std::stringstream ss;
+        ss << "clear:" << index;
+        PostMessage(pp::Var(ss.str()));
+
+        const auto SLICE_SIZE = 4096;
+        size_t sliceIndex = 0;
+
+        while (sliceIndex < b64.length()) {
+            ss.str(std::string());
+            ss << "append:" << index << ":" << b64.substr(sliceIndex, SLICE_SIZE);
+            sliceIndex += SLICE_SIZE;
+            PostMessage(pp::Var(ss.str()));
+        }
+        printf("Persisted save %s.  %i bytes\n", fileName.c_str(), saveData.length());
     }
 
     static void _present(void* data, int32_t blah) {

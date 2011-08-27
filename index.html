@@ -9,12 +9,20 @@
 
     function pushSave(index) {
         var state = localStorage.getItem('save' + index);
-        if (state) {
-            console.log('state' + index + ': ' + state.toSource());
-            V1naclModule.postMessage('setSave' + index + ':' + state);
-        } else {
+        if (!state) {
             console.log('No state for slot ' + index);
+            return;
         }
+
+        V1naclModule.postMessage('clear:' + index);
+        var sliceIndex = 0;
+        var SLICE_SIZE = 4096;
+        while (sliceIndex < state.length) {
+            var nextSlice = state.substr(sliceIndex, SLICE_SIZE);
+            sliceIndex += SLICE_SIZE;
+            V1naclModule.postMessage('append:' + index + ':' + nextSlice);
+        }
+        V1naclModule.postMessage('close:' + index);
     }
 
     // When the NaCl module has loaded, hook up an event listener to handle
@@ -37,16 +45,25 @@
     // simply displays the content of the message in an alert panel.
     function handleMessage(message_event) {
         var d = message_event.data;
-        if (/^save0:/.match(d)) {
-            localStorage.setItem('save0', d.substr(6));
-        } else if (/^save1:/.match(d)) {
-            localStorage.setItem('save1', d.substr(6));
-        } else if (/^save2:/.match(d)) {
-            localStorage.setItem('save2', d.substr(6));
-        } else if (/^save3:/.match(d)) {
-            localStorage.setItem('save3', d.substr(6));
+        
+        if (!d) {
+            console.log("Bad message data :(");
+            return;
+        }
+
+        var s = d.split(':');
+        if (s[0] == 'clear') {
+            var index = s[1];
+            localStorage.setItem('save' + index, '');
+            return;
+        } else if (s[0] == 'append') {
+            var index = s[1];
+            var data = s[2];
+            var key = 'save' + index;
+            var newValue = localStorage.getItem(key) + data;
+            localStorage.setItem(key, newValue);
         } else {
-            alert(d);
+            alert("Unknown message: " + d);
         }
     }
 
@@ -114,7 +131,16 @@
   </div>
 </p>
 
+<h2>Controls</h2>
+<dl>
+    <dt>Arrow keys</dt><dd>Move</dd>
+    <dt>Enter</dt><dd>Interact, select menu options</dd>
+    <dt>Tab</dt><dd>Cancel out of menus</dd>
+    <dt>Space</dt><dd>Main menu (items, equipment, etc)</dd>
+    <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
+</dl>
 <h2>Status</h2>
 <div id="status_field">NO-STATUS</div>
+   
 </body>
 </html>

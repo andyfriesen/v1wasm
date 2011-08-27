@@ -31,6 +31,8 @@ namespace verge {
         int seek(long int offset, int origin);
         int tell();
 
+        size_t write(const void* src, size_t length);
+
         std::string getData();
 
     private:

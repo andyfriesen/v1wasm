@@ -27,7 +27,7 @@ namespace verge {
 
     void File::open(FileMode m) {
         pos = 0;
-        mode = mode;
+        mode = m;
     }
 
     void File::close() {
@@ -35,6 +35,8 @@ namespace verge {
     }
 
     char File::getc() {
+        assert(mode == FileMode::Read);
+
         if (pos < data.size()) {
             return data[pos++];
         } else {
@@ -43,12 +45,16 @@ namespace verge {
     }
 
     void File::ungetc() {
+        assert(mode == FileMode::Read);
+
         if (pos > 0) {
             --pos;
         }
     }
 
     size_t File::read(void* dest, size_t length) {
+        assert(mode == FileMode::Read);
+
         auto s = std::min(pos + length, data.size());
         auto p = static_cast<char*>(dest);
         std::copy(&data[pos], &data[s], p);
@@ -57,6 +63,8 @@ namespace verge {
     }
 
     int File::seek(long int origin, int offset) {
+        assert(mode != FileMode::None);
+
         switch (offset) {
             case SEEK_SET: pos = size_t(std::max<int>(0, origin)); break;
             case SEEK_CUR: pos += origin; break;
@@ -71,7 +79,22 @@ namespace verge {
     }
 
     int File::tell() {
+        assert(mode != FileMode::None);
+
         return pos;
+    }
+
+    size_t File::write(const void* src, size_t length) {
+        assert(mode == FileMode::Write);
+
+        auto p(static_cast<const char*>(src));
+
+        auto newSize = std::max(pos + length, data.size());
+        data.reserve(newSize);
+        data.insert(data.begin() + pos, p, p + length);
+        pos += length;
+
+        return length;
     }
 
     std::string File::getData() {
@@ -86,17 +109,21 @@ namespace verge {
     */
 
     FilePtr FS::open(const std::string& filename, FileMode mode) {
-        assert(mode == FileMode::Read && "Writing is not yet implemented");
-
         auto fn = toLower(filename);
+        FilePtr f;
 
         if (files.count(fn)) {
-            auto f = files[fn];
-            f->open(mode);
-            return f;
+            f = files[fn];
+        } else if (mode == FileMode::Write) {
+            f.reset(new File(DataVec()));
+            files[fn] = f;
         }
 
-        return FilePtr();
+        if (f) {
+            f->open(mode);
+        }
+
+        return f;
     }
 
     void FS::set(const std::string& filename, DataVec data) {
@@ -116,6 +143,8 @@ namespace verge {
         auto m = FileMode::None;
         if (*mode == 'r') {
             m = FileMode::Read;
+        } else if (*mode == 'w') {
+            m = FileMode::Write;
         } else {
             assert(!"Unknown mode");
         }
@@ -130,10 +159,6 @@ namespace verge {
 
     size_t vread(void* dest, size_t size, size_t length, VFILE* f) {
         return f->read(dest, size * length);
-    }
-
-    size_t vwrite(const void* src, size_t size, size_t length, VFILE* f) {
-        return 0;//f->write(src, size * length);
     }
 
     char* vgets(char* dest, int num, VFILE* file) {
@@ -161,6 +186,10 @@ namespace verge {
 
     int vtell(VFILE* f) {
         return f->tell();
+    }
+
+    size_t vwrite(const void* ptr, size_t size, size_t count, VFILE* stream) {
+        return stream->write(ptr, size * count);
     }
 
     namespace impl {
