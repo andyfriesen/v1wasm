@@ -51,6 +51,7 @@ void readKeyboard() {
     verge::plugin->getInputEvents(events);
 
     for (auto i = events.begin(); i != events.end(); ++i) {
+        //printf("Key event scan=%i down? %i\n", i->keyCode, i->type == verge::EventType::KeyDown);
         auto xl = verge::scanMap[DOMScanCode(i->keyCode)];
 
         keyboard_map[xl] = i->type == verge::EventType::KeyDown;
@@ -67,6 +68,7 @@ void initcontrols(char joystk) {
     verge::scanMap[DOMScanCode::VK_SPACE] = SCAN_SPACE;
     verge::scanMap[DOMScanCode::VK_META] = SCAN_ALT;
     verge::scanMap[DOMScanCode::VK_TAB] = SCAN_TAB;
+    verge::scanMap[DOMScanCode::VK_TILDE] = SCAN_TILDE;
 }
 
 void readb() {

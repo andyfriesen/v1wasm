@@ -583,8 +583,10 @@ void process_entities() {
 void process_controls();
 
 void ProcessControls() {
-    if (party[0].speed < 4) {
-        switch (party[0].speed) {
+    const auto effectiveSpeed = keyboard_map[SCAN_TILDE] ? 6 : party[0].speed;
+
+    if (effectiveSpeed < 4) {
+        switch (effectiveSpeed) {
         case 1:
             if (party[0].speedct < 3) {
                 party[0].speedct++;
@@ -602,10 +604,10 @@ void ProcessControls() {
             }
         }
     }
-    if (party[0].speed < 5) {
+    if (effectiveSpeed < 5) {
         process_controls();
     }
-    switch (party[0].speed) {
+    switch (effectiveSpeed) {
     case 5:
         process_controls();
         process_controls();

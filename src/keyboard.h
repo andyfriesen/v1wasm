@@ -57,7 +57,9 @@ enum DOMScanCode {
     VK_F21 = 0xF008,
     VK_F22 = 0xF009,
     VK_F23 = 0xF00A,
-    VK_F24 = 0xF00B
+    VK_F24 = 0xF00B,
+
+    VK_TILDE = 0xC0,
 };
 
 enum VScanCode {
@@ -146,4 +148,6 @@ enum VScanCode {
     SCAN_DEL = 0x53,
     SCAN_F11 = 0x57,
     SCAN_F12 = 0x58,
+    
+    SCAN_TILDE = 0x7e,
 };
