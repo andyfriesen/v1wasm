@@ -112,11 +112,11 @@ namespace verge {
         auto fn = toLower(filename);
         FilePtr f;
 
-        if (files.count(fn)) {
-            f = files[fn];
-        } else if (mode == FileMode::Write) {
+        if (mode == FileMode::Write) {
             f.reset(new File(DataVec()));
             files[fn] = f;
+        } else if (files.count(fn)) {
+            f = files[fn];
         }
 
         if (f) {

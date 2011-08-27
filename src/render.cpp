@@ -247,6 +247,7 @@ void drawvclayer2() {
 
 
 void drawmap() {
+    vgaclear();
     if (cameratracking) {
         if (party[0].x > 155) {
             xwin = (party[0].x - 155);
@@ -275,8 +276,6 @@ void drawmap() {
     }
     if (layer0) {
         DrawLayer0(xwin, ywin);
-    } else {
-        vgaclear();
     }
     if (layervc == 3) {
         drawvclayer();
