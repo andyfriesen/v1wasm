@@ -1952,7 +1952,7 @@ int ReadVar0(int var) {
     case 29:
         return party[0].y / 16;
     case 30:
-        return timer;
+        return getVcTimer();
     case 31:
         return drawparty;
     case 32:
@@ -2134,7 +2134,7 @@ void WriteVar0(int var, int value) {
     case 29:
         return;
     case 30:
-        timer = value;
+        setVcTimer(value);
         return;
     case 31:
         drawparty = value;

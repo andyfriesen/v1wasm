@@ -39,25 +39,12 @@ unsigned char gsimg[512], iuflag = 0;
 extern unsigned char menuptr[256];
 
 void greyscale(int width, int height, unsigned char* src, unsigned char* dest) {
-    int i, j;
-    unsigned char r, g, b, c;
-
-    //  for (j=0; j<height; j++)
-    //      for (i=0; i<width; i++)
-    //          { c=src[(j*width)+i];
-    //            c=greyxlatbl[c];
-    //            dest[(j*width)+i]=c;
-    //          }
-
-    for (j = 0; j < height; j++)
-        for (i = 0; i < width; i++) {
-            c = src[(j * width) + i];
-            r = pal[(c * 3)];
-            g = pal[(c * 3) + 1];
-            b = pal[(c * 3) + 2];
-            c = (r + g + b) / 6;
-            dest[(j * width) + i] = c;
+    for (auto j = 0; j < height; j++) {
+        for (auto i = 0; i < width; i++) {
+            auto c = src[(j * width) + i];
+            dest[(j * width) + i] = greyxlatbl[c];
         }
+    }
 }
 
 void LoadSaveErase(char mode)
