@@ -470,8 +470,7 @@ void lastmove(char n) {
 }
 
 void startfollow() {
-    char i;
-    for (i = 1; i < numchars; i++) {
+    for (int i = 1; i < numchars; i++) {
         if (lastmoves[i] == 1) {
             party[i].y++;
             party[i].facing = 0;
@@ -505,14 +504,11 @@ void startfollow() {
 
 int InvFace() {
     switch (party[0].facing) {
-    case 0:
-        return 1;
-    case 1:
-        return 0;
-    case 2:
-        return 3;
-    case 3:
-        return 2;
+        case 0: return 1;
+        case 1: return 0;
+        case 2: return 3;
+        case 3: return 2;
+        default: return 0;
     }
 }
 
@@ -629,44 +625,29 @@ void ProcessControls() {
 }
 
 void process_controls() {
-    unsigned char i;
-    char l, r, t, b; /* -- ric: 21/Apr/98 - moved from top -- */
     party[0].speedct = 0;
     if (!party[0].moving) {
         xtc = party[0].x / 16;
         ytc = party[0].y / 16;
-        if ((mapp[((ytc + 1)*xsize) + xtc] & 1) == 1) {
-            b = 0;
-        } else {
-            b = 1;
-        }
-        if ((mapp[((ytc - 1)*xsize) + xtc] & 1) == 1) {
-            t = 0;
-        } else {
-            t = 1;
-        }
-        if ((mapp[(ytc * xsize) + ((party[0].x + 17) / 16)] & 1) == 1) {
-            r = 0;
-        } else {
-            r = 1;
-        }
-        if ((mapp[(ytc * xsize) + ((party[0].x - 15) / 16)] & 1) == 1) {
-            l = 0;
-        } else {
-            l = 1;
-        }
+
+        auto cheatHax = 0 && keyboard_map[SCAN_TILDE];
+
+        bool downOk = cheatHax || !ObstructionAt(xtc, ytc + 1);
+        bool upOk = cheatHax || !ObstructionAt(xtc, ytc - 1);
+        bool rightOk = cheatHax || !ObstructionAt(xtc + 1, ytc);
+        bool leftOk  = cheatHax || !ObstructionAt(xtc - 1, ytc);
 
         if (xtc == 0) {
-            l = 0;
+            leftOk = 0;
         }
         if (ytc == 0) {
-            t = 0;
+            upOk = 0;
         }
         if (xtc == xsize - 1) {
-            r = 0;    /* -- ric: 28/Apr/98 -- */
+            rightOk = 0;
         }
         if (ytc == ysize - 1) {
-            b = 0;    /* -- ric: 28/Apr/98 -- */
+            downOk = 0;
         }
 
         readcontrols();
@@ -680,10 +661,8 @@ void process_controls() {
             MainMenu();
         }
 
-        for (i = 0; i < 128; i++) { /* -- ric: 03/May/98 -- */
-            if ((key_map[i].pressed) && (key_map[i].boundscript)) {
-                //         dec_to_asciiz(i,strbuf);
-                //         err(strbuf);
+        for (auto i = 0; i < 128; i++) { /* -- ric: 03/May/98 -- */
+            if (key_map[i].pressed && key_map[i].boundscript) {
                 ExecuteStartUpScript(key_map[i].boundscript);
             }
         }
@@ -704,7 +683,7 @@ void process_controls() {
             party[0].facing = 1;
         }
 
-        if ((right) && (r) && !EntityAt(xtc + 1, ytc)) {
+        if (right && rightOk && !EntityAt(xtc + 1, ytc)) {
             party[0].x++;
             party[0].facing = 2;
             party[0].moving = 3;
@@ -714,7 +693,7 @@ void process_controls() {
             startfollow();
             return;
         }
-        if ((down) && (b) && !EntityAt(xtc, ytc + 1)) {
+        if (down && downOk && !EntityAt(xtc, ytc + 1)) {
             party[0].y++;
             party[0].facing = 0;
             party[0].moving = 1;
@@ -724,7 +703,7 @@ void process_controls() {
             startfollow();
             return;
         }
-        if ((left) && (l) && !EntityAt(xtc - 1, ytc)) {
+        if (left && leftOk && !EntityAt(xtc - 1, ytc)) {
             party[0].x--;
             party[0].facing = 3;
             party[0].moving = 4;
@@ -734,7 +713,7 @@ void process_controls() {
             startfollow();
             return;
         }
-        if ((up) && (t) && !EntityAt(xtc, ytc - 1)) {
+        if (up && upOk && !EntityAt(xtc, ytc - 1)) {
             party[0].y--;
             party[0].facing = 1;
             party[0].moving = 2;
@@ -753,7 +732,7 @@ void process_controls() {
     }
 
     if (party[0].moving) {
-        for (i = 0; i < numchars; i++) {
+        for (auto i = 0; i < numchars; i++) {
             if (party[i].moving == 1) {
                 party[i].y++;
                 party[i].movcnt--;
