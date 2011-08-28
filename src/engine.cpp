@@ -433,24 +433,26 @@ void process_stepzone() {
     // information, adjusts for delays and then makes a chance roll to see if
     // an event is called.
 
-    unsigned char cz, t1;
+    const auto x = party[0].x / 16;
+    const auto y = party[0].y / 16;
+    const auto cz = mapp[y * xsize + x] >> 1; // low bit is obstruction data
+    const auto& z = zone[cz];
 
-    cz = mapp[(((party[0].y / 16) * xsize) + (party[0].x / 16))] >> 1;
     if (lz != cz) {
         zonedelay = 0;
         lz = cz;
     }
-    if (!zone[cz].percent) {
+    if (!z.percent) {
         return;
     }
-    if (zonedelay < zone[cz].delay) {
+    if (zonedelay < z.delay) {
         zonedelay++;
         return;
     }
 
-    t1 = (rand() * 255);
-    if (t1 <= zone[cz].percent) {
-        ExecuteScript(zone[cz].callevent);
+    const auto randomNumber = rand() & 255;
+    if (randomNumber <= z.percent) {
+        ExecuteScript(z.callevent);
         zonedelay = 0;
     }
 }

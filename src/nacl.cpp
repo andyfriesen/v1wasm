@@ -140,13 +140,14 @@ struct GameDownloader {
     GameDownloader(pp::Instance* instance)
         : instance(instance)
         , ccFactory(this)
+        , game_url("sully/")
     { }
 
     void start(pp::CompletionCallback oc) {
         onComplete = oc;
         downloader.reset(new Downloader(instance));
         auto cc = ccFactory.NewCallback(&GameDownloader::gotManifest);
-        downloader->get("sully/manifest.txt", cc);
+        downloader->get(game_url + "manifest.txt", cc);
     }
 
     void gotManifest(int32_t result) {
@@ -185,7 +186,7 @@ struct GameDownloader {
 
         auto next = manifest.back();
         manifest.pop_back();
-        auto url = "sully/" + next;
+        auto url = game_url + next;
         auto cc = ccFactory.NewCallback(&GameDownloader::gotFile, next);
         downloader.reset(new Downloader(instance));
         downloader->get(url, cc);
@@ -231,6 +232,7 @@ private:
     std::shared_ptr<pp::FileIO> fio;
     std::vector<std::string> manifest;
     pp::CompletionCallback onComplete;
+    const std::string game_url;
 };
 
 struct V1naclInstance

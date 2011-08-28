@@ -65,6 +65,7 @@ void dump_palette(unsigned char* palette) {
 namespace {
     void set_palette(unsigned char* pall) {
         std::copy(pall, pall + sizeof(pal), realPalette);
+        vgadump();
     }
 
     void get_palette() {
@@ -100,7 +101,6 @@ void set_intensity(unsigned n) {
         pal2[i] = (pal[i] * n) / 63;
     }
     set_palette(pal2);
-    vgadump();
 }
 
 void initvga(IFramebuffer* fb) {
