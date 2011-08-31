@@ -309,10 +309,9 @@ void drawmaploc(int xw, int yw) {
     if (hookretrace) {
         ExecuteScript(hookretrace);
     }
+    vgaclear();
     if (layer0) {
         DrawLayer0(xw, yw);
-    } else {
-        memset(virscr + 5648, 0, 70368);
     }
     if ((!layerc) || (layerc == 3) && drawparty) {
         drawcharacters(xw, yw);
