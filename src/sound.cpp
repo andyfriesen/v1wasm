@@ -9,11 +9,14 @@
 #include "keyboard.h"
 #include "engine.h"
 #include "control.h"
-//#include "mikmod.h"
+#include "ppapi/cpp/instance.h"
+#include "audiere/audiere.h"
+#include "audiere/device_nacl.h"
 #include "sound.h"
 #include "timer.h"
 #include "render.h"
 #include "fs.h"
+#include "nacl.h"
 
 using namespace verge;
 
@@ -22,17 +25,17 @@ char curch;
 char jf;
 char waitvrt, speed = 0, moneycheat = 0;
 int vspm;
-//int mapvcm; // -- aen; 31/May/98 -- no longer used; see LoadVC().
 int vcbufm;
-//int mapm; // -- aen; 30/May/98 -- no longer used; see load_map().
 
 char playing = 0;
 char playingsong[13];
 
-extern char jb1, jb2, jb3, jb4;
-
 unsigned char mp_volume;
 signed short mp_sngpos;
+
+namespace {
+    audiere::AudioDevicePtr audioDevice;
+}
 
 void tickhandler() {
 }
@@ -60,18 +63,6 @@ parseloop:
         waitvrt = atoi(strbuf);
         goto parseloop;
     }
-    //  if (!strcmp(strbuf,"vsp"))    // -- aen; 31/May/98 -- no longer used;
-    //     { fscanf(s,"%s",strbuf);   // -- see load_map().
-    //       vspm=atoi(strbuf);
-    //       goto parseloop; }
-    //  if (!strcmp(strbuf,"map"))    // -- aen; 30/May/98 -- no longer used;
-    //     { fscanf(s,"%s",strbuf);   // -- see load_map().
-    //       mapm=atoi(strbuf);
-    //       goto parseloop; }
-    //  if (!strcmp(strbuf,"mapvc"))  // -- aen; 31/May/98 -- no longer used;
-    //     { fscanf(s,"%s",strbuf);   // -- see LoadVC().
-    //       mapvcm=atoi(strbuf);
-    //       goto parseloop; }
     if (!strcmp(strbuf, "vcbuf")) {
         vscanf(s, "%s", strbuf);
         vcbufm = atoi(strbuf);
@@ -182,19 +173,12 @@ parseloop:
 
 int lastvol;
 
-void sound_init()
 // Incidently, sound_init() also initializes the control interface, since
 // they both use SETUP.CFG.
-{
+void sound_init() {
     vspm = 256000;
-    //mapvcm=50000; // -- aen; 31/May/09 -- no longer used; see LoadVC().
     vcbufm = 250000;
-    //mapm=150000; // -- aen; 30/May/09 -- no longer used; see load_map().
 
-    jb1 = 1;
-    jb2 = 2;
-    jb3 = 3;
-    jb4 = 4;
     waitvrt = 0;
     jf = 0;
     vspspeed = 0;
@@ -203,6 +187,8 @@ void sound_init()
     allocbuffers();
     initcontrols(jf);
     playingsong[0] = 0;
+
+    audioDevice = new audiere::NaclAudioDevice((pp::Instance*)verge::plugin);
 }
 
 void sound_loadsfx(char* fname) {

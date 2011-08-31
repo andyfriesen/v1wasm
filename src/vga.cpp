@@ -26,10 +26,6 @@ using namespace verge;
 
 void PreCalc_TransparencyFields();
 
-namespace verge {
-    IFramebuffer* plugin = 0;
-}
-
 namespace {
     unsigned char realPalette[256 * 3];
 
@@ -103,9 +99,8 @@ void set_intensity(unsigned n) {
     set_palette(pal2);
 }
 
-void initvga(IFramebuffer* fb) {
+void initvga() {
     PreCalc_TransparencyFields();
-    plugin = fb;
 }
 
 void closevga() {

@@ -15,10 +15,12 @@ namespace verge {
         EventType type;
         int keyCode;
     };
-}
 
-struct IFramebuffer {
-    virtual void getInputEvents(std::vector<verge::InputEvent>& events) = 0;
-    virtual void vgadump(unsigned char* backBuffer, unsigned char* palette) = 0;
-    virtual void persistSave(const std::string& fileName, const std::string& saveData) = 0;
-};
+    struct IFramebuffer {
+        virtual void getInputEvents(std::vector<verge::InputEvent>& events) = 0;
+        virtual void vgadump(unsigned char* backBuffer, unsigned char* palette) = 0;
+        virtual void persistSave(const std::string& fileName, const std::string& saveData) = 0;
+    };
+
+    extern IFramebuffer* plugin;
+}

@@ -34,7 +34,10 @@ int kb1 = SCAN_ENTER;
 int kb2 = SCAN_TAB;
 int kb3 = SCAN_ESC;
 int kb4 = SCAN_SPACE;
-char jb1, jb2, jb3, jb4;              // joystick definable controls.
+int jb1 = 1;
+int jb2 = 2;
+int jb3 = 3;
+int jb4 = 4;              // joystick definable controls.
 
 void ScreenShot();
 

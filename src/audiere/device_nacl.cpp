@@ -3,17 +3,12 @@
 #include <stdio.h>
 #include "device_nacl.h"
 #include "debug.h"
+#include "ppapi/cpp/instance.h"
 
 
 namespace audiere {
 
-  NaclAudioDevice*
-  NaclAudioDevice::create(const ParameterList& parameters) {
-    return new NaclAudioDevice();
-  }
-
-
-  NaclAudioDevice::NaclAudioDevice()
+  NaclAudioDevice::NaclAudioDevice(pp::Instance* instance)
     : MixerDevice(44100)
   {
   }

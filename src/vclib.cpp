@@ -2,6 +2,7 @@
 // The VergeC standard function library
 // Copyright (C)1997 BJ Eirich
 
+#include <cassert>
 #include <stdlib.h>
 #include <string.h>
 #include "entity.h"
@@ -732,7 +733,8 @@ void Redraw() {
 void SText() {
     char* str1, *str2, *str3;
     char st1[31], st2[31], st3[31];
-    char portrait, first = 1, line = 1, chr = 0;
+    char portrait, first = 1, line = 1;
+    int chr = 0;
 
     // Setup - Read stuff from the VC
     portrait = ResolveOperand();
@@ -2042,6 +2044,7 @@ int ReadVar0(int var) {
     case 73:
         return mp_sngpos; /* -- xBig_D: 10/May/98 */
     }
+    assert(!"Unexpected");
 }
 
 void WriteVar0(int var, int value) {

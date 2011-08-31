@@ -30,8 +30,12 @@
 
 void MiscSetup();
 void PutOwnerText();
-void initvga(IFramebuffer* fb);
+void initvga();
 void InitItems();
+
+namespace verge {
+    verge::IFramebuffer* plugin = 0;
+}
 
 struct ScopedLock {
     ScopedLock(pthread_mutex_t& m)
@@ -237,7 +241,7 @@ private:
 
 struct V1naclInstance
     : public pp::Instance
-    , IFramebuffer
+    , verge::IFramebuffer
 {
     explicit V1naclInstance(PP_Instance instance, pp::Module* module)
         : pp::Instance(instance)
@@ -259,6 +263,8 @@ struct V1naclInstance
     }
 
     virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
+        verge::plugin = this;
+
         graphics = new pp::Graphics2D(this, pp::Size(320, 240), true);
         auto result = BindGraphics(*graphics);
         if (!result) {
@@ -391,7 +397,7 @@ struct V1naclInstance
     void* run() {
         MiscSetup();
         PutOwnerText();
-        initvga(this);
+        initvga();
         InitItems();
 
         while (1) {

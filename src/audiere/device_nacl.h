@@ -5,18 +5,19 @@
 #include "audiere.h"
 #include "device_mixer.h"
 
+namespace pp {
+    struct Instance;
+}
 
 namespace audiere {
 
   class NaclAudioDevice : public MixerDevice {
-  public:
-    static NaclAudioDevice* create(const ParameterList& parameters);
-
   private:
-    NaclAudioDevice();
     ~NaclAudioDevice();
 
   public:
+    NaclAudioDevice(pp::Instance* instance);
+
     // AbstractDevice::registerCallback
     // AbstractDevice::unregisterCallback
     // AbstractDevice::clearCallbacks
