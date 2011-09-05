@@ -25,7 +25,7 @@ namespace verge {
 
         void open(FileMode mode);
         void close();
-        char getc();
+        int getc();
         void ungetc();
 
         size_t read(void* dest, size_t length);
@@ -70,7 +70,7 @@ namespace verge {
     size_t vread(void* dest, size_t size, size_t length, VFILE* f);
     size_t vwrite(const void* src, size_t size, size_t length, VFILE* f);
     char* vgets(char* dest, int num, VFILE* file);
-    char vgetc(VFILE* file);
+    int vgetc(VFILE* file);
     int vseek(VFILE* file, long int offset, int origin);
     int vtell(VFILE* file);
 

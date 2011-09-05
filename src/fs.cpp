@@ -34,13 +34,15 @@ namespace verge {
         mode = FileMode::None;
     }
 
-    char File::getc() {
+    int File::getc() {
         assert(mode == FileMode::Read);
 
-        if (pos < data.size()) {
-            return data[pos++];
+        char c;
+        auto result = read(&c, 1);
+        if (result == 1) {
+            return c;
         } else {
-            return 0;
+            return EOF;
         }
     }
 
@@ -56,10 +58,17 @@ namespace verge {
         assert(mode == FileMode::Read);
 
         auto s = std::min(pos + length, data.size());
+        auto readSize = s - pos;
         auto p = static_cast<char*>(dest);
         std::copy(&data[pos], &data[s], p);
+
+        if (readSize < length) {
+            printf("vread past end of file.  pos=%i size=%i length=%i actualLength=%i\n", pos, data.size(), length, s - pos);
+        }
+
         pos = s;
-        return s;
+
+        return readSize;
     }
 
     int File::seek(long int origin, int offset) {
@@ -193,7 +202,7 @@ namespace verge {
         return dest;
     }
 
-    char vgetc(VFILE* f) {
+    int vgetc(VFILE* f) {
         return f->getc();
     }
 
