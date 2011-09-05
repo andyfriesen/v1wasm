@@ -10,8 +10,6 @@
 #include "engine.h"
 #include "control.h"
 #include "ppapi/cpp/instance.h"
-#include "audiere/audiere.h"
-#include "audiere/device_nacl.h"
 #include "sound.h"
 #include "timer.h"
 #include "render.h"
@@ -20,25 +18,20 @@
 
 using namespace verge;
 
-char numfx;
-char curch;
-char jf;
-char waitvrt, speed = 0, moneycheat = 0;
-int vspm;
-int vcbufm;
+char numfx = 0;
+char curch = 0;
+char jf = 0;
+char waitvrt;
+char speed = 0;
+char moneycheat = 0;
+int vspm = 0;
+int vcbufm = 0;
 
 char playing = 0;
 char playingsong[13];
 
-unsigned char mp_volume;
-signed short mp_sngpos;
-
-namespace {
-    audiere::AudioDevicePtr audioDevice;
-}
-
-void tickhandler() {
-}
+unsigned char mp_volume = 100;
+signed short mp_sngpos = 0;
 
 void ParseSetup() {
     char strbuf[256];
@@ -187,23 +180,40 @@ void sound_init() {
     allocbuffers();
     initcontrols(jf);
     playingsong[0] = 0;
-
-    audioDevice = new audiere::NaclAudioDevice((pp::Instance*)verge::plugin);
 }
 
 void sound_loadsfx(char* fname) {
+    VFILE* f = vopen(fname, "r");
+    if (!f) {
+        err("Could not open sound effect index file.");
+    }
+
+    int numfx = 0;
+    vscanf(f, "%i", &numfx);
+
+    for (auto i = 0; i < numfx; ++i) {
+        char filename[255];
+        vscanf(f, "%s", filename);
+        verge::plugin->loadSound(filename);
+    }
+
+    vclose(f);
 }
 
 void sound_freesfx() {
+    // blaaaah whatever
 }
 
-void playsong(char* sngnme) {
+void playsong(const char* songName) {
+    verge::plugin->playSong(songName);
 }
 
 void stopsound() {
+    verge::plugin->stopSound();
 }
 
-void playeffect(char efc) {
+void playeffect(int efc) {
+    verge::plugin->playEffect(efc);
 }
 
 /*playsound(char *fname,int rate)

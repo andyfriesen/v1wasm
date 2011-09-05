@@ -41,9 +41,7 @@ extern int vspm;                       // external def-amount of VSP memory
 
 void InitRenderSystem() {
     vcscreen1 = (unsigned char*) valloc(64000, "vcscreen1");
-    //memset(vcscreen1, 0, 64000);
     vcscreen2 = (unsigned char*) valloc(64000, "vcscreen2");
-    //memset(vcscreen2, 0, 64000);
     vcscreen = vcscreen1;
     if (vspspeed) {
         vspmask = (unsigned char*) valloc(vspm, "vspmask");

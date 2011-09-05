@@ -6,7 +6,8 @@
 #include "device_mixer.h"
 
 namespace pp {
-    struct Instance;
+  struct Instance;
+  struct Audio;
 }
 
 namespace audiere {
@@ -25,6 +26,13 @@ namespace audiere {
     // MixerDevice::openBuffer
     void ADR_CALL update();
     const char* ADR_CALL getName();
+
+    static void _audioCallback(void* samples, uint32_t buffer_size, void* data);
+    void audioCallback(void* samples, uint32_t buffer_size);
+
+  private:
+    pp::Instance* instance;
+    pp::Audio* audio;
   };
 
 }

@@ -5,6 +5,7 @@
 #include <memory>
 #include <vector>
 #include <stdio.h>
+#include "audiere/audiere.h"
 
 #undef getc
 
@@ -19,7 +20,7 @@ namespace verge {
         Write,
     };
 
-    struct File {
+    struct File : public audiere::File {
         explicit File(DataVec data);
 
         void open(FileMode mode);
@@ -34,6 +35,12 @@ namespace verge {
         size_t write(const void* src, size_t length);
 
         std::string getData();
+
+        // audiere::File implementation
+        virtual void ref();
+        virtual void unref();
+        virtual int read(void* dest, int length);
+        virtual bool seek(int position, audiere::File::SeekMode seekMode);
 
     private:
         FileMode mode;

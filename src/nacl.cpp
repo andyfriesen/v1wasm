@@ -19,6 +19,8 @@
 #include "ppapi/cpp/image_data.h"
 #include "ppapi/cpp/size.h"
 #include "ppapi/cpp/var.h"
+#include "audiere/audiere.h"
+#include "audiere/device_nacl.h"
 
 #include "fs.h"
 #include "main.h"
@@ -35,6 +37,13 @@ void InitItems();
 
 namespace verge {
     verge::IFramebuffer* plugin = 0;
+}
+
+namespace audiere {
+  SampleSource* OpenSource(
+    const FilePtr& file,
+    const char* filename,
+    FileFormat file_format);
 }
 
 struct ScopedLock {
@@ -202,7 +211,7 @@ struct GameDownloader {
             return;
         }
 
-        printf("GameDownloader::gotFile '%s' OK\n", currentFile.c_str());
+        //printf("GameDownloader::gotFile '%s' OK\n", currentFile.c_str());
 
         auto d = downloader->getData();
         auto l = downloader->getLength();
@@ -264,6 +273,8 @@ struct V1naclInstance
 
     virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
         verge::plugin = this;
+
+        audioDevice = new audiere::NaclAudioDevice(this);
 
         graphics = new pp::Graphics2D(this, pp::Size(320, 240), true);
         auto result = BindGraphics(*graphics);
@@ -348,7 +359,7 @@ struct V1naclInstance
         auto command = sm.substr(0, p);
         auto index = sm.substr(p + 1)[0] - '0';
 
-        printf("HandleMessage %s\n", sm.substr(0, 80).c_str());
+        //printf("HandleMessage %s\n", sm.substr(0, 80).c_str());
 
         if (index < 0 || index > 3) {
             printf("Bad command index %i\n", index);
@@ -447,7 +458,10 @@ struct V1naclInstance
     // Caution: Should only be called by the game thread
     virtual void persistSave(const std::string& fileName, const std::string& saveData) {
         auto psr = new PersistSaveRequestData(this, fileName, saveData);
-        module->core()->CallOnMainThread(0, pp::CompletionCallback(&V1naclInstance::_persistSave, psr));
+        module->core()->CallOnMainThread(
+            0,
+            pp::CompletionCallback(&V1naclInstance::_persistSave, psr)
+        );
     }
 
     // Caution: Should only be called by the game thread
@@ -470,6 +484,92 @@ struct V1naclInstance
         }
 
         module->core()->CallOnMainThread(0, pp::CompletionCallback(&V1naclInstance::_present, this));
+    }
+
+    struct LoadSoundRequest {
+        V1naclInstance* self;
+        const std::string fileName;
+        LoadSoundRequest(V1naclInstance* self, const std::string& fileName)
+            : self(self)
+            , fileName(fileName)
+        {}
+    };
+
+    virtual void loadSound(const std::string& fileName) {
+        auto lsr = new LoadSoundRequest(this, fileName);
+        module->core()->CallOnMainThread(
+            0,
+            pp::CompletionCallback(&V1naclInstance::_loadSound, lsr)
+        );
+    }
+
+    static void _loadSound(void* data, int32_t blah) {
+        auto lsr = static_cast<LoadSoundRequest*>(data);
+        lsr->self->__loadSound(lsr->fileName);
+        delete lsr;
+    }
+
+    void __loadSound(const std::string& fileName) {
+        printf("V1naclInstance::__loadSound(%s) index %i\n", fileName.c_str(), soundEffects.size());
+        soundEffects.push_back(audiere::OpenSound(audioDevice, fileName.c_str(), false));
+    }
+
+    struct PlaySongRequest {
+        V1naclInstance* self;
+        const std::string songName;
+
+        PlaySongRequest(V1naclInstance* self, const std::string songName)
+            : self(self)
+            , songName(songName)
+            { }
+    };
+
+    virtual void playSong(const std::string& songName) {
+        auto psr = new PlaySongRequest(this, songName);
+        module->core()->CallOnMainThread(
+            0,
+            pp::CompletionCallback(&V1naclInstance::_playSong, psr)
+        );
+    }
+
+    static void _playSong(void* data, int32_t bleh) {
+        auto psr = static_cast<PlaySongRequest*>(data);
+        psr->self->__playSong(psr->songName);
+        delete psr;
+    }
+
+    void __playSong(const std::string& songName) {
+        printf("V1naclInstance::__playSong(%s)\n", songName.c_str());
+        auto f = verge::vopen(songName.c_str(), "r");
+        auto file_format = audiere::FF_MOD;
+        auto ss = audiere::OpenSource(audiere::FilePtr(f), songName.c_str(), file_format);
+        currentMusic = audiere::OpenSound(audioDevice, ss, false);
+        if (currentMusic) {
+            currentMusic->setRepeat(true);
+            currentMusic->play();
+        }
+        verge::vclose(f);
+    }
+
+    virtual void playEffect(size_t index) {
+        if (0 <= index && index < soundEffects.size()) {
+            soundEffects[index]->play();
+        }
+    }
+
+    virtual void stopSound() {
+        for (auto i = 0; i < soundEffects.size(); ++i) {
+            soundEffects[i]->stop();
+        }
+        currentMusic->stop();
+    }
+
+    virtual void setVolume(int volume) {
+        auto normalizedVolume = float(volume) / 100.0f;
+        currentMusic->setVolume(normalizedVolume);
+    }
+
+    virtual void setSongPos(int songPos) {
     }
 
 private:
@@ -540,6 +640,10 @@ private:
     pthread_t thread;
     pthread_mutex_t bbMutex;
     pthread_mutex_t inputMutex;
+
+    audiere::AudioDevicePtr audioDevice;
+    std::vector<audiere::OutputStreamPtr> soundEffects;
+    audiere::OutputStreamPtr currentMusic;
 };
 
 class V1naclModule : public pp::Module {

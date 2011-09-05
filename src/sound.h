@@ -1,6 +1,6 @@
 void sound_init();
-void playeffect(char efc);
-void playsong(char* sngnme);
+void playeffect(int efc);
+void playsong(const char* songName);
 void stopsong();
 void stopsound();
 extern char speed, moneycheat;
