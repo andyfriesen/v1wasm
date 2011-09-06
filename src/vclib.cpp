@@ -258,13 +258,16 @@ drawloop:
     vgadump();
     readcontrols();
 
-    if (first == 2) if (b1 || b2 || b4) {
+    if (first == 2) {
+        if (b1 || b2 || b4) {
             goto drawloop;
         } else {
             an = 0;
             setTimerCount(0);
             return;
         }
+    }
+
     if (first && !b1 && !b2 && !b4) {
         first = 0;
     } else if (first) {
@@ -438,13 +441,16 @@ drawloop:
     readcontrols();
 
 
-    if (first == 2) if (b1 || b2 || b4) {
+    if (first == 2) {
+        if (b1 || b2 || b4) {
             goto drawloop;
         } else {
             an = 0;
             setTimerCount(0);
             return;
         }
+    }
+
     if (first && !b1 && !b2 && !b4 && !down && !up) {
         first = 0;
     } else if (first) {
@@ -795,13 +801,16 @@ drawloop:
 
     readcontrols();
 
-    if (first == 2) if (b1 || b2 || b4) {
+    if (first == 2) {
+        if (b1 || b2 || b4) {
             goto drawloop;
         } else {
             an = 0;
             setTimerCount(0);
             return;
         }
+    }
+
     if (first && !b1 && !b2 && !b4) {
         first = 0;
     } else if (first) {
@@ -948,13 +957,10 @@ void ChangeZone() {
 }
 
 void GetItem() {
-    short int c, d;
-    int i, j;
+    auto c = ResolveOperand() - 1;
+    auto d = ResolveOperand();
 
-    c = ResolveOperand() - 1;
-    d = ResolveOperand();
-
-    j = pstats[c].invcnt;
+    auto j = pstats[c].invcnt;
     if (j != 24) {
         pstats[c].inv[j] = d;
         pstats[c].invcnt++;
@@ -1105,8 +1111,6 @@ void VCPutPCX() {
 }
 
 void HookTimer() {
-    int l;
-
     hooktimer = ResolveOperand();
 }
 
@@ -1115,13 +1119,11 @@ void HookRetrace() {
 }
 
 void VCLoadPCX() {
-    int ofs, i;
-
     GrabString(stringbuffer);
-    ofs = ResolveOperand();
+    auto ofs = ResolveOperand();
     LoadPCXHeaderNP(stringbuffer);
 
-    for (i = 0; i < depth; i++) {
+    for (auto i = 0; i < depth; i++) {
         int vidoffset = (i * width) + ofs;
         ReadPCXLine(vidoffset, (unsigned char*)vcdatabuf);
     }

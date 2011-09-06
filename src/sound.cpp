@@ -27,9 +27,6 @@ char moneycheat = 0;
 int vspm = 0;
 int vcbufm = 0;
 
-char playing = 0;
-char playingsong[13];
-
 unsigned char mp_volume = 100;
 signed short mp_sngpos = 0;
 
@@ -179,7 +176,6 @@ void sound_init() {
     ParseSetup();
     allocbuffers();
     initcontrols(jf);
-    playingsong[0] = 0;
 }
 
 void sound_loadsfx(char* fname) {
@@ -204,8 +200,16 @@ void sound_freesfx() {
     // blaaaah whatever
 }
 
-void playsong(const char* songName) {
-    verge::plugin->playSong(songName);
+
+namespace {
+    std::string playingSong;
+}
+
+void playsong(const std::string& songName) {
+    if (songName != playingSong) {
+        playingSong = songName;
+        verge::plugin->playSong(songName);
+    }
 }
 
 void stopsound() {

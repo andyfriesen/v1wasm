@@ -142,8 +142,6 @@ void InitPStats() {
 }
 
 void StartNewGame(char* startp) {
-    int i;
-
     numchars = 0;
     InitPStats();
     addcharacter(1);
