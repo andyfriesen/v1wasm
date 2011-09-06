@@ -12,7 +12,7 @@ import os.path
 nacl_env = make_nacl_env.NaClEnvironment(use_c_plus_plus_libs=True)
 nacl_env.Append(
     CPPPATH=['src/dumb/include'],
-    CXXFLAGS='-std=gnu++0x',
+    CXXFLAGS=['-std=gnu++0x'],#, '-finstrument-functions'],
     CPPDEFINES=['NO_FLAC', 'NO_SPEEX', 'NO_OGG', 'NO_MP3', 'AUDIERE_NACL']
 )
 

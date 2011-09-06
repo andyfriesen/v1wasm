@@ -62,10 +62,6 @@ namespace verge {
         auto p = static_cast<char*>(dest);
         std::copy(&data[pos], &data[s], p);
 
-        if (readSize < length) {
-            printf("vread past end of file.  pos=%i size=%i length=%i actualLength=%i\n", pos, data.size(), length, s - pos);
-        }
-
         pos = s;
 
         return readSize;

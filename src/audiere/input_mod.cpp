@@ -99,7 +99,7 @@ namespace audiere {
   
   int
   MODInputStream::doRead(int frame_count, void* buffer) {
-    return duh_render(m_renderer, 16, 0, 1.0f, 65536.0f / 44100,
+      return duh_render(m_renderer, 16, 0, 1.0f, 65536.0f / 44100,
                       frame_count, buffer);
   }
 

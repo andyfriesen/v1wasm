@@ -35,8 +35,39 @@ void PutOwnerText();
 void initvga();
 void InitItems();
 
+#if 0
+void __cyg_profile_func_enter (void *func, void *caller) __attribute__((no_instrument_function));
+void __cyg_profile_func_exit (void *func, void *caller) __attribute__((no_instrument_function));
+
+__thread int tid;
+void __cyg_profile_func_enter(void *this_fn, void *call_site) {
+  printf("Thread %p entering %p\n", &tid, this_fn);
+}
+
+void __cyg_profile_func_exit(void *this_fn, void *call_site) {
+  printf("Thread %p exiting %p\n", &tid, this_fn);
+}
+#endif
+
 namespace verge {
     verge::IFramebuffer* plugin = 0;
+
+    struct ScopedLock {
+        ScopedLock(pthread_mutex_t& m)
+        : mutex(m)
+            {
+                auto result = pthread_mutex_lock(&mutex);
+                assert(0 == result && "Unable to lock mutex");
+            }
+
+        ~ScopedLock() {
+            auto result = pthread_mutex_unlock(&mutex);
+            assert(0 == result && "Unable to unlock mutex");
+        }
+
+    private:
+        pthread_mutex_t& mutex;
+    };
 }
 
 namespace audiere {
@@ -45,23 +76,6 @@ namespace audiere {
     const char* filename,
     FileFormat file_format);
 }
-
-struct ScopedLock {
-    ScopedLock(pthread_mutex_t& m)
-        : mutex(m)
-    {
-        auto result = pthread_mutex_lock(&mutex);
-        assert(0 == result && "Unable to lock mutex");
-    }
-
-    ~ScopedLock() {
-        auto result = pthread_mutex_unlock(&mutex);
-        assert(0 == result && "Unable to unlock mutex");
-    }
-
-private:
-    pthread_mutex_t& mutex;
-};
 
 struct Downloader {
     explicit Downloader(pp::Instance* instance)
@@ -274,7 +288,9 @@ struct V1naclInstance
     virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
         verge::plugin = this;
 
+#ifdef VERGE_AUDIO
         audioDevice = new audiere::NaclAudioDevice(this);
+#endif
 
         graphics = new pp::Graphics2D(this, pp::Size(320, 240), true);
         auto result = BindGraphics(*graphics);
@@ -323,7 +339,7 @@ struct V1naclInstance
         pp::KeyboardInputEvent kie(event);
         ie.keyCode = kie.GetKeyCode();
 
-        ScopedLock sl(inputMutex);
+        verge::ScopedLock sl(inputMutex);
         eventQueue.push_back(ie);
 
         return true;
@@ -437,7 +453,7 @@ struct V1naclInstance
     }
 
     virtual void getInputEvents(std::vector<verge::InputEvent>& events) {
-        ScopedLock sl(inputMutex);
+        verge::ScopedLock sl(inputMutex);
 
         events.swap(eventQueue);
         eventQueue.resize(0);
@@ -510,8 +526,10 @@ struct V1naclInstance
     }
 
     void __loadSound(const std::string& fileName) {
+#ifdef VERGE_AUDIO
         printf("V1naclInstance::__loadSound(%s) index %i\n", fileName.c_str(), soundEffects.size());
         soundEffects.push_back(audiere::OpenSound(audioDevice, fileName.c_str(), false));
+#endif
     }
 
     struct PlaySongRequest {
@@ -539,6 +557,7 @@ struct V1naclInstance
     }
 
     void __playSong(const std::string& songName) {
+#ifdef VERGE_AUDIO
         printf("V1naclInstance::__playSong(%s)\n", songName.c_str());
         auto f = verge::vopen(songName.c_str(), "r");
         auto file_format = audiere::FF_MOD;
@@ -549,24 +568,33 @@ struct V1naclInstance
             currentMusic->play();
         }
         verge::vclose(f);
+#else
+        printf("V1naclInstance::__playSong(%s) but audio is disabled\n", songName.c_str());
+#endif
     }
 
     virtual void playEffect(size_t index) {
+#ifdef VERGE_AUDIO
         if (0 <= index && index < soundEffects.size()) {
             soundEffects[index]->play();
         }
+#endif
     }
 
     virtual void stopSound() {
+#ifdef VERGE_AUDIO
         for (auto i = 0; i < soundEffects.size(); ++i) {
             soundEffects[i]->stop();
         }
         currentMusic->stop();
+#endif
     }
 
     virtual void setVolume(int volume) {
+#ifdef VERGE_AUDIO
         auto normalizedVolume = float(volume) / 100.0f;
         currentMusic->setVolume(normalizedVolume);
+#endif
     }
 
     virtual void setSongPos(int songPos) {
@@ -641,9 +669,11 @@ private:
     pthread_mutex_t bbMutex;
     pthread_mutex_t inputMutex;
 
+#ifdef VERGE_AUDIO
     audiere::AudioDevicePtr audioDevice;
     std::vector<audiere::OutputStreamPtr> soundEffects;
     audiere::OutputStreamPtr currentMusic;
+#endif
 };
 
 class V1naclModule : public pp::Module {

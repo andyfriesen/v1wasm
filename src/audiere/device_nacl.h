@@ -33,6 +33,8 @@ namespace audiere {
   private:
     pp::Instance* instance;
     pp::Audio* audio;
+
+    uint32_t sampleFrameCount;
   };
 
 }

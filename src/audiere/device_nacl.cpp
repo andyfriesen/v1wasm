@@ -9,7 +9,7 @@
 #include "dumb.h"
 
 namespace {
-    const int SAMPLE_FRAME_COUNT = 4096;
+    const uint32_t SAMPLE_FRAME_COUNT = 2048u;
 }
 
 namespace audiere {
@@ -17,7 +17,7 @@ namespace audiere {
     : MixerDevice(44100)
     , instance(instance)
   {
-      auto sampleFrameCount = pp::AudioConfig::RecommendSampleFrameCount(
+      sampleFrameCount = pp::AudioConfig::RecommendSampleFrameCount(
           PP_AUDIOSAMPLERATE_44100,
           SAMPLE_FRAME_COUNT
       );
@@ -62,6 +62,6 @@ namespace audiere {
 
 
   void NaclAudioDevice::audioCallback(void* samples, uint32_t buffer_size) {
-    this->read(buffer_size / 4, samples);
+    this->read(buffer_size / sizeof(uint32_t), samples);
   }
 }

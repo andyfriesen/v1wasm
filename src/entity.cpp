@@ -15,7 +15,7 @@ int random(int, int);
 // ============================ Data ============================
 
 struct chrrec {
-    char fname[13]                       __attribute__ ((packed));
+    char fname[13];
 };
 
 struct chrrec chrlist[100];           // CHR list

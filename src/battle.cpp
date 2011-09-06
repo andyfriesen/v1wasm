@@ -18,7 +18,7 @@ VFILE* d;
 void UpdateEquipStats();
 
 char whotoattack() {
-    unsigned char t1, t2;
+    int t1, t2;
 
     if (numchars == 1) {
         return partyidx[0] - 1;
