@@ -18,19 +18,12 @@ VFILE* d;
 void UpdateEquipStats();
 
 char whotoattack() {
-    int t1, t2;
-
     if (numchars == 1) {
         return partyidx[0] - 1;
     }
 
 tryagain:
-    t1 = rand();
-    t2 = (255 / numchars) + 1;
-    t1 = (t1 / t2);
-    if (t1 == numchars) {
-        goto tryagain;
-    }
+    auto t1 = rand() % numchars;
     if (pstats[partyidx[t1]].status == 1) {
         goto tryagain;
     }
@@ -162,9 +155,7 @@ void levelup(int chr) {
 }
 
 void battle() {
-    unsigned char t1;
-
-    t1 = whotoattack();
+    auto t1 = whotoattack();
 
     if (pstats[t1].curhp <= 2) {
         pstats[t1].curhp = 0;

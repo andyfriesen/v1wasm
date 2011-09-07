@@ -573,15 +573,45 @@ struct V1naclInstance
 #endif
     }
 
+    struct PlayEffectRequest {
+        V1naclInstance* self;
+        size_t index;
+        PlayEffectRequest (V1naclInstance* self, size_t index)
+            : self(self)
+            , index(index)
+        { }
+    };
+
     virtual void playEffect(size_t index) {
+        return;
+
+        auto per = new PlayEffectRequest(this, index);
+        module->core()->CallOnMainThread(
+            0,
+            pp::CompletionCallback(&V1naclInstance::_playEffect, per)
+        );
+    }
+
+    static void _playEffect(void* data, int32_t) {
+        auto per = static_cast<PlayEffectRequest*>(data);
+        per->self->__playEffect(per->index);
+        delete per;
+    }
+
+    void __playEffect(size_t index) {
+        printf("V1naclInstance::__playEffect(%i) size=%i\n", index, soundEffects.size());
+
 #ifdef VERGE_AUDIO
         if (0 <= index && index < soundEffects.size()) {
+            auto s = soundEffects[index];
+            printf("ptr -> %p\n", s.get());
             soundEffects[index]->play();
         }
 #endif
     }
 
     virtual void stopSound() {
+        return;
 #ifdef VERGE_AUDIO
         for (auto i = 0; i < soundEffects.size(); ++i) {
             soundEffects[i]->stop();
@@ -591,6 +621,7 @@ struct V1naclInstance
     }
 
     virtual void setVolume(int volume) {
+        return;
 #ifdef VERGE_AUDIO
         auto normalizedVolume = float(volume) / 100.0f;
         currentMusic->setVolume(normalizedVolume);

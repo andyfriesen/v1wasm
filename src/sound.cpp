@@ -163,21 +163,6 @@ parseloop:
 
 int lastvol;
 
-// Incidently, sound_init() also initializes the control interface, since
-// they both use SETUP.CFG.
-void sound_init() {
-    vspm = 256000;
-    vcbufm = 250000;
-
-    waitvrt = 0;
-    jf = 0;
-    vspspeed = 0;
-
-    ParseSetup();
-    allocbuffers();
-    initcontrols(jf);
-}
-
 void sound_loadsfx(char* fname) {
     VFILE* f = vopen(fname, "r");
     if (!f) {
@@ -194,6 +179,23 @@ void sound_loadsfx(char* fname) {
     }
 
     vclose(f);
+}
+
+// Incidently, sound_init() also initializes the control interface, since
+// they both use SETUP.CFG.
+void sound_init() {
+    vspm = 256000;
+    vcbufm = 250000;
+
+    waitvrt = 0;
+    jf = 0;
+    vspspeed = 0;
+
+    ParseSetup();
+    allocbuffers();
+    initcontrols(jf);
+
+    sound_loadsfx("MAIN.SFX");
 }
 
 void sound_freesfx() {

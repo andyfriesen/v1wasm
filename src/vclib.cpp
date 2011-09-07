@@ -1891,6 +1891,7 @@ void ExecLibFunc(unsigned char func) {
     default:
         err("*error* Unknown library function in VC code");
     }
+    printf("\tExecLibFunc %i OK\n", func);
 }
 
 int ReadVar0(int var) {
