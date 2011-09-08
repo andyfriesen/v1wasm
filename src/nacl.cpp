@@ -9,9 +9,6 @@
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/completion_callback.h"
-#include "ppapi/cpp/file_system.h"
-#include "ppapi/cpp/file_ref.h"
-#include "ppapi/cpp/file_io.h"
 #include "ppapi/cpp/url_request_info.h"
 #include "ppapi/cpp/input_event.h"
 #include "ppapi/cpp/url_loader.h"
@@ -167,14 +164,15 @@ struct GameDownloader {
     GameDownloader(pp::Instance* instance)
         : instance(instance)
         , ccFactory(this)
-        , game_url("sully/")
     { }
 
-    void start(pp::CompletionCallback oc) {
+    void start(const std::string& url, pp::CompletionCallback oc) {
+        game_url = url;
+
         onComplete = oc;
         downloader.reset(new Downloader(instance));
         auto cc = ccFactory.NewCallback(&GameDownloader::gotManifest);
-        downloader->get(game_url + "manifest.txt", cc);
+        downloader->get(game_url + "/manifest.txt", cc);
     }
 
     void gotManifest(int32_t result) {
@@ -213,7 +211,7 @@ struct GameDownloader {
 
         auto next = manifest.back();
         manifest.pop_back();
-        auto url = game_url + next;
+        auto url = game_url + "/" + next;
         auto cc = ccFactory.NewCallback(&GameDownloader::gotFile, next);
         downloader.reset(new Downloader(instance));
         downloader->get(url, cc);
@@ -233,16 +231,6 @@ struct GameDownloader {
         getNextFile();
     }
 
-    void openedFile(int32_t result, std::string currentFile) {
-        if (result != PP_OK) {
-            printf("FileIO::Open failed %i\n", result);
-            return;
-        }
-
-        auto cb = ccFactory.NewCallback(&GameDownloader::fileWriteComplete, currentFile);
-        fio->Write(0, downloader->getData(), downloader->getLength(), cb);
-    }
-
     void fileWriteComplete(int32_t writeResult, std::string currentFile) {
         if (writeResult < 0) {
             printf("FileIO::Write failed result=%i\n", writeResult);
@@ -256,10 +244,9 @@ private:
     pp::Instance* instance;
     pp::CompletionCallbackFactory<GameDownloader> ccFactory;
     std::shared_ptr<Downloader> downloader;
-    std::shared_ptr<pp::FileIO> fio;
     std::vector<std::string> manifest;
     pp::CompletionCallback onComplete;
-    const std::string game_url;
+    std::string game_url;
 };
 
 struct V1naclInstance
@@ -270,7 +257,6 @@ struct V1naclInstance
         : pp::Instance(instance)
         , module(module)
         , ccfactory(this)
-        , fileSystem(this, PP_FILESYSTEMTYPE_LOCALTEMPORARY)
         , gameDownloader(this)
         , graphics(0)
         , backBuffer(0)
@@ -286,6 +272,15 @@ struct V1naclInstance
     }
 
     virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
+        std::string gameUrl;
+
+        for (auto i = 0u; i < argc; i++) {
+            printf("Arg %i: %s=%s\n", i, argn[i], argv[i]);
+            if (0 == strcmp("game_url", argn[i])) {
+                gameUrl = argv[i];
+            }
+        }
+
         verge::plugin = this;
 
 #ifdef VERGE_AUDIO
@@ -306,8 +301,8 @@ struct V1naclInstance
             false
         );
 
-        auto cb = ccfactory.NewCallback(&V1naclInstance::fileSystemIsOpen);
-        fileSystem.Open(5000, cb);
+        auto cb = ccfactory.NewCallback(&V1naclInstance::downloadComplete);
+        gameDownloader.start(gameUrl, cb);
         return true;
     }
 
@@ -350,16 +345,6 @@ struct V1naclInstance
 
         auto cb = ccfactory.NewCallback(&V1naclInstance::tick);
         module->core()->CallOnMainThread(10, cb);
-    }
-
-    void fileSystemIsOpen(int32_t result) {
-        if (result != 0) {
-            printf("FileSystem::Open failed %i\n", result);
-            return;
-        }
-
-        auto cb = ccfactory.NewCallback(&V1naclInstance::downloadComplete);
-        gameDownloader.start(cb);
     }
 
     std::vector<std::string> saveGameBase64;
@@ -613,7 +598,7 @@ struct V1naclInstance
     virtual void stopSound() {
         return;
 #ifdef VERGE_AUDIO
-        for (auto i = 0; i < soundEffects.size(); ++i) {
+        for (auto i = 0u; i < soundEffects.size(); ++i) {
             soundEffects[i]->stop();
         }
         currentMusic->stop();
@@ -689,7 +674,6 @@ private:
 
     pp::Module* module;
     pp::CompletionCallbackFactory<V1naclInstance> ccfactory;
-    pp::FileSystem fileSystem;
     GameDownloader gameDownloader;
 
     pp::Graphics2D* graphics;
