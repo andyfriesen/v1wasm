@@ -16,24 +16,6 @@
     V1naclModule = null;  // Global application object.
     statusText = 'NO-STATUS';
 
-    function pushSave(index) {
-        var state = localStorage.getItem('save' + index);
-        if (!state) {
-            console.log('No state for slot ' + index);
-            return;
-        }
-
-        V1naclModule.postMessage('clear:' + index);
-        var sliceIndex = 0;
-        var SLICE_SIZE = 4096;
-        while (sliceIndex < state.length) {
-            var nextSlice = state.substr(sliceIndex, SLICE_SIZE);
-            sliceIndex += SLICE_SIZE;
-            V1naclModule.postMessage('append:' + index + ':' + nextSlice);
-        }
-        V1naclModule.postMessage('close:' + index);
-    }
-
     // When the NaCl module has loaded, hook up an event listener to handle
     // messages coming from it via PPB_Messaging.PostMessage() (in C) or
     // pp::Instance.PostMessage() (in C++), and indicate success.
@@ -41,12 +23,7 @@
         V1naclModule = document.getElementById('v1nacl');
         V1naclModule.addEventListener('message', handleMessage, false);
         updateStatus('SUCCESS');
-
-        pushSave(0);
-        pushSave(1);
-        pushSave(2);
-        pushSave(3);
-   }
+    }
 
     // The 'message' event handler.  This handler is fired when the NaCl module
     // posts a message to the browser by calling PPB_Messaging.PostMessage()
@@ -131,14 +108,6 @@
        document.getElementById('listener')
           .addEventListener('load', moduleDidLoad, true);
     </script>
-
-    <embed name="nacl_module"
-       id="v1nacl"
-       width=320 height=200
-       src="v1nacl.nmf"
-       type="application/x-nacl"
-       game_url="sots"
-       />
   </div>
 </p>
 
@@ -152,6 +121,23 @@
 </dl>
 <h2>Status</h2>
 <div id="status_field">NO-STATUS</div>
-   
+
+<script>
+   (function() {
+        var embed = document.createElement('embed');
+        embed.width = 320;
+        embed.height = 200;
+        embed.src = 'v1nacl.nmf';
+        embed.type = 'application/x-nacl';
+        embed.setAttribute('game_url', 'sots');
+
+        embed.setAttribute('save0', localStorage.getItem('save0'));
+        embed.setAttribute('save1', localStorage.getItem('save1'));
+        embed.setAttribute('save2', localStorage.getItem('save2'));
+        embed.setAttribute('save3', localStorage.getItem('save3'));
+
+        document.getElementById('listener').appendChild(embed);
+    })();
+</script>
 </body>
 </html>

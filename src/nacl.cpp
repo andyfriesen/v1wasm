@@ -271,6 +271,11 @@ struct V1naclInstance
     virtual ~V1naclInstance() {
     }
 
+    void encodeSaveGame(const std::string& filename, const std::string& data64) {
+        const auto de64 = base64::decode(data64);
+        verge::vset(filename, verge::DataVec(de64.begin(), de64.end()));
+    }
+
     virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
         std::string gameUrl;
 
@@ -278,6 +283,14 @@ struct V1naclInstance
             printf("Arg %i: %s=%s\n", i, argn[i], argv[i]);
             if (0 == strcmp("game_url", argn[i])) {
                 gameUrl = argv[i];
+            } else if (0 == strcmp("save0", argn[i])) {
+                encodeSaveGame("SAVEDAT.000", argv[i]);
+            } else if (0 == strcmp("save1", argn[i])) {
+                encodeSaveGame("SAVEDAT.001", argv[i]);
+            } else if (0 == strcmp("save2", argn[i])) {
+                encodeSaveGame("SAVEDAT.002", argv[i]);
+            } else if (0 == strcmp("save3", argn[i])) {
+                encodeSaveGame("SAVEDAT.003", argv[i]);
             }
         }
 
@@ -347,44 +360,10 @@ struct V1naclInstance
         module->core()->CallOnMainThread(10, cb);
     }
 
-    std::vector<std::string> saveGameBase64;
-
     // FIXME: This races with engine initialization.
     // We should probably wait on a "start" message before spinning off the game thread
     // to fix this.
     virtual void HandleMessage(const pp::Var& var_message) {
-        saveGameBase64.resize(4);
-
-        auto sm(var_message.AsString());
-        auto p = sm.find(':');
-        auto command = sm.substr(0, p);
-        auto index = sm.substr(p + 1)[0] - '0';
-
-        //printf("HandleMessage %s\n", sm.substr(0, 80).c_str());
-
-        if (index < 0 || index > 3) {
-            printf("Bad command index %i\n", index);
-            return;
-        }
-
-        if (command == "clear") {
-            saveGameBase64.at(index).clear();
-        } else if (command == "append") {
-            // sm[p] == ':'
-            // sm[p + 1] == 0, 1, 2, or 3
-            // sm[p + 2] == ':'
-            // sm[p + 3] == first byte of base64'd gunk
-            saveGameBase64.at(index).append(sm.substr(p + 3));
-        } else if (command == "close") {
-            std::string fname("SAVEDAT.00");
-            fname += char('0' + index);
-
-            const auto de64 = base64::decode(saveGameBase64.at(index));
-
-            printf("Got savegame %s from localStorage.  %i bytes\n", fname.c_str(), de64.length());
-            verge::vset(fname.c_str(), verge::DataVec(de64.begin(), de64.end()));
-            saveGameBase64.at(index).clear();
-        }
     }
 
     void downloadComplete(int32_t result) {
