@@ -71,7 +71,7 @@ unsigned short int vadelay[100];       // delay counter
 
 std::vector<short> map0; // Tile data
 std::vector<short> map1;
-std::vector<char> mapp;
+std::vector<unsigned char> mapp;
 
 unsigned char* vsp0, *chrs;      // graphic data pointers
 unsigned char* itemicons, *chr2;       // more graphic ptrs

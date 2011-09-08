@@ -135,7 +135,7 @@ extern unsigned char* itemicons, *chrs, *chr2;
 extern int gp, xwin, ywin, xtc, ytc, xofs, yofs;
 extern std::vector<short> map0;
 extern std::vector<short> map1;
-extern std::vector<char> mapp;
+extern std::vector<unsigned char> mapp;
 extern short unsigned xsize, ysize, vadelay[100];
 extern unsigned char layerc, pmultx, pdivx, pmulty, pdivy, saveflag;
 extern unsigned char* vsp0, autoent;
