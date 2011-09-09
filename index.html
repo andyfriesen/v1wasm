@@ -3,14 +3,29 @@
 <head>
   <title>VERGE!</title>
   <style>
+  body {
+      font-family: sans-serif;
+      background-color: black;
+      color: white;
+  }
+
   #listener {
-      width: 640px;
-      height: 400px;
+      text-align: center;
   }
 
   #listener embed {
-      -webkit-transform: matrix(2, 0, 0, 2, 160, 100);
+      -webkit-transform: scale(2) translate(0, 50px);
+      z-index: 999;
+      margin: auto;
   }
+
+  #controls {
+      position: absolute;
+      top: 0;
+      right: 0;
+      z-index: -1;
+  }
+
   </style>
   <script type="text/javascript">
     V1naclModule = null;  // Global application object.
@@ -85,7 +100,7 @@
 </head>
 <body onload="pageDidLoad()">
 
-<h1>Native Client Module V1nacl</h1>
+<div id='plugin'>
 <p>
   <!-- Load the published .nexe.  This includes the 'nacl' attribute which
   shows how to load multi-architecture modules.  Each entry in the "nexes"
@@ -110,7 +125,8 @@
     </script>
   </div>
 </p>
-
+</div>
+<div id='controls'>
 <h2>Controls</h2>
 <dl>
     <dt>Arrow keys</dt><dd>Move</dd>
@@ -119,24 +135,33 @@
     <dt>Space</dt><dd>Main menu (items, equipment, etc)</dd>
     <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
 </dl>
+</div>
 <h2>Status</h2>
 <div id="status_field">NO-STATUS</div>
 
 <script>
    (function() {
         var embed = document.createElement('embed');
-        embed.width = 320;
-        embed.height = 200;
+
         embed.src = 'v1nacl.nmf';
         embed.type = 'application/x-nacl';
-        embed.setAttribute('game_url', 'sots');
+        embed.style.width = '320px';
+        embed.style.height = '200px';
 
-        embed.setAttribute('save0', localStorage.getItem('save0'));
-        embed.setAttribute('save1', localStorage.getItem('save1'));
-        embed.setAttribute('save2', localStorage.getItem('save2'));
-        embed.setAttribute('save3', localStorage.getItem('save3'));
+        embed.setAttribute('game_url', 'sots');
+        pushSave(0);
+        pushSave(1);
+        pushSave(2);
+        pushSave(3);
 
         document.getElementById('listener').appendChild(embed);
+
+        function pushSave(index) {
+            var s = localStorage.getItem('save' + index);
+            if (s) {
+                embed.setAttribute('save' + index, s);
+            }
+        }
     })();
 </script>
 </body>
