@@ -120,9 +120,7 @@
   -->
   <div id="listener">
     <script type="text/javascript">
-       document.getElementById('listener')
-          .addEventListener('load', moduleDidLoad, true);
-    </script>
+   </script>
   </div>
 </p>
 </div>
@@ -143,6 +141,7 @@
    (function() {
         var embed = document.createElement('embed');
 
+        embed.id = 'v1nacl';
         embed.src = 'v1nacl.nmf';
         embed.type = 'application/x-nacl';
         embed.style.width = '320px';
@@ -154,7 +153,9 @@
         pushSave(2);
         pushSave(3);
 
-        document.getElementById('listener').appendChild(embed);
+        var l = document.getElementById('listener');
+        l.appendChild(embed);
+        embed.addEventListener('load', moduleDidLoad, true);
 
         function pushSave(index) {
             var s = localStorage.getItem('save' + index);

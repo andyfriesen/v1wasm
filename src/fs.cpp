@@ -258,7 +258,7 @@ namespace verge {
 
             do {
                 auto c = file->getc();
-                if (c == 0) {
+                if (c == -1) {
                     break;
                 } else if (!iswhite(c)) {
                     *value++ = c;

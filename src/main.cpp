@@ -84,20 +84,17 @@ void PutOwnerText() {
 }
 
 void InitPStats() {
-    VFILE* pdat;
-    VFILE* cdat;
-    char i;
-    pdat = vopen("PARTY.DAT", "r");
+    auto pdat = vopen("PARTY.DAT", "r");
     if (!pdat) {
         err("Fatal error: PARTY.DAT not found");
     }
     vscanf(pdat, "%s", strbuf);
     tchars = atoi((char*)strbuf);
-    for (i = 0; i < tchars; i++) {
+    for (auto i = 0; i < tchars; i++) {
         vscanf(pdat, "%s", &pstats[i].chrfile);
         vscanf(pdat, "%s", strbuf);
         vscanf(pdat, "%s", strbuf);
-        cdat = vopen(strbuf, "r");
+        auto cdat = vopen(strbuf, "r");
         if (!cdat) {
             err("Could not open character DAT file.");
         }
@@ -214,7 +211,7 @@ void LoadGame(char* fn) {
 
 void ProcessEquipDat() {
     VFILE* f;
-    int a, i, t;
+    int a, i;
     int i2;
 
     // This function parses EQUIP.DAT, which sets all the stats for equipment.
@@ -514,7 +511,6 @@ inputloop:
             cursel = 0;
         }
         playeffect(0);
-        playeffect(0);
         goto drawloop;
     }
     if (up) {
@@ -523,7 +519,6 @@ inputloop:
         } else {
             cursel--;
         }
-        playeffect(0);
         playeffect(0);
         goto drawloop;
     }

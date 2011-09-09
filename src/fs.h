@@ -93,7 +93,7 @@ namespace verge {
             if (format[count] == '%' && format[count + 1] != '%') {
                 do {
                     auto c = file->getc();
-                    if (c == 0) {
+                    if (c == -1) {
                         return count;
                     } else if (impl::iswhite(c)) {
                         count++;
