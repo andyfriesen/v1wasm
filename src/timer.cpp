@@ -54,6 +54,23 @@ void setTimerCount(int offset) {
 void incTimerCount() {
     timer_count++;
     vc_timer++;
+
+    tickctr++;
+    if (tickctr == 100) {
+        tickctr = 0;
+        sec++;
+
+        if (sec == 60) {
+            sec = 0;
+            min++;
+            if (min == 60) {
+                min = 0;
+                hr++;
+            }
+        }
+    }
+
+    // FIXME: HookTimer.  Can't run it here.
 }
 
 void decTimerCount() {
