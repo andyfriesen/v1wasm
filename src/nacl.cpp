@@ -260,6 +260,7 @@ struct V1naclInstance
         , gameDownloader(this)
         , graphics(0)
         , backBuffer(0)
+        , soundEnabled(false)
     {
         pthread_mutex_init(&bbMutex, 0);
         pthread_mutex_init(&inputMutex, 0);
@@ -283,6 +284,8 @@ struct V1naclInstance
             printf("Arg %i: %s=%s\n", i, argn[i], argv[i]);
             if (0 == strcmp("game_url", argn[i])) {
                 gameUrl = argv[i];
+            } else if (0 == strcmp("sound", argn[i])) {
+                soundEnabled = 0 == strcmp("on", argv[i]);
             } else if (0 == strcmp("save0", argn[i])) {
                 encodeSaveGame("SAVEDAT.000", argv[i]);
             } else if (0 == strcmp("save1", argn[i])) {
@@ -296,9 +299,9 @@ struct V1naclInstance
 
         verge::plugin = this;
 
-#ifdef VERGE_AUDIO
-        audioDevice = new audiere::NaclAudioDevice(this);
-#endif
+        if (soundEnabled) {
+            audioDevice = new audiere::NaclAudioDevice(this);
+        }
 
         graphics = new pp::Graphics2D(this, pp::Size(320, 240), true);
         auto result = BindGraphics(*graphics);
@@ -490,10 +493,10 @@ struct V1naclInstance
     }
 
     void __loadSound(const std::string& fileName) {
-#ifdef VERGE_AUDIO
-        printf("V1naclInstance::__loadSound(%s) index %i\n", fileName.c_str(), soundEffects.size());
-        soundEffects.push_back(audiere::OpenSound(audioDevice, fileName.c_str(), false));
-#endif
+        if (soundEnabled) {
+            printf("V1naclInstance::__loadSound(%s) index %i\n", fileName.c_str(), soundEffects.size());
+            soundEffects.push_back(audiere::OpenSound(audioDevice, fileName.c_str(), false));
+        }
     }
 
     struct PlaySongRequest {
@@ -521,20 +524,20 @@ struct V1naclInstance
     }
 
     void __playSong(const std::string& songName) {
-#ifdef VERGE_AUDIO
-        printf("V1naclInstance::__playSong(%s)\n", songName.c_str());
-        auto f = verge::vopen(songName.c_str(), "r");
-        auto file_format = audiere::FF_MOD;
-        auto ss = audiere::OpenSource(audiere::FilePtr(f), songName.c_str(), file_format);
-        currentMusic = audiere::OpenSound(audioDevice, ss, false);
-        if (currentMusic) {
-            currentMusic->setRepeat(true);
-            currentMusic->play();
+        if (soundEnabled) {
+            printf("V1naclInstance::__playSong(%s)\n", songName.c_str());
+            auto f = verge::vopen(songName.c_str(), "r");
+            auto file_format = audiere::FF_MOD;
+            auto ss = audiere::OpenSource(audiere::FilePtr(f), songName.c_str(), file_format);
+            currentMusic = audiere::OpenSound(audioDevice, ss, false);
+            if (currentMusic) {
+                currentMusic->setRepeat(true);
+                currentMusic->play();
+            }
+            verge::vclose(f);
+        } else {
+            printf("V1naclInstance::__playSong(%s) but audio is disabled\n", songName.c_str());
         }
-        verge::vclose(f);
-#else
-        printf("V1naclInstance::__playSong(%s) but audio is disabled\n", songName.c_str());
-#endif
     }
 
     struct PlayEffectRequest {
@@ -565,31 +568,31 @@ struct V1naclInstance
     void __playEffect(size_t index) {
         printf("V1naclInstance::__playEffect(%i) size=%i\n", index, soundEffects.size());
 
-#ifdef VERGE_AUDIO
-        if (0 <= index && index < soundEffects.size()) {
-            auto s = soundEffects[index];
-            printf("ptr -> %p\n", s.get());
-            soundEffects[index]->play();
+        if (soundEnabled) {
+            if (0 <= index && index < soundEffects.size()) {
+                auto s = soundEffects[index];
+                printf("ptr -> %p\n", s.get());
+                soundEffects[index]->play();
+            }
         }
-#endif
     }
 
     virtual void stopSound() {
         return;
-#ifdef VERGE_AUDIO
-        for (auto i = 0u; i < soundEffects.size(); ++i) {
-            soundEffects[i]->stop();
+        if (soundEnabled) {
+            for (auto i = 0u; i < soundEffects.size(); ++i) {
+                soundEffects[i]->stop();
+            }
+            currentMusic->stop();
         }
-        currentMusic->stop();
-#endif
     }
 
     virtual void setVolume(int volume) {
         return;
-#ifdef VERGE_AUDIO
-        auto normalizedVolume = float(volume) / 100.0f;
-        currentMusic->setVolume(normalizedVolume);
-#endif
+        if (soundEnabled) {
+            auto normalizedVolume = float(volume) / 100.0f;
+            currentMusic->setVolume(normalizedVolume);
+        }
     }
 
     virtual void setSongPos(int songPos) {
@@ -663,11 +666,11 @@ private:
     pthread_mutex_t bbMutex;
     pthread_mutex_t inputMutex;
 
-#ifdef VERGE_AUDIO
+    bool soundEnabled;
+
     audiere::AudioDevicePtr audioDevice;
     std::vector<audiere::OutputStreamPtr> soundEffects;
     audiere::OutputStreamPtr currentMusic;
-#endif
 };
 
 class V1naclModule : public pp::Module {

@@ -142,12 +142,13 @@
         var embed = document.createElement('embed');
 
         embed.id = 'v1nacl';
-        embed.src = 'v1nacl.nmf';
+        embed.src = 'v1nacl_dbg.nmf';
         embed.type = 'application/x-nacl';
         embed.style.width = '320px';
         embed.style.height = '200px';
 
         embed.setAttribute('game_url', 'sots');
+        //embed.setAttribute('sound', 'on');
         pushSave(0);
         pushSave(1);
         pushSave(2);
