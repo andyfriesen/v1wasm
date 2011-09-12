@@ -65,6 +65,37 @@ namespace verge {
     private:
         pthread_mutex_t& mutex;
     };
+
+    template <typename C, typename Arg1>
+    struct MainThreadMethodRequest {
+        typedef void (C::*MethodPtr)(Arg1);
+
+        C* instance;
+        MethodPtr method;
+        Arg1 arg1;
+        MainThreadMethodRequest(C* instance, MethodPtr method, Arg1 arg1)
+            : instance(instance)
+            , method(method)
+            , arg1(arg1)
+        {}
+
+        static void invoke(void* data, int32_t) {
+            auto self = static_cast<MainThreadMethodRequest*>(data);
+            auto i = self->instance;
+            auto m = self->method;
+            auto a = self->arg1;
+
+            (i->*m)(a);
+
+            delete self;
+        }
+    };
+
+    template <typename C, typename Arg1>
+    pp::CompletionCallback makeMainThreadCallback(C* self, void (C::*methodPtr)(Arg1), Arg1 arg1) {
+        auto req = new MainThreadMethodRequest<C, Arg1>(self, methodPtr, arg1);
+        return pp::CompletionCallback(MainThreadMethodRequest<C, Arg1>::invoke, req);
+    }
 }
 
 namespace audiere {
@@ -269,9 +300,6 @@ struct V1naclInstance
         RequestFilteringInputEvents(PP_INPUTEVENT_CLASS_KEYBOARD);
     }
 
-    virtual ~V1naclInstance() {
-    }
-
     void encodeSaveGame(const std::string& filename, const std::string& data64) {
         const auto de64 = base64::decode(data64);
         verge::vset(filename, verge::DataVec(de64.begin(), de64.end()));
@@ -447,6 +475,43 @@ struct V1naclInstance
         );
     }
 
+private:
+    static void _persistSave(void* data, int32_t blah) {
+        auto psr = static_cast<PersistSaveRequestData*>(data);
+        psr->instance->__persistSave(psr->fileName, psr->saveData);
+        delete psr;
+    }
+
+    void __persistSave(const std::string& fileName, std::string& saveData) {
+        // HACK:
+        int index = 5;
+        auto lastChar = fileName[fileName.length() - 1];
+        if (lastChar >= '0' && lastChar <= '3') {
+            index = lastChar - '0';
+        } else {
+            printf("reallyPersistSave bad fname %s index %i\n", fileName.c_str(), index);
+            return;
+        }
+
+        auto b64(base64::encode(saveData));
+
+        std::stringstream ss;
+        ss << "clear:" << index;
+        PostMessage(pp::Var(ss.str()));
+
+        const auto SLICE_SIZE = 4096;
+        size_t sliceIndex = 0;
+
+        while (sliceIndex < b64.length()) {
+            ss.str(std::string());
+            ss << "append:" << index << ":" << b64.substr(sliceIndex, SLICE_SIZE);
+            sliceIndex += SLICE_SIZE;
+            PostMessage(pp::Var(ss.str()));
+        }
+        printf("Persisted save %s.  %i bytes\n", fileName.c_str(), saveData.length());
+    }
+
+public:
     // Caution: Should only be called by the game thread
     virtual void vgadump(unsigned char* framebuffer, unsigned char* palette) {
         if (0 != pthread_mutex_lock(&bbMutex)) {
@@ -469,36 +534,20 @@ struct V1naclInstance
         module->core()->CallOnMainThread(0, pp::CompletionCallback(&V1naclInstance::_present, this));
     }
 
-    struct LoadSoundRequest {
-        V1naclInstance* self;
-        const std::string fileName;
-        LoadSoundRequest(V1naclInstance* self, const std::string& fileName)
-            : self(self)
-            , fileName(fileName)
-        {}
-    };
-
     virtual void loadSound(const std::string& fileName) {
-        auto lsr = new LoadSoundRequest(this, fileName);
-        module->core()->CallOnMainThread(
-            0,
-            pp::CompletionCallback(&V1naclInstance::_loadSound, lsr)
-        );
+        auto cb = makeMainThreadCallback(this, &V1naclInstance::__loadSound, fileName);
+        module->core()->CallOnMainThread(0, cb);
     }
 
-    static void _loadSound(void* data, int32_t blah) {
-        auto lsr = static_cast<LoadSoundRequest*>(data);
-        lsr->self->__loadSound(lsr->fileName);
-        delete lsr;
-    }
-
-    void __loadSound(const std::string& fileName) {
+private:
+    void __loadSound(std::string fileName) {
         if (soundEnabled) {
             printf("V1naclInstance::__loadSound(%s) index %i\n", fileName.c_str(), soundEffects.size());
             soundEffects.push_back(audiere::OpenSound(audioDevice, fileName.c_str(), false));
         }
     }
 
+public:
     struct PlaySongRequest {
         V1naclInstance* self;
         const std::string songName;
@@ -510,20 +559,12 @@ struct V1naclInstance
     };
 
     virtual void playSong(const std::string& songName) {
-        auto psr = new PlaySongRequest(this, songName);
-        module->core()->CallOnMainThread(
-            0,
-            pp::CompletionCallback(&V1naclInstance::_playSong, psr)
-        );
+        auto cb = makeMainThreadCallback(this, &V1naclInstance::__playSong, songName);
+        module->core()->CallOnMainThread(0, cb);
     }
 
-    static void _playSong(void* data, int32_t bleh) {
-        auto psr = static_cast<PlaySongRequest*>(data);
-        psr->self->__playSong(psr->songName);
-        delete psr;
-    }
-
-    void __playSong(const std::string& songName) {
+private:
+    void __playSong(std::string songName) {
         if (soundEnabled) {
             printf("V1naclInstance::__playSong(%s)\n", songName.c_str());
             auto f = verge::vopen(songName.c_str(), "r");
@@ -540,29 +581,12 @@ struct V1naclInstance
         }
     }
 
-    struct PlayEffectRequest {
-        V1naclInstance* self;
-        size_t index;
-        PlayEffectRequest (V1naclInstance* self, size_t index)
-            : self(self)
-            , index(index)
-        { }
-    };
-
+public:
     virtual void playEffect(size_t index) {
         return;
 
-        auto per = new PlayEffectRequest(this, index);
-        module->core()->CallOnMainThread(
-            0,
-            pp::CompletionCallback(&V1naclInstance::_playEffect, per)
-        );
-    }
-
-    static void _playEffect(void* data, int32_t) {
-        auto per = static_cast<PlayEffectRequest*>(data);
-        per->self->__playEffect(per->index);
-        delete per;
+        auto cb = makeMainThreadCallback(this, &V1naclInstance::__playEffect, index);
+        module->core()->CallOnMainThread(0, cb);
     }
 
     void __playEffect(size_t index) {
@@ -599,41 +623,6 @@ struct V1naclInstance
     }
 
 private:
-    static void _persistSave(void* data, int32_t blah) {
-        auto psr = static_cast<PersistSaveRequestData*>(data);
-        psr->instance->reallyPersistSave(psr->fileName, psr->saveData);
-        delete psr;
-    }
-
-    void reallyPersistSave(const std::string& fileName, std::string& saveData) {
-        // HACK:
-        int index = 5;
-        auto lastChar = fileName[fileName.length() - 1];
-        if (lastChar >= '0' && lastChar <= '3') {
-            index = lastChar - '0';
-        } else {
-            printf("reallyPersistSave bad fname %s index %i\n", fileName.c_str(), index);
-            return;
-        }
-
-        auto b64(base64::encode(saveData));
-
-        std::stringstream ss;
-        ss << "clear:" << index;
-        PostMessage(pp::Var(ss.str()));
-
-        const auto SLICE_SIZE = 4096;
-        size_t sliceIndex = 0;
-
-        while (sliceIndex < b64.length()) {
-            ss.str(std::string());
-            ss << "append:" << index << ":" << b64.substr(sliceIndex, SLICE_SIZE);
-            sliceIndex += SLICE_SIZE;
-            PostMessage(pp::Var(ss.str()));
-        }
-        printf("Persisted save %s.  %i bytes\n", fileName.c_str(), saveData.length());
-    }
-
     static void _present(void* data, int32_t blah) {
         auto self = static_cast<V1naclInstance*>(data);
         self->present();
