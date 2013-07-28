@@ -6,6 +6,7 @@
 
 import os
 import os.path
+import json
 
 """
 ~/src/nacl_sdk/pepper_28/examples/demo/pi_generator% make V=1
@@ -22,29 +23,54 @@ python /Users/andy/src/nacl_sdk/pepper_28/tools/oshelpers.py mkdir -p newlib/Deb
 python /Users/andy/src/nacl_sdk/pepper_28/tools/create_nmf.py -o newlib/Debug/pi_generator.nmf newlib/Debug/pi_generator_x86_32.nexe newlib/Debug/pi_generator_x86_64.nexe newlib/Debug/pi_generator_arm.nexe -D /Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_glibc/x86_64-nacl/bin/objdump -L /Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_glibc/x86_64-nacl/lib32 -L /Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_glibc/x86_64-nacl/lib -s ./newlib/Debug
 """
 
-def Nexe(env, name, sources):
+def Pexe(env, name, sources):
     blah = name + '.nmf'
     progName = name + '.pexe'
-    prog = env.Program(progName, sources)
-    env.Command(
+    return env.Program(progName, sources)
+
+def NexeNmf(env, target, source):
+    tp = target[0].get_path()
+    def n(arch):
+        return {"url": '{0}_{1}.nexe'.format(tp, arch)}
+
+    content = {
+      "program": {
+        "x86-64": n('x86_64'),
+        "x86-32": n('x86_32'),
+        "arm": n('arm'),
+      }
+    }
+
+    json.dump(content, file(tp + '.nmf', 'wt'))
+
+def PexeNmf(env, name):
+    return env.Command(
         blah,
         prog,
         'python $NACL_SDK_ROOT/tools/create_nmf.py -o $TARGET $SOURCE -s ./pnacl/Debug',
-        )
+    )
+
+def TranslatePexe(env, name, sources, arch):
+    env.Command(
+        '{0}_{1}.nexe'.format(name, arch),
+        sources,
+        '$NACL_BIN/pnacl-translate -arch ' + arch + ' $SOURCE -o $TARGET'
+    )
 
 def NaClEnvironment():
-    env = Environment()
-    env.AddMethod(Nexe, 'Nexe')
+    env = Environment(BUILDERS={'NexeNmf': Builder(action=NexeNmf)})
+    env.AddMethod(Pexe, 'Pexe')
 
     env['NACL_HOST'] = 'host_x86_64'
-    env['NACL_SDK_ROOT'] = '/Users/andy/src/nacl_sdk/pepper_canary'
+    env['NACL_SDK_ROOT'] = '/Users/andy/src/nacl_sdk/pepper_28'
     env['NACL_TOOLCHAIN'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/$NACL_HOST'
+    env['NACL_BIN'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/bin'
     env['CONFIG'] = 'Debug'
 
     env['NACL_ARCH'] = 'pnacl'
 
-    env['CC'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/bin/pnacl-clang'
-    env['CXX'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/bin/pnacl-clang++'
+    env['CC'] = '$NACL_BIN/pnacl-clang'
+    env['CXX'] = '$NACL_BIN/pnacl-clang++'
 
     env.Append(LIBPATH=[
             '$NACL_SDK_ROOT/lib/pnacl/$CONFIG'
@@ -195,4 +221,11 @@ env.Append(
     ]
 )
 
-env.Nexe('verge', sources + audiereSource + dumbSource)
+pexe = env.Pexe('verge', sources + audiereSource + dumbSource)
+
+x64 = TranslatePexe(env, 'verge', pexe, 'x86_64')
+x86 = TranslatePexe(env, 'verge', pexe, 'x86_32')
+arm = TranslatePexe(env, 'verge', pexe, 'arm')
+
+nmf = env.NexeNmf('verge', pexe)
+
