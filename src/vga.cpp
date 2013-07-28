@@ -36,7 +36,10 @@ unsigned char pal[768];
 extern char waitvrt, fade, cancelfade, *strbuf;
 
 unsigned char* fnt, *fnt2, *tbox, *n;
-short int x1 = 17, y1 = 17;
+
+namespace vga {
+    short int x1 = 17, y1 = 17;
+}
 
 unsigned char screen[BACKBUFFER_SIZE];
 unsigned char virscr[BACKBUFFER_SIZE];
@@ -438,8 +441,8 @@ void bigpchar(int x, int y, char c) {
 }
 
 void gotoxy(int x, int y) {
-    x1 = x;
-    y1 = y;
+    vga::x1 = x;
+    vga::y1 = y;
 }
 
 void printstring(const char* str) {
@@ -453,8 +456,8 @@ void printstring(const char* str) {
 
 mainloop:
     c = str[i];
-    pchar(x1, y1, c);
-    x1 = x1 + 8;
+    pchar(vga::x1, vga::y1, c);
+    vga::x1 = vga::x1 + 8;
     i++;
     if (str[i] != 0) {
         goto mainloop;
@@ -491,8 +494,8 @@ void bigprintstring(const char* str) {
 
 mainloop:
     c = str[i];
-    bigpchar(x1, y1, c);
-    x1 = x1 + 10;
+    bigpchar(vga::x1, vga::y1, c);
+    vga::x1 = vga::x1 + 10;
     i++;
     if (str[i] != 0) {
         goto mainloop;

@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include "audiere/audiere.h"
 
+#include "shared_ptr.h"
+
 #undef getc
 
 namespace pp { class Instance; }
@@ -47,7 +49,7 @@ namespace verge {
         DataVec data;
         size_t pos;
     };
-    typedef std::shared_ptr<File> FilePtr;
+    DEFINE_PTR(File);
 
     struct FS {
         friend class File;

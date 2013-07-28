@@ -9,6 +9,7 @@
 #include "ppapi/cpp/instance.h"
 #include "ppapi/cpp/module.h"
 #include "ppapi/cpp/completion_callback.h"
+#include "ppapi/utility/completion_callback_factory.h"
 #include "ppapi/cpp/url_request_info.h"
 #include "ppapi/cpp/input_event.h"
 #include "ppapi/cpp/url_loader.h"

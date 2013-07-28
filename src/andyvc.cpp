@@ -53,8 +53,16 @@ drawloop:
     vgadump();
     readcontrols();
 
-    if (first == 2) if (b1 || b2 || b4) { goto drawloop; }
-        else { an = 0; setTimerCount(0); return; }
+    if (first == 2) {
+        if (b1 || b2 || b4) {
+            goto drawloop;
+        } else {
+            an = 0;
+            setTimerCount(0);
+            return;
+        }
+    }
+
     if (first && !b1 && !b2 && !b4) { first = 0; }
     else if (first) { goto drawloop; }
 

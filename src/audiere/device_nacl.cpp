@@ -18,6 +18,7 @@ namespace audiere {
     , instance(instance)
   {
       sampleFrameCount = pp::AudioConfig::RecommendSampleFrameCount(
+          instance,
           PP_AUDIOSAMPLERATE_44100,
           SAMPLE_FRAME_COUNT
       );

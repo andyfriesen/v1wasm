@@ -209,6 +209,14 @@ void LoadGame(char* fn) {
     startmap(mapname);
 }
 
+void toUpperCase(char* s) {
+    while (char c = *s++) {
+        if (c >= 'a' && c <= 'z') {
+            c ^= 32;
+        }
+    }
+}
+
 void ProcessEquipDat() {
     VFILE* f;
     int a, i;
@@ -226,7 +234,7 @@ void ProcessEquipDat() {
     for (i = 1; i <= a; i++) {
 pl1:
         vscanf(f, "%s", strbuf);
-        strupr(strbuf);
+        toUpperCase(strbuf);
         if (!strcmp(strbuf, "//")) {
             vgets(strbuf, 99, f);
             goto pl1;
@@ -306,7 +314,7 @@ eqloop:
     for (i = 1; i <= a; i++) {
 mpl1:
         vscanf(f, "%s", strbuf);
-        strupr(strbuf);
+        toUpperCase(strbuf);
         if (!strcmp(strbuf, "//")) {
             vgets(strbuf, 99, f);
             goto mpl1;

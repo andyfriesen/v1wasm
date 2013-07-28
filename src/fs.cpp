@@ -136,6 +136,7 @@ namespace verge {
 
         if (mode == FileMode::Write) {
             f.reset(new File(DataVec()));
+            FilePtr g(f);
             files[fn] = f;
         } else if (files.count(fn)) {
             f = files[fn];

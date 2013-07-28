@@ -4,19 +4,79 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import make_nacl_env
-import nacl_utils
 import os
 import os.path
 
-nacl_env = make_nacl_env.NaClEnvironment(use_c_plus_plus_libs=True)
-nacl_env.Append(
-    CPPPATH=['src/dumb/include'],
-    CXXFLAGS=['-std=gnu++0x'],#, '-finstrument-functions'],
-    CPPDEFINES=['NO_FLAC', 'NO_SPEEX', 'NO_OGG', 'NO_MP3', 'AUDIERE_NACL', 'VERGE_AUDIO']
-)
+"""
+~/src/nacl_sdk/pepper_28/examples/demo/pi_generator% make V=1
+python /Users/andy/src/nacl_sdk/pepper_28/tools/oshelpers.py mkdir -p newlib/Debug/
+/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/i686-nacl-g++ -o newlib/Debug/pi_generator_x86_32.o -c pi_generator.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=x86_32
+/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/i686-nacl-g++ -o newlib/Debug/pi_generator_module_x86_32.o -c pi_generator_module.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=x86_32
+/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/i686-nacl-g++ -o newlib/Debug/pi_generator_x86_32.nexe newlib/Debug/pi_generator_x86_32.o newlib/Debug/pi_generator_module_x86_32.o -Wl,-as-needed -L/Users/andy/src/nacl_sdk/pepper_28/lib/newlib_x86_32/Debug -lppapi_cpp -lppapi
+/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/x86_64-nacl-g++ -o newlib/Debug/pi_generator_x86_64.o -c pi_generator.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=x86_64
+/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/x86_64-nacl-g++ -o newlib/Debug/pi_generator_module_x86_64.o -c pi_generator_module.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=x86_64
+/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/x86_64-nacl-g++ -o newlib/Debug/pi_generator_x86_64.nexe newlib/Debug/pi_generator_x86_64.o newlib/Debug/pi_generator_module_x86_64.o -Wl,-as-needed -L/Users/andy/src/nacl_sdk/pepper_28/lib/newlib_x86_64/Debug -lppapi_cpp -lppapi
+/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_arm_newlib/bin/arm-nacl-g++ -o newlib/Debug/pi_generator_arm.o -c pi_generator.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=arm
+/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_arm_newlib/bin/arm-nacl-g++ -o newlib/Debug/pi_generator_module_arm.o -c pi_generator_module.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=arm
+/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_arm_newlib/bin/arm-nacl-g++ -o newlib/Debug/pi_generator_arm.nexe newlib/Debug/pi_generator_arm.o newlib/Debug/pi_generator_module_arm.o -Wl,-as-needed -L/Users/andy/src/nacl_sdk/pepper_28/lib/newlib_arm/Debug -lppapi_cpp -lppapi
+python /Users/andy/src/nacl_sdk/pepper_28/tools/create_nmf.py -o newlib/Debug/pi_generator.nmf newlib/Debug/pi_generator_x86_32.nexe newlib/Debug/pi_generator_x86_64.nexe newlib/Debug/pi_generator_arm.nexe -D /Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_glibc/x86_64-nacl/bin/objdump -L /Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_glibc/x86_64-nacl/lib32 -L /Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_glibc/x86_64-nacl/lib -s ./newlib/Debug
+"""
 
-nacl_env['STRIP'] = os.path.join(nacl_utils.FindToolchain(), 'bin', 'nacl-strip')
+def Nexe(env, name, sources):
+    blah = name + '.nmf'
+    progName = name + '.pexe'
+    prog = env.Program(progName, sources)
+    env.Command(
+        blah,
+        prog,
+        'python $NACL_SDK_ROOT/tools/create_nmf.py -o $TARGET $SOURCE -s ./pnacl/Debug',
+        )
+
+def NaClEnvironment():
+    env = Environment()
+    env.AddMethod(Nexe, 'Nexe')
+
+    env['NACL_HOST'] = 'host_x86_64'
+    env['NACL_SDK_ROOT'] = '/Users/andy/src/nacl_sdk/pepper_28'
+    env['NACL_TOOLCHAIN'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/$NACL_HOST'
+
+    env['NACL_ARCH'] = 'pnacl'
+
+    env['CC'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/bin/pnacl-clang'
+    env['CXX'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/bin/pnacl-clang++'
+
+    env.Append(CPPDEFINES=[
+            'NACL_ARCH=$NACL_ARCH',
+            'NACL_SDK_DEBUG',
+            'USE_TR1'
+        ]
+    )
+
+    env.Append(CPPPATH=[
+            '$NACL_SDK_ROOT/include'
+        ]
+    )
+
+    env.Append(CXXFLAGS=[
+            #'-cxx-isystem', '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/usr/include/c++/4.6.2',
+            #'-cxx-isystem', '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/usr/include/c++/4.6.2/arm-none-linux-gnueabi',
+            #'-nostdinc++'
+        ]
+    )
+
+    env.Append(CFLAGS=[
+            '-MMD',
+            '-Wno-long-long',
+        ]
+    )
+
+    env.Append(LIBS=[
+            'ppapi',
+            'ppapi_cpp'
+        ]
+    )
+
+    return env
 
 dumbSource = ['src/dumb/' + s for s in Split("""
     core/atexit.c
@@ -101,7 +161,35 @@ fs.cpp      nacl.cpp    stack.cpp   base64.cpp
 """)
 sources = ['src/' + s for s in sources]
 
-nexes = nacl_env.AllNaClModules(sources + audiereSource + dumbSource, 'v1nacl')
+#nacl_env = NaClEnvironment()
+#nacl_env.Append(
+#    CPPPATH=['src/dumb/include'],
+#    CXXFLAGS=['-std=gnu++0x'],#, '-finstrument-functions'],
+#    CPPDEFINES=['NO_FLAC', 'NO_SPEEX', 'NO_OGG', 'NO_MP3', 'AUDIERE_NACL', 'VERGE_AUDIO']
+#)
+#nacl_env['STRIP'] = os.path.join(nacl_utils.FindToolchain(), 'bin', 'nacl-strip')
+#nexes = nacl_env.AllNaClModules(sources + audiereSource + dumbSource, 'v1nacl')
+#archs = ['x86', 'x64']
+#nacl_env.AddPostAction(nexes, "$STRIP $TARGET")
 
-archs = ['x86', 'x64']
-nacl_env.AddPostAction(nexes, "$STRIP $TARGET")
+env = NaClEnvironment()
+
+env.Append(
+    CPPPATH=[
+        'src/dumb/include'
+    ],
+    CXXFLAGS=[
+        '-std=c++11',
+        #'-Werror', # Hahaha no way.  This code dates back to like 1997.
+    ],
+    CPPDEFINES=[
+        'NO_FLAC',
+        'NO_SPEEX',
+        'NO_OGG',
+        'NO_MP3',
+        'AUDIERE_NACL',
+        'VERGE_AUDIO'
+    ]
+)
+
+env.Nexe('verge', sources + audiereSource + dumbSource)
