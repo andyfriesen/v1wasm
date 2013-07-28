@@ -37,13 +37,19 @@ def NaClEnvironment():
     env.AddMethod(Nexe, 'Nexe')
 
     env['NACL_HOST'] = 'host_x86_64'
-    env['NACL_SDK_ROOT'] = '/Users/andy/src/nacl_sdk/pepper_28'
+    env['NACL_SDK_ROOT'] = '/Users/andy/src/nacl_sdk/pepper_canary'
     env['NACL_TOOLCHAIN'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/$NACL_HOST'
+    env['CONFIG'] = 'Debug'
 
     env['NACL_ARCH'] = 'pnacl'
 
     env['CC'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/bin/pnacl-clang'
     env['CXX'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/bin/pnacl-clang++'
+
+    env.Append(LIBPATH=[
+            '$NACL_SDK_ROOT/lib/pnacl/$CONFIG'
+        ]
+    )
 
     env.Append(CPPDEFINES=[
             'NACL_ARCH=$NACL_ARCH',
@@ -58,9 +64,6 @@ def NaClEnvironment():
     )
 
     env.Append(CXXFLAGS=[
-            #'-cxx-isystem', '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/usr/include/c++/4.6.2',
-            #'-cxx-isystem', '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/usr/include/c++/4.6.2/arm-none-linux-gnueabi',
-            #'-nostdinc++'
         ]
     )
 
@@ -72,7 +75,7 @@ def NaClEnvironment():
 
     env.Append(LIBS=[
             'ppapi',
-            'ppapi_cpp'
+            'ppapi_cpp',
         ]
     )
 
