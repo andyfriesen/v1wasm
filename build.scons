@@ -8,25 +8,11 @@ import os
 import os.path
 import json
 
-"""
-~/src/nacl_sdk/pepper_28/examples/demo/pi_generator% make V=1
-python /Users/andy/src/nacl_sdk/pepper_28/tools/oshelpers.py mkdir -p newlib/Debug/
-/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/i686-nacl-g++ -o newlib/Debug/pi_generator_x86_32.o -c pi_generator.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=x86_32
-/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/i686-nacl-g++ -o newlib/Debug/pi_generator_module_x86_32.o -c pi_generator_module.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=x86_32
-/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/i686-nacl-g++ -o newlib/Debug/pi_generator_x86_32.nexe newlib/Debug/pi_generator_x86_32.o newlib/Debug/pi_generator_module_x86_32.o -Wl,-as-needed -L/Users/andy/src/nacl_sdk/pepper_28/lib/newlib_x86_32/Debug -lppapi_cpp -lppapi
-/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/x86_64-nacl-g++ -o newlib/Debug/pi_generator_x86_64.o -c pi_generator.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=x86_64
-/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/x86_64-nacl-g++ -o newlib/Debug/pi_generator_module_x86_64.o -c pi_generator_module.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=x86_64
-/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_newlib/bin/x86_64-nacl-g++ -o newlib/Debug/pi_generator_x86_64.nexe newlib/Debug/pi_generator_x86_64.o newlib/Debug/pi_generator_module_x86_64.o -Wl,-as-needed -L/Users/andy/src/nacl_sdk/pepper_28/lib/newlib_x86_64/Debug -lppapi_cpp -lppapi
-/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_arm_newlib/bin/arm-nacl-g++ -o newlib/Debug/pi_generator_arm.o -c pi_generator.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=arm
-/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_arm_newlib/bin/arm-nacl-g++ -o newlib/Debug/pi_generator_module_arm.o -c pi_generator_module.cc -g -O0 -pthread -MMD -DNACL_SDK_DEBUG  -I/Users/andy/src/nacl_sdk/pepper_28/include  -Wno-long-long -Werror -DNACL_ARCH=arm
-/Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_arm_newlib/bin/arm-nacl-g++ -o newlib/Debug/pi_generator_arm.nexe newlib/Debug/pi_generator_arm.o newlib/Debug/pi_generator_module_arm.o -Wl,-as-needed -L/Users/andy/src/nacl_sdk/pepper_28/lib/newlib_arm/Debug -lppapi_cpp -lppapi
-python /Users/andy/src/nacl_sdk/pepper_28/tools/create_nmf.py -o newlib/Debug/pi_generator.nmf newlib/Debug/pi_generator_x86_32.nexe newlib/Debug/pi_generator_x86_64.nexe newlib/Debug/pi_generator_arm.nexe -D /Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_glibc/x86_64-nacl/bin/objdump -L /Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_glibc/x86_64-nacl/lib32 -L /Users/andy/src/nacl_sdk/pepper_28/toolchain/mac_x86_glibc/x86_64-nacl/lib -s ./newlib/Debug
-"""
-
 def Pexe(env, name, sources):
     blah = name + '.nmf'
-    progName = name + '.pexe'
-    return env.Program(progName, sources)
+    progName = name + '.debug.pexe'
+    debug_pexe = env.Program(progName, sources)
+    return FinalizePexe(env, name)
 
 def NexeNmf(env, target, source):
     tp = target[0].get_path()
@@ -50,6 +36,13 @@ def PexeNmf(env, name):
         'python $NACL_SDK_ROOT/tools/create_nmf.py -o $TARGET $SOURCE -s ./pnacl/Debug',
     )
 
+def FinalizePexe(env, source):
+    env.Command(
+        source + '.final.pexe',
+        source + '.debug.pexe',
+        '$NACL_BIN/pnacl-finalize $SOURCE -o $TARGET'
+    )
+
 def TranslatePexe(env, name, sources, arch):
     env.Command(
         '{0}_{1}.nexe'.format(name, arch),
@@ -62,9 +55,9 @@ def NaClEnvironment():
     env.AddMethod(Pexe, 'Pexe')
 
     env['NACL_HOST'] = 'host_x86_64'
-    env['NACL_SDK_ROOT'] = '/Users/andy/src/nacl_sdk/pepper_28'
-    env['NACL_TOOLCHAIN'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/$NACL_HOST'
-    env['NACL_BIN'] = '$NACL_SDK_ROOT/toolchain/mac_x86_pnacl/newlib/bin'
+    env['NACL_SDK_ROOT'] = '/Users/andy/src/nacl_sdk/pepper_35'
+    env['NACL_TOOLCHAIN'] = '$NACL_SDK_ROOT/toolchain/mac_pnacl/$NACL_HOST'
+    env['NACL_BIN'] = '$NACL_SDK_ROOT/toolchain/mac_pnacl/bin'
     env['CONFIG'] = 'Debug'
 
     env['NACL_ARCH'] = 'pnacl'
@@ -80,7 +73,7 @@ def NaClEnvironment():
     env.Append(CPPDEFINES=[
             'NACL_ARCH=$NACL_ARCH',
             'NACL_SDK_DEBUG',
-            'USE_TR1'
+            # 'USE_TR1'
         ]
     )
 
@@ -208,7 +201,8 @@ env.Append(
         'src/dumb/include'
     ],
     CXXFLAGS=[
-        '-std=c++11',
+        # '-std=c++11',
+        '-std=gnu++11',
         #'-Werror', # Hahaha no way.  This code dates back to like 1997.
     ],
     CPPDEFINES=[
@@ -223,9 +217,8 @@ env.Append(
 
 pexe = env.Pexe('verge', sources + audiereSource + dumbSource)
 
-x64 = TranslatePexe(env, 'verge', pexe, 'x86_64')
-x86 = TranslatePexe(env, 'verge', pexe, 'x86_32')
-arm = TranslatePexe(env, 'verge', pexe, 'arm')
+# x64 = TranslatePexe(env, 'verge', pexe, 'x86_64')
+# x86 = TranslatePexe(env, 'verge', pexe, 'x86_32')
+# arm = TranslatePexe(env, 'verge', pexe, 'arm')
 
-nmf = env.NexeNmf('verge', pexe)
-
+# nmf = env.NexeNmf('verge', pexe)

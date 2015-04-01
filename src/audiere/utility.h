@@ -6,7 +6,7 @@
 #pragma warning(disable : 4786)
 #endif
 
-
+#include <stdlib.h>
 #include <algorithm>
 #include <map>
 #include <string>
