@@ -202,9 +202,9 @@ struct GameDownloader {
         game_url = url;
 
         onComplete = oc;
-        downloader.reset(new Downloader(instance));
+        manifestDownloader.reset(new Downloader(instance));
         auto cc = ccFactory.NewCallback(&GameDownloader::gotManifest);
-        downloader->get(game_url + "/manifest.txt", cc);
+        manifestDownloader->get(game_url + "/manifest.txt", cc);
     }
 
     void gotManifest(int32_t result) {
@@ -213,7 +213,7 @@ struct GameDownloader {
             return;
         }
 
-        auto data = std::string(downloader->getData(), downloader->getLength());
+        auto data = std::string(manifestDownloader->getData(), manifestDownloader->getLength());
         do {
             auto p = data.find('\n');
             if (p == std::string::npos) {
@@ -226,7 +226,7 @@ struct GameDownloader {
             data.erase(0, p + 1);
         } while (true);
 
-        getNextFile();
+        startDownload();
     }
 
     void appendToManifest(const std::string& s) {
@@ -235,21 +235,16 @@ struct GameDownloader {
         }
     }
 
-    void getNextFile() {
-        if (manifest.size() == 0) {
-            onComplete.Run(PP_OK);
-            return;
+    void startDownload() {
+        for (const auto& fileName: manifest) {
+            auto downloader = std::make_shared<Downloader>(instance);
+            auto cc = ccFactory.NewCallback(&GameDownloader::gotFile, downloader, fileName);
+            downloaders.push_back(downloader);
+            downloader->get(game_url + "/" + fileName, cc);
         }
-
-        auto next = manifest.back();
-        manifest.pop_back();
-        auto url = game_url + "/" + next;
-        auto cc = ccFactory.NewCallback(&GameDownloader::gotFile, next);
-        downloader.reset(new Downloader(instance));
-        downloader->get(url, cc);
     }
 
-    void gotFile(int32_t result, std::string currentFile) {
+    void gotFile(int32_t result, std::shared_ptr<Downloader> downloader, std::string currentFile) {
         if (result != PP_OK) {
             printf("Failed ;_;\n");
             return;
@@ -260,25 +255,22 @@ struct GameDownloader {
         auto d = downloader->getData();
         auto l = downloader->getLength();
         verge::vset(currentFile, verge::DataVec(d, d + l));
-        getNextFile();
-    }
 
-    void fileWriteComplete(int32_t writeResult, std::string currentFile) {
-        if (writeResult < 0) {
-            printf("FileIO::Write failed result=%i\n", writeResult);
-            return;
+        ++numComplete;
+        if (numComplete >= manifest.size()) {
+            onComplete.Run(PP_OK);
         }
-
-        getNextFile();
     }
 
 private:
     pp::Instance* instance;
     pp::CompletionCallbackFactory<GameDownloader> ccFactory;
-    std::shared_ptr<Downloader> downloader;
+    std::shared_ptr<Downloader> manifestDownloader;
+    std::vector<std::shared_ptr<Downloader>> downloaders;
     std::vector<std::string> manifest;
     pp::CompletionCallback onComplete;
     std::string game_url;
+    size_t numComplete = 0;
 };
 
 struct V1naclInstance
@@ -290,7 +282,6 @@ struct V1naclInstance
         , module(module)
         , ccfactory(this)
         , gameDownloader(this)
-        , graphics(0)
         , backBuffer(0)
         , soundEnabled(false)
     {
@@ -332,8 +323,9 @@ struct V1naclInstance
             audioDevice = new audiere::NaclAudioDevice(this);
         }
 
-        graphics = new pp::Graphics2D(this, pp::Size(320, 240), true);
-        auto result = BindGraphics(*graphics);
+        graphics = pp::Graphics2D(this, pp::Size(320, 200), true);
+        graphics.SetScale(2.0);
+        auto result = BindGraphics(graphics);
         if (!result) {
             printf("BindGraphics failed %i\n", result);
             return false;
@@ -594,7 +586,7 @@ public:
         printf("V1naclInstance::__playEffect(%i) size=%i\n", index, soundEffects.size());
 
         if (soundEnabled) {
-            if (0 <= index && index < soundEffects.size()) {
+            if (index < soundEffects.size()) {
                 auto s = soundEffects[index];
                 printf("ptr -> %p\n", s.get());
                 soundEffects[index]->play();
@@ -630,9 +622,9 @@ private:
     }
 
     void present() {
-        graphics->PaintImageData(*backBuffer, pp::Point());
+        graphics.PaintImageData(*backBuffer, pp::Point());
         pp::CompletionCallback cb = ccfactory.NewCallback(&V1naclInstance::presentComplete);
-        graphics->Flush(cb);
+        graphics.Flush(cb);
     }
 
     void presentComplete(int32_t result) {
@@ -648,7 +640,8 @@ private:
     pp::CompletionCallbackFactory<V1naclInstance> ccfactory;
     GameDownloader gameDownloader;
 
-    pp::Graphics2D* graphics;
+    pp::Graphics2D graphics;
+
     pp::ImageData* backBuffer;
     std::vector<verge::InputEvent> eventQueue;
 
