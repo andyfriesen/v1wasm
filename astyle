@@ -1,0 +1,9 @@
+#!/bin/sh
+
+~/src/astyle/build/mac/bin/astyle \
+    --style=java --indent-cases \
+    --indent-namespaces --indent-col1-comments \
+    --pad-oper --pad-header --add-brackets \
+    --add-one-line-brackets --convert-tabs \
+    --align-pointer=type --align-reference=type \
+    $*
