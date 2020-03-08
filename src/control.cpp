@@ -3,7 +3,11 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <map>
+#include <vector>
 #include <stdio.h>
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#include "wasm.h"
 #include "main.h"
 #include "keyboard.h"
 
@@ -37,6 +41,7 @@ int jb1 = 1;
 int jb2 = 2;
 int jb3 = 3;
 int jb4 = 4;              // joystick definable controls.
+static std::vector<verge::InputEvent> inputEvents;
 
 void ScreenShot();
 
@@ -44,23 +49,51 @@ void readbuttons();
 void readjoystick();
 
 namespace verge {
-    extern IFramebuffer* plugin;
     std::map<DOMScanCode, VScanCode> scanMap;
-}
 
-void readKeyboard() {
-    std::vector<verge::InputEvent> events;
-    verge::plugin->getInputEvents(events);
+    EM_BOOL onKeyDown(int eventType, const EmscriptenKeyboardEvent *e, void *userData) {
+        inputEvents.push_back(verge::InputEvent{ verge::EventType::KeyDown, int(e->keyCode) });
+        return true;
+    }
 
-    for (auto i = events.begin(); i != events.end(); ++i) {
-        //printf("Key event scan=%i down? %i\n", i->keyCode, i->type == verge::EventType::KeyDown);
-        auto xl = verge::scanMap[DOMScanCode(i->keyCode)];
+    EM_BOOL onKeyUp(int eventType, const EmscriptenKeyboardEvent *e, void *userData) {
+        inputEvents.push_back(verge::InputEvent{ verge::EventType::KeyUp, int(e->keyCode) });
+        return true;
+    }
 
-        keyboard_map[xl] = i->type == verge::EventType::KeyDown;
+    void registerInputEventHandlers() {
+        EMSCRIPTEN_RESULT result;
+        result = emscripten_set_keydown_callback(
+            "vergeCanvas",
+            nullptr,
+            true,
+            &onKeyDown
+        );
+        // TEST_RESULT(result);
+
+        result = emscripten_set_keyup_callback(
+            "vergeCanvas",
+            nullptr,
+            true,
+            &onKeyUp
+        );
+        // TEST_RESULT(result);
     }
 }
 
+
+void readKeyboard() {
+    for (const auto& event: inputEvents) {
+        //printf("Key event scan=%i down? %i\n", event.keyCode, event.type == verge::EventType::KeyDown);
+        auto xl = verge::scanMap[DOMScanCode(event.keyCode)];
+
+        keyboard_map[xl] = event.type == verge::EventType::KeyDown;
+    }
+    inputEvents.clear();
+}
+
 void initcontrols(char joystk) {
+    verge::registerInputEventHandlers();
     verge::scanMap[DOMScanCode::VK_UP] = SCAN_UP;
     verge::scanMap[DOMScanCode::VK_DOWN] = SCAN_DOWN;
     verge::scanMap[DOMScanCode::VK_LEFT] = SCAN_LEFT;

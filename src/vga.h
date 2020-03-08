@@ -1,8 +1,7 @@
 
 #pragma once
 
-struct IFramebuffer;
-
+void initvga();
 void closevga();
 void quick_killgfx();
 void quick_restoregfx();
@@ -31,7 +30,7 @@ void grabregion(int x, int y, int width, int height, unsigned char* spr);
 void fontcolor(unsigned char c);
 void ColorField(int x, int y, int x2, int y2, unsigned char* tbl);
 void ColorScale(unsigned char* dest, int st, int fn, int inv);
-void VCprintstring(int xx, int yy, char* str);
+void VCprintstring(int xx, int yy, const char* str);
 
 void dec_to_asciiz(int num, char* buf);
 
@@ -46,7 +45,8 @@ void dump_palette(unsigned char*);
 
 const int XRES = 320;
 const int YRES = 200;
-const int BACKBUFFER_PITCH = 352;
+const int BACKBUFFER_PITCH = XRES + 32;
+
 inline unsigned char* getScreenPointer(int x, int y) {
     return virscr + (y + 16) * BACKBUFFER_PITCH + x + 16;
 }

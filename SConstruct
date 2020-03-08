@@ -45,6 +45,7 @@ def EmscriptenEnvironment():
             '-O3',
             '-MMD',
             '-Wno-long-long',
+            '-Wno-dangling-else',
             '-s',
             'ASYNCIFY',
         ]
@@ -136,7 +137,7 @@ sources = Split("""
     battle.cpp  entity.cpp  menu2.cpp   pcx.cpp     sound.cpp   vclib.cpp
     control.cpp main.cpp    render.cpp  timer.cpp   vga.cpp
 
-    fs.cpp      stack.cpp   base64.cpp
+    fs.cpp      stack.cpp   base64.cpp  wasm.cpp
 """)
 sources = ['src/' + s for s in sources]
 
@@ -161,4 +162,4 @@ env.Append(
     ]
 )
 
-verge = env.Program('verge', sources + audiereSource + dumbSource)
+verge = env.Program('verge.wasm', sources + audiereSource + dumbSource)

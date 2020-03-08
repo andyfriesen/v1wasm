@@ -842,10 +842,6 @@ void CreateSaveImage(unsigned char* buf) {
     }
 }
 
-namespace verge {
-    extern IFramebuffer* plugin;
-}
-
 void SaveGame(char* fn) {
     VFILE* f;
     unsigned char cz;
@@ -875,11 +871,11 @@ void SaveGame(char* fn) {
     vclose(f);
 
     // NaCl
-    {
-        auto f = vopen(fn, "r");
-        verge::plugin->persistSave(fn, f->getData());
-        vclose(f);
-    }
+    // {
+    //     auto f = vopen(fn, "r");
+    //     verge::plugin->persistSave(fn, f->getData());
+    //     vclose(f);
+    // }
 }
 
 void startmap(char* fname) {

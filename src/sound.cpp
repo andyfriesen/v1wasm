@@ -173,7 +173,7 @@ void sound_loadsfx(const char* fname) {
     for (auto i = 0; i < numfx; ++i) {
         char filename[255];
         vscanf(f, "%s", filename);
-        verge::plugin->loadSound(filename);
+        // verge::plugin->loadSound(filename);
     }
 
     vclose(f);
@@ -208,16 +208,16 @@ namespace {
 void playsong(const std::string& songName) {
     if (songName != playingSong) {
         playingSong = songName;
-        verge::plugin->playSong(songName);
+        // verge::plugin->playSong(songName);
     }
 }
 
 void stopsound() {
-    verge::plugin->stopSound();
+    // verge::plugin->stopSound();
 }
 
 void playeffect(int efc) {
-    verge::plugin->playEffect(efc);
+    // verge::plugin->playEffect(efc);
 }
 
 /*playsound(char *fname,int rate)

@@ -27,10 +27,12 @@ void sethz(unsigned int hz) {
 void restorehz() {
 }
 
-void timer_init() {
+int timer_init() {
+    return 0;
 }
 
-void timer_close() {
+int timer_close() {
+    return 0;
 }
 
 void delay(int ms) {

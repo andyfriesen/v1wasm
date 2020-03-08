@@ -8,6 +8,8 @@
 #include <string.h>
 #include <cassert>
 #include <algorithm>
+
+#include <emscripten.h>
 #include "control.h"
 #include "render.h"
 #include "timer.h"
@@ -39,6 +41,34 @@ namespace vga {
 
 unsigned char screen[BACKBUFFER_SIZE];
 unsigned char virscr[BACKBUFFER_SIZE];
+
+EM_JS(void, webgl_initvga, (), {
+    window.vergeCanvas = document.getElementById('vergeCanvas');
+    window.vergeImageData = new ImageData(320, 200);
+    window.vergeImageArray = window.vergeImageData.data;
+});
+
+EM_JS(void, webgl_vgadump, (unsigned char* frameBuffer, size_t frameBufferSize, unsigned char* palette), {
+    const pal = HEAP8.subarray(palette, palette + 768);
+    const fb = HEAP8.subarray(frameBuffer, frameBuffer + frameBufferSize);
+
+    const stride = 0;
+
+    for (let y = 0; y < 200; ++y) {
+        for (let x = 0; x < 320; ++x) {
+            c = fb[srcIndex++];
+            const c = 0xFF000000
+                | pal[c * 3] << 16
+                | pal[c * 3 + 1] << 8
+                | pal[c * 3 + 2];
+
+            window.vergeImageArray[destIndex++] = c;
+        }
+        srcIndex += stride;
+    }
+
+    window.vergeCanvas.putImageData(window.vergeImageData, 0, 0);
+});
 
 void wait() {
     // vsync?
@@ -99,6 +129,7 @@ void set_intensity(unsigned n) {
 }
 
 void initvga() {
+    webgl_initvga();
     PreCalc_TransparencyFields();
 }
 
@@ -116,10 +147,6 @@ void vgaclear() {
 }
 
 void vgadump() {
-    if (!plugin) {
-        return;
-    }
-
     unsigned char bb[BACKBUFFER_SIZE];
     auto dest = bb;
     auto src = getScreenPointer(0, 0);
@@ -131,7 +158,7 @@ void vgadump() {
         src += BACKBUFFER_PITCH;
     }
 
-    plugin->vgadump(bb, realPalette);
+    webgl_vgadump(bb, BACKBUFFER_SIZE, realPalette);
 }
 
 void setpixel(int x, int y, char c) {
