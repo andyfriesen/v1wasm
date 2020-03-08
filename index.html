@@ -1,170 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>VERGE!</title>
-  <style>
-  body {
-      font-family: sans-serif;
-      background-color: black;
-      color: white;
-  }
-
-  #listener {
-      text-align: center;
-  }
-
-  #listener embed {
-      -webkit-transform: scale(2) translate(0, 50px);
-      transform: scale(2) translate(0, 50px);
-      z-index: 999;
-      margin: auto;
-  }
-
-  #controls {
-      position: absolute;
-      top: 0;
-      right: 0;
-      z-index: -1;
-  }
-
-  </style>
-  <script type="text/javascript">
-    V1naclModule = null;  // Global application object.
-    statusText = 'NO-STATUS';
-
-    // When the NaCl module has loaded, hook up an event listener to handle
-    // messages coming from it via PPB_Messaging.PostMessage() (in C) or
-    // pp::Instance.PostMessage() (in C++), and indicate success.
-    function moduleDidLoad() {
-        V1naclModule = document.getElementById('verge');
-        V1naclModule.addEventListener('message', handleMessage, false);
-        updateStatus('SUCCESS');
-    }
-
-    // The 'message' event handler.  This handler is fired when the NaCl module
-    // posts a message to the browser by calling PPB_Messaging.PostMessage()
-    // (in C) or pp::Instance.PostMessage() (in C++).  This implementation
-    // simply displays the content of the message in an alert panel.
-    function handleMessage(message_event) {
-        var d = message_event.data;
-
-        if (!d) {
-            console.log("Bad message data :(");
-            return;
+    <meta charset="UTF-8">
+    <title>VERGE!</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: black;
+            color: white;
         }
 
-        var s = d.split(':');
-        if (s[0] == 'clear') {
-            var index = s[1];
-            localStorage.setItem('save' + index, '');
-            return;
-        } else if (s[0] == 'append') {
-            var index = s[1];
-            var data = s[2];
-            var key = 'save' + index;
-            var newValue = localStorage.getItem(key) + data;
-            localStorage.setItem(key, newValue);
-        } else {
-            alert("Unknown message: " + d);
+        #listener {
+            text-align: center;
         }
-    }
 
-    // If the page loads before the Native Client module loads, then set the
-    // status message indicating that the module is still loading.  Otherwise,
-    // do not change the status message.
-    function pageDidLoad() {
-      if (V1naclModule == null) {
-        updateStatus('LOADING...');
-      } else {
-        // It's possible that the Native Client module onload event fired
-        // before the page's onload event.  In this case, the status message
-        // will reflect 'SUCCESS', but won't be displayed.  This call will
-        // display the current message.
-        updateStatus();
-      }
-    }
+        #listener embed {
+            -webkit-transform: scale(2) translate(0, 50px);
+            transform: scale(2) translate(0, 50px);
+            z-index: 999;
+            margin: auto;
+        }
 
-    // Set the global status message.  If the element with id 'statusField'
-    // exists, then set its HTML to the status message as well.
-    // opt_message The message test.  If this is null or undefined, then
-    // attempt to set the element with id 'statusField' to the value of
-    // |statusText|.
-    function updateStatus(opt_message) {
-      if (opt_message)
-        statusText = opt_message;
-      var statusField = document.getElementById('status_field');
-      if (statusField) {
-        statusField.innerHTML = statusText;
-      }
-    }
-  </script>
-</head>
-<body onload="pageDidLoad()">
+        #controls {
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: -1;
+        }
 
-<div id='plugin'>
-<p>
-  <!-- Load the published .nexe.  This includes the 'nacl' attribute which
-  shows how to load multi-architecture modules.  Each entry in the "nexes"
-  object in the .nmf manifest file is a key-value pair: the key is the
-  instruction set architecture ('x86-32', 'x86-64', etc.); the value is a URL
-  for the desired NaCl module.
-  To load the debug versions of your .nexes, set the 'nacl' attribute to the
-  _dbg.nmf version of the manifest file.
+    </style>
+    <script type="text/aoeuaoeuaoeua-dont-run-me-yet">
+        V1naclModule = null;    // Global application object.
+        statusText = 'NO-STATUS';
 
-  Note: Since this NaCl module does not use any real-estate in the browser,
-  it's width and height are set to 0.
+        // When the NaCl module has loaded, hook up an event listener to handle
+        // messages coming from it via PPB_Messaging.PostMessage() (in C) or
+        // pp::Instance.PostMessage() (in C++), and indicate success.
+        function moduleDidLoad() {
+            V1naclModule = document.getElementById('verge');
+            V1naclModule.addEventListener('message', handleMessage, false);
+            updateStatus('SUCCESS');
+        }
 
-  Note: The <EMBED> element is wrapped inside a <DIV>, which has a 'load'
-  event listener attached.  This wrapping method is used instead of attaching
-  the 'load' event listener directly to the <EMBED> element to ensure that the
-  listener is active before the NaCl module 'load' event fires.
-  -->
-  <div id="listener">
-    <canvas id="vergeCanvas"></canvas>
-  </div>
-</p>
-</div>
-<div id='controls'>
-<h2>Controls</h2>
-<dl>
-    <dt>Arrow keys</dt><dd>Move</dd>
-    <dt>Enter</dt><dd>Interact, select menu options</dd>
-    <dt>Tab</dt><dd>Cancel out of menus</dd>
-    <dt>Space</dt><dd>Main menu (items, equipment, etc)</dd>
-    <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
-</dl>
-</div>
-<h2>Status</h2>
-<div id="status_field">NO-STATUS</div>
+        // The 'message' event handler.  This handler is fired when the NaCl module
+        // posts a message to the browser by calling PPB_Messaging.PostMessage()
+        // (in C) or pp::Instance.PostMessage() (in C++).  This implementation
+        // simply displays the content of the message in an alert panel.
+        function handleMessage(message_event) {
+            var d = message_event.data;
 
-<script>
-   (function() {
-        var embed = document.createElement('embed');
+            if (!d) {
+                console.log("Bad message data :(");
+                return;
+            }
 
-        embed.setAttribute('id', 'verge');
-        embed.setAttribute('src', 'verge.nmf');
-        embed.setAttribute('type', 'application/x-pnacl');
-        embed.style.width = '320px';
-        embed.style.height = '200px';
-
-        embed.setAttribute('game_url', 'sots');
-        embed.setAttribute('sound', 'on');
-        pushSave(0);
-        pushSave(1);
-        pushSave(2);
-        pushSave(3);
-
-        var l = document.getElementById('listener');
-        l.appendChild(embed);
-        embed.addEventListener('load', moduleDidLoad, true);
-
-        function pushSave(index) {
-            var s = localStorage.getItem('save' + index);
-            if (s) {
-                embed.setAttribute('save' + index, s);
+            var s = d.split(':');
+            if (s[0] == 'clear') {
+                var index = s[1];
+                localStorage.setItem('save' + index, '');
+                return;
+            } else if (s[0] == 'append') {
+                var index = s[1];
+                var data = s[2];
+                var key = 'save' + index;
+                var newValue = localStorage.getItem(key) + data;
+                localStorage.setItem(key, newValue);
+            } else {
+                alert("Unknown message: " + d);
             }
         }
-    })();
-</script>
+
+        // If the page loads before the Native Client module loads, then set the
+        // status message indicating that the module is still loading.  Otherwise,
+        // do not change the status message.
+        function pageDidLoad() {
+            if (V1naclModule == null) {
+                updateStatus('LOADING...');
+            } else {
+                // It's possible that the Native Client module onload event fired
+                // before the page's onload event.  In this case, the status message
+                // will reflect 'SUCCESS', but won't be displayed.  This call will
+                // display the current message.
+                updateStatus();
+            }
+        }
+
+        // Set the global status message.  If the element with id 'statusField'
+        // exists, then set its HTML to the status message as well.
+        // opt_message The message test.  If this is null or undefined, then
+        // attempt to set the element with id 'statusField' to the value of
+        // |statusText|.
+        function updateStatus(opt_message) {
+            if (opt_message)
+            statusText = opt_message;
+            var statusField = document.getElementById('status_field');
+            if (statusField) {
+                statusField.innerHTML = statusText;
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <canvas id="vergeCanvas" width="320" height="200"></canvas>
+    <div id='controls'>
+        <h2>Controls</h2>
+        <dl>
+            <dt>Arrow keys</dt><dd>Move</dd>
+            <dt>Enter</dt><dd>Interact, select menu options</dd>
+            <dt>Tab</dt><dd>Cancel out of menus</dd>
+            <dt>Space</dt><dd>Main menu (items, equipment, etc)</dd>
+            <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
+        </dl>
+    </div>
+    <script async type="text/javascript" src="verge.out.js"></script>
 </body>
 </html>

@@ -64,7 +64,7 @@ namespace verge {
     void registerInputEventHandlers() {
         EMSCRIPTEN_RESULT result;
         result = emscripten_set_keydown_callback(
-            "vergeCanvas",
+            "#vergeCanvas",
             nullptr,
             true,
             &onKeyDown
@@ -72,7 +72,7 @@ namespace verge {
         // TEST_RESULT(result);
 
         result = emscripten_set_keyup_callback(
-            "vergeCanvas",
+            "#vergeCanvas",
             nullptr,
             true,
             &onKeyUp
