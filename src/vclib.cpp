@@ -1024,12 +1024,12 @@ drawloop:
     readcontrols();
 
     if (first == 2) if (b2 || b3) {
-            goto drawloop;
-        } else {
-            an = 0;
-            setTimerCount(0);
-            return;
-        }
+        goto drawloop;
+    } else {
+        an = 0;
+        setTimerCount(0);
+        return;
+    }
     if (first && !b1 && !b3 && !down && !up) {
         first = 0;
     } else if (first) {

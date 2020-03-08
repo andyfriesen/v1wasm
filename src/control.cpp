@@ -4,7 +4,6 @@
 
 #include <map>
 #include <stdio.h>
-#include "nacl.h"
 #include "main.h"
 #include "keyboard.h"
 

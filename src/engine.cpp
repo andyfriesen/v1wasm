@@ -16,7 +16,6 @@
 #include "timer.h"
 #include "ricvc.h"
 #include "vga.h"
-#include "nacl.h"
 
 using namespace verge;
 

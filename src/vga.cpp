@@ -8,9 +8,6 @@
 #include <string.h>
 #include <cassert>
 #include <algorithm>
-#include "ppapi/cpp/graphics_2d.h"
-#include "ppapi/cpp/image_data.h"
-#include "ppapi/cpp/completion_callback.h"
 #include "control.h"
 #include "render.h"
 #include "timer.h"
@@ -18,7 +15,6 @@
 #include "vga.h"
 #include "main.h"
 #include "fs.h"
-#include "nacl.h"
 
 using namespace verge;
 
@@ -464,7 +460,7 @@ mainloop:
     }
 }
 
-void VCprintstring(int xx, int yy, char* str) {
+void VCprintstring(int xx, int yy, const char* str) {
     int i;
     char c;
 

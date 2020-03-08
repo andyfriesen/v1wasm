@@ -9,12 +9,10 @@
 #include "keyboard.h"
 #include "engine.h"
 #include "control.h"
-#include "ppapi/cpp/instance.h"
 #include "sound.h"
 #include "timer.h"
 #include "render.h"
 #include "fs.h"
-#include "nacl.h"
 
 using namespace verge;
 
@@ -163,7 +161,7 @@ parseloop:
 
 int lastvol;
 
-void sound_loadsfx(char* fname) {
+void sound_loadsfx(const char* fname) {
     VFILE* f = vopen(fname, "r");
     if (!f) {
         err("Could not open sound effect index file.");
