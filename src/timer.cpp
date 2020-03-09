@@ -30,16 +30,15 @@ void restorehz() {
 }
 
 EM_JS(void, wasm_initTimer, (unsigned int* count), {
-    window.vergeStartTime = Date.now();
     function incr() {
-        HEAP32[count >> 2] = (Date.now() - vergeStartTime) / 10;
-        window.vergeRaf = requestAnimationFrame(incr);
+        HEAP32[count >> 2]++;
     }
-    window.vergeRaf = requestAnimationFrame(incr);
+    window.vergeTimer = setInterval(incr, 10);
 });
 
 EM_JS(void, wasm_closeTimer, (), {
-    cancelAnimationFrame(window.vergeRaf);
+    cancelTimer(window.vergeTimer);
+    window.vergeTimer = null;
 });
 
 namespace {
@@ -97,7 +96,7 @@ void decTimerCount() {
 }
 
 int getTimerCount() {
-    return time();
+    return timer_count;
 }
 
 int getVcTimer() {

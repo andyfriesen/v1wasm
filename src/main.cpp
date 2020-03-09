@@ -611,6 +611,7 @@ drawloop:
     vgadump();
     while ((down) || (up)) {
         readcontrols();
+        wait();
     }
 
 inputloop:
@@ -632,6 +633,8 @@ inputloop:
         playeffect(0);
         goto drawloop;
     }
+
+    wait();
 
     if (!b1) {
         goto inputloop;

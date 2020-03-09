@@ -1,6 +1,7 @@
 
 #pragma once
 
+void wait();
 void initvga();
 void closevga();
 void quick_killgfx();
