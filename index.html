@@ -28,6 +28,10 @@
             z-index: -1;
         }
 
+        canvas {
+            background-color: green;
+        }
+
     </style>
     <script type="text/aoeuaoeuaoeua-dont-run-me-yet">
         V1naclModule = null;    // Global application object.
@@ -118,6 +122,22 @@
             const ctx = document.getElementById('vergeCanvas').getContext('2d');
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, 320, 200);
+
+            ctx.fillStyle = 'black';
+            ctx.fillText('Loading! :D', 100, 100);
+
+
+            // const imageData = new ImageData(320, 200);
+            // const imageArray = imageData.data;
+
+            // for (let x = 0; x < 256; ++x) {
+            //     for (let y = 0; y < 200; ++y) {
+            //         const i = (y * 320 + x) * 4;
+            //         imageArray[i] = x;
+            //         imageArray[i + 3] = 0xFF;
+            //     }
+            // }
+            // ctx.putImageData(imageData, 0, 0);
         })();
     </script>
     <script async type="text/javascript" src="verge.out.js"></script>

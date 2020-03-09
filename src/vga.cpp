@@ -46,26 +46,26 @@ EM_JS(void, wasm_initvga, (), {
     window.vergeCanvas = document.getElementById('vergeCanvas');
     window.vergeContext = window.vergeCanvas.getContext('2d');
     window.vergeImageData = new ImageData(320, 200);
-    window.vergeImageArray = new Uint32Array(window.vergeImageData.data);
+    window.vergeImageArray = window.vergeImageData.data;
 });
 
 EM_JS(void, wasm_vgadump, (unsigned char* frameBuffer, size_t frameBufferSize, unsigned char* palette), {
-    const pal = HEAP8.subarray(palette, palette + 768);
-    const fb = HEAP8.subarray(frameBuffer, frameBuffer + frameBufferSize);
+    const pal = HEAPU8.subarray(palette, palette + 768);
+    const fb = HEAPU8.subarray(frameBuffer, frameBuffer + frameBufferSize);
 
     const stride = 0;
     let srcIndex = 0;
     let destIndex = 0;
 
+    const ia = window.vergeImageArray;
+
     for (let y = 0; y < 200; ++y) {
         for (let x = 0; x < 320; ++x) {
             let c = fb[srcIndex++];
-            c = 0xFF000000
-                | pal[c * 3] << 16
-                | pal[c * 3 + 1] << 8
-                | pal[c * 3 + 2];
-
-            window.vergeImageArray[destIndex++] = c;
+            ia[destIndex++] = pal[c * 3];
+            ia[destIndex++] = pal[c * 3 + 1];
+            ia[destIndex++] = pal[c * 3 + 2];
+            ia[destIndex++] = 0xFF;
         }
         srcIndex += stride;
     }
