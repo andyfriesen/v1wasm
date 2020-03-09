@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <emscripten.h>
+#include <emscripten/fetch.h>
 #include "control.h"
 #include "engine.h"
 #include "keyboard.h"
@@ -29,7 +31,110 @@ extern char fade;
 
 extern unsigned int effectofstbl[1024], startupofstbl[1024], magicofstbl[1024];
 
-int Exist(char* fname) {
+namespace verge {
+    const std::string gameRoot = "sully/";
+    std::vector<std::string> manifest;
+
+    void preload(std::string_view);
+
+    void downloadGameAssets(std::string_view content) {
+        auto append = [&](std::string_view name) {
+            if (!name.empty()) {
+                manifest.push_back(std::string{name});
+            }
+        };
+
+        while (!content.empty()) {
+            auto pos = content.find('\n');
+            if (pos == std::string::npos) {
+                append(content);
+                break;
+            }
+            content.remove_prefix(pos + 1);
+        }
+    }
+
+    EM_JS(void, fetchSync, (const char* pathPtr, size_t* size, char** data), {
+        return Asyncify.handleSleep(resume => {
+            const path = UTF8ToString(pathPtr);
+            console.log('fetchSync', path);
+            return fetch(path).then(response => {
+                if (!response.ok) {
+                    console.error('fetchSync failed', path);
+                    HEAP32[size >> 2] = 0;
+                    HEAP32[data >> 2] = 0;
+                    resume();
+                    return;
+                }
+                return response.blob();
+            }).then(blob =>
+                blob.arrayBuffer()
+            ).then(array => {
+                const bytes = new Uint8Array(array);
+                HEAP32[size >> 2] = bytes.length;
+                const dataPtr = _malloc(bytes.length);
+                HEAP32[data >> 2] = dataPtr;
+                HEAP8.set(bytes, dataPtr);
+                resume();
+            });
+        });
+    });
+
+    struct FreeDelete { void operator()(char* p) { free(p); } };
+    using Deleter = std::unique_ptr<char, FreeDelete>;
+
+    void downloadGame() {
+        printf("downloadGame\n");
+        std::string manifestPath = gameRoot + "manifest.txt";
+        char* manifestPtr;
+        size_t manifestLength;
+        fetchSync(manifestPath.c_str(), &manifestLength, &manifestPtr);
+        Deleter hello{ manifestPtr };
+
+        std::string_view manifest{ manifestPtr, manifestLength };
+
+        printf("Manifest size is %zi\n", manifest.size());
+        printf("FIREHOSE %.*s\n", int(manifest.size()), manifest.data());
+
+        std::vector<std::string_view> files;
+        auto append = [&](std::string_view name) {
+            if (!name.empty())
+                files.push_back(name);
+        };
+
+        while (!manifest.empty()) {
+            auto pos = manifest.find('\n');
+            if (pos == std::string::npos) {
+                append(manifest);
+                break;
+            }
+            append(manifest.substr(0, pos));
+            manifest.remove_prefix(pos + 1);
+        }
+
+        for (const auto& filename: files) {
+            preload(filename);
+        }
+        printf("downloadGame complete\n");
+    }
+
+    void preload(std::string_view path) {
+        std::string filename = gameRoot;
+        filename.append(path.begin(), path.end());
+
+        size_t contentLength;
+        char* content;
+        fetchSync(filename.c_str(), &contentLength, &content);
+        Deleter hello{ content };
+
+        verge::DataVec vec(content, content + contentLength);
+
+        printf("Preloaded '%s' %zi bytes\n", filename.c_str(), vec.size());
+        verge::vset(filename, std::move(vec));
+    }
+}
+
+int Exist(const char* fname) {
     VFILE* tempf;
 
     tempf = vopen(fname, "rb");
@@ -556,6 +661,8 @@ fadeloop:
 }
 
 int main() {
+    verge::downloadGame();
+
     MiscSetup();
     PutOwnerText();
     initvga();

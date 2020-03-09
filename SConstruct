@@ -41,17 +41,24 @@ def EmscriptenEnvironment():
         ]
     )
 
-    env.Append(CFLAGS=[
-            '-O3',
+    env.Append(CXXFLAGS=[
+            '-O1', '-g',
+            # '-O3',
+
             '-MMD',
+            '-Wno-parentheses',
             '-Wno-long-long',
             '-Wno-dangling-else',
-            '-s',
-            'ASYNCIFY',
-
-            '-g',
         ]
     )
+
+    env.Append(LINKFLAGS=[
+        '-g4', '--source-map-base', 'http://localhost:8000/',
+
+        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync"]\'',
+        '-s', 'ASYNCIFY',
+        '-s', 'FETCH=1',
+    ])
 
     # env.Append(LIBS=[
     #         'ppapi',
@@ -139,7 +146,7 @@ sources = Split("""
     battle.cpp  entity.cpp  menu2.cpp   pcx.cpp     sound.cpp   vclib.cpp
     control.cpp main.cpp    render.cpp  timer.cpp   vga.cpp
 
-    fs.cpp      stack.cpp   base64.cpp  wasm.cpp
+    fs.cpp      stack.cpp   base64.cpp
 """)
 sources = ['src/' + s for s in sources]
 
@@ -164,4 +171,4 @@ env.Append(
     ]
 )
 
-verge = env.Program('verge.out.js', sources + audiereSource + dumbSource)
+verge = env.Program('verge.out.js', sources + audiereSource)# + dumbSource)
