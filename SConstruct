@@ -55,7 +55,7 @@ def EmscriptenEnvironment():
     env.Append(LINKFLAGS=[
         '-g4', '--source-map-base', 'http://localhost:8000/',
 
-        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync"]\'',
+        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","wasm_vgadump"]\'',
         '-s', 'ASYNCIFY',
         '-s', 'FETCH=1',
     ])

@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 
+#include <emscripten.h>
+
 #include "engine.h" // for valloc()
 
 #define PIT0 0x40
@@ -27,20 +29,35 @@ void sethz(unsigned int hz) {
 void restorehz() {
 }
 
+EM_JS(void, wasm_initTimer, (unsigned int* count), {
+    window.vergeStartTime = Date.now();
+    function incr() {
+        HEAP32[count >> 2] = (Date.now() - vergeStartTime) / 10;
+        window.vergeRaf = requestAnimationFrame(incr);
+    }
+    window.vergeRaf = requestAnimationFrame(incr);
+});
+
+EM_JS(void, wasm_closeTimer, (), {
+    cancelAnimationFrame(window.vergeRaf);
+});
+
+namespace {
+    unsigned int timer_count = 0;
+    int vc_timer;
+}
+
 int timer_init() {
+    wasm_initTimer(&timer_count);
     return 0;
 }
 
 int timer_close() {
+    wasm_closeTimer();
     return 0;
 }
 
 void delay(int ms) {
-}
-
-namespace {
-    volatile unsigned int timer_count = 0;
-    volatile int vc_timer;
 }
 
 int time() {

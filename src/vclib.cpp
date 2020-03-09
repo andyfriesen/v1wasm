@@ -370,6 +370,7 @@ void FadeIn() {
     int t = 0;
     while (t < s) {
         t = getTimerCount() - startTime;
+        printf("FadeIn %d %d %d\n", startTime, t, s);
         int i = (t * 64) / s;
         set_intensity(i);
     }

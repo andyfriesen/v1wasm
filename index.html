@@ -113,6 +113,13 @@
             <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
         </dl>
     </div>
+    <script>
+        (function() {
+            const ctx = document.getElementById('vergeCanvas').getContext('2d');
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, 320, 200);
+        })();
+    </script>
     <script async type="text/javascript" src="verge.out.js"></script>
 </body>
 </html>

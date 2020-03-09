@@ -42,32 +42,38 @@ namespace vga {
 unsigned char screen[BACKBUFFER_SIZE];
 unsigned char virscr[BACKBUFFER_SIZE];
 
-EM_JS(void, webgl_initvga, (), {
+EM_JS(void, wasm_initvga, (), {
     window.vergeCanvas = document.getElementById('vergeCanvas');
+    window.vergeContext = window.vergeCanvas.getContext('2d');
     window.vergeImageData = new ImageData(320, 200);
-    window.vergeImageArray = window.vergeImageData.data;
+    window.vergeImageArray = new Uint32Array(window.vergeImageData.data);
 });
 
-EM_JS(void, webgl_vgadump, (unsigned char* frameBuffer, size_t frameBufferSize, unsigned char* palette), {
-    const pal = HEAP8.subarray(palette, palette + 768);
-    const fb = HEAP8.subarray(frameBuffer, frameBuffer + frameBufferSize);
+EM_JS(void, wasm_vgadump, (unsigned char* frameBuffer, size_t frameBufferSize, unsigned char* palette), {
+    return Asyncify.handleSleep(resume => {
+        const pal = HEAP8.subarray(palette, palette + 768);
+        const fb = HEAP8.subarray(frameBuffer, frameBuffer + frameBufferSize);
 
-    const stride = 0;
+        const stride = 0;
+        let srcIndex = 0;
+        let destIndex = 0;
 
-    for (let y = 0; y < 200; ++y) {
-        for (let x = 0; x < 320; ++x) {
-            c = fb[srcIndex++];
-            const c = 0xFF000000
-                | pal[c * 3] << 16
-                | pal[c * 3 + 1] << 8
-                | pal[c * 3 + 2];
+        for (let y = 0; y < 200; ++y) {
+            for (let x = 0; x < 320; ++x) {
+                let c = fb[srcIndex++];
+                c = 0xFF000000
+                    | pal[c * 3] << 16
+                    | pal[c * 3 + 1] << 8
+                    | pal[c * 3 + 2];
 
-            window.vergeImageArray[destIndex++] = c;
+                window.vergeImageArray[destIndex++] = c;
+            }
+            srcIndex += stride;
         }
-        srcIndex += stride;
-    }
 
-    window.vergeCanvas.putImageData(window.vergeImageData, 0, 0);
+        window.vergeContext.putImageData(window.vergeImageData, 0, 0);
+        requestAnimationFrame(resume);
+    });
 });
 
 void wait() {
@@ -129,7 +135,7 @@ void set_intensity(unsigned n) {
 }
 
 void initvga() {
-    webgl_initvga();
+    wasm_initvga();
     PreCalc_TransparencyFields();
 }
 
@@ -158,7 +164,7 @@ void vgadump() {
         src += BACKBUFFER_PITCH;
     }
 
-    webgl_vgadump(bb, BACKBUFFER_SIZE, realPalette);
+    wasm_vgadump(bb, BACKBUFFER_SIZE, realPalette);
 }
 
 void setpixel(int x, int y, char c) {

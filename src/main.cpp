@@ -93,9 +93,6 @@ namespace verge {
 
         std::string_view manifest{ manifestPtr, manifestLength };
 
-        printf("Manifest size is %zi\n", manifest.size());
-        printf("FIREHOSE %.*s\n", int(manifest.size()), manifest.data());
-
         std::vector<std::string_view> files;
         auto append = [&](std::string_view name) {
             if (!name.empty())
@@ -130,7 +127,7 @@ namespace verge {
         verge::DataVec vec(content, content + contentLength);
 
         printf("Preloaded '%s' %zi bytes\n", filename.c_str(), vec.size());
-        verge::vset(filename, std::move(vec));
+        verge::vset(std::string{ path }, std::move(vec));
     }
 }
 
