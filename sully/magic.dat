@@ -1,0 +1,25 @@
+5
+Cure_1 0 Cures_20_to_50_HP  2 1 1 1 1 0 5 60
+Fire_1 1 Fire_Attack  2 2 1 1 2 0 3 80
+Ice_1 2 Ice_Attack   2 3 1 1 3 0 3 80
+Lit_1 3 Lightning_Attack   2 4 1 1 4 0 3 80  
+Warp 4 Warps_to_Town  2 5 1 1 5 0 4 130
+
+Item_Name <#icon> Item_Description <use> <useeffect> <type> <equipflag> <equipidx> <mp cost> <price>
+
+<use>: 2 for usable an infinite number of times.
+       4 for usable ONLY camped, infinitely
+       6 for usable in combat only, indefinetly.
+<useeffect>: an index to MAGIC.VC
+<type>: one of the following
+        0 for OS. (Own Self)
+        1 for 1A. (One Ally)
+        2 for AA. (All Allies)
+        3 for 1E. (One Enemy)
+        4 for AE. (All Enemy)
+<equipflag>: This is vestigal data.                                                                      
+<equipidx> is a pointer to MAGICEQ.DAT when necessary.
+<mp cost>: This is the cost in mp for the spell
+<price>: This is the cost in stores for the spell
+
+
