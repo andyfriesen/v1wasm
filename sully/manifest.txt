@@ -106,7 +106,6 @@ pop01.pcx
 pop02.pcx
 pop03.pcx
 quake.wav
-readme.txt
 sara.chr
 sara.cr2
 sara.dat
@@ -145,8 +144,6 @@ verge.faq
 verge.pal
 verge1.pcx
 verge320.pcx
-vergec.txt
-vergedoc.txt
 village.map
 village.vc
 vorn.chr
