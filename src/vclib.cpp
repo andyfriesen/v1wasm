@@ -5,6 +5,7 @@
 #include <cassert>
 #include <stdlib.h>
 #include <string.h>
+#include <emscripten.h>
 #include "entity.h"
 #include "engine.h"
 #include "vc.h"
@@ -370,7 +371,6 @@ void FadeIn() {
     int t = 0;
     while (t < s) {
         t = getTimerCount() - startTime;
-        printf("FadeIn %d %d %d\n", startTime, t, s);
         int i = (t * 64) / s;
         set_intensity(i);
     }
@@ -1268,13 +1268,7 @@ void NewGame() {
 
 void Delay() {
     auto s = ResolveOperand();
-    auto finishTime = getTimerCount() + s;
-    while (getTimerCount() < finishTime)
-        if ((keyboard_map[SCAN_ALT]) &&
-                (keyboard_map[SCAN_CTRL]) &&
-                (keyboard_map[SCAN_DEL])) {
-            err("Exiting: CTRL-ALT-DEL pressed.");
-        }
+    emscripten_sleep(s * 10);
 }
 
 void GetNextMove() {

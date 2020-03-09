@@ -57,7 +57,7 @@ namespace verge {
     EM_JS(void, fetchSync, (const char* pathPtr, size_t* size, char** data), {
         return Asyncify.handleSleep(resume => {
             const path = UTF8ToString(pathPtr);
-            console.log('fetchSync', path);
+            // console.log('fetchSync', path);
             return fetch(path).then(response => {
                 if (!response.ok) {
                     console.error('fetchSync failed', path);
@@ -126,7 +126,7 @@ namespace verge {
 
         verge::DataVec vec(content, content + contentLength);
 
-        printf("Preloaded '%s' %zi bytes\n", filename.c_str(), vec.size());
+        // printf("Preloaded '%s' %zi bytes\n", filename.c_str(), vec.size());
         verge::vset(std::string{ path }, std::move(vec));
     }
 }

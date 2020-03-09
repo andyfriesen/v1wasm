@@ -50,34 +50,35 @@ EM_JS(void, wasm_initvga, (), {
 });
 
 EM_JS(void, wasm_vgadump, (unsigned char* frameBuffer, size_t frameBufferSize, unsigned char* palette), {
-    return Asyncify.handleSleep(resume => {
-        const pal = HEAP8.subarray(palette, palette + 768);
-        const fb = HEAP8.subarray(frameBuffer, frameBuffer + frameBufferSize);
+    const pal = HEAP8.subarray(palette, palette + 768);
+    const fb = HEAP8.subarray(frameBuffer, frameBuffer + frameBufferSize);
 
-        const stride = 0;
-        let srcIndex = 0;
-        let destIndex = 0;
+    const stride = 0;
+    let srcIndex = 0;
+    let destIndex = 0;
 
-        for (let y = 0; y < 200; ++y) {
-            for (let x = 0; x < 320; ++x) {
-                let c = fb[srcIndex++];
-                c = 0xFF000000
-                    | pal[c * 3] << 16
-                    | pal[c * 3 + 1] << 8
-                    | pal[c * 3 + 2];
+    for (let y = 0; y < 200; ++y) {
+        for (let x = 0; x < 320; ++x) {
+            let c = fb[srcIndex++];
+            c = 0xFF000000
+                | pal[c * 3] << 16
+                | pal[c * 3 + 1] << 8
+                | pal[c * 3 + 2];
 
-                window.vergeImageArray[destIndex++] = c;
-            }
-            srcIndex += stride;
+            window.vergeImageArray[destIndex++] = c;
         }
+        srcIndex += stride;
+    }
 
-        window.vergeContext.putImageData(window.vergeImageData, 0, 0);
-        requestAnimationFrame(resume);
-    });
+    window.vergeContext.putImageData(window.vergeImageData, 0, 0);
+});
+
+EM_JS(void, wasm_nextFrame, (), {
+    return Asyncify.handleSleep(requestAnimationFrame);
 });
 
 void wait() {
-    // vsync?
+    wasm_nextFrame();
 }
 
 void dump_palette(unsigned char* palette) {
@@ -165,6 +166,7 @@ void vgadump() {
     }
 
     wasm_vgadump(bb, BACKBUFFER_SIZE, realPalette);
+    wasm_nextFrame();
 }
 
 void setpixel(int x, int y, char c) {
