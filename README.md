@@ -1,15 +1,15 @@
 # VERGE
 
-This is a PNaCl port of version 1 of Vecna's VERGE engine.
+This is a WASM port of version 1 of Vecna's VERGE engine.
 
-I chose it as a guinea pig to play with NaCl development because it's sophisticated enough to prove some kind of challenge without being huge and unweildly.
+I chose it as a guinea pig to play with ~NaCl~ WASM development because it's sophisticated enough to prove some kind of challenge without being huge and unweildly.
 
 # Compiling
 
-FIXME FIXME
+Install SCons and Emscripten.
 
-Install SCons and the PNaCl SDK.
+```bash
+$ scons
+```
 
-Hack build.scons so that it knows where your SDK is.
-
-scons --file=build.scons
+Then run an HTTP server rooted the root of this repository and load index.html in a browser.
