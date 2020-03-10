@@ -58,6 +58,9 @@ def EmscriptenEnvironment():
         '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","wasm_nextFrame","emscripten_sleep"]\'',
         '-s', 'ASYNCIFY',
         '-s', 'FETCH=1',
+        '-s', 'FORCE_FILESYSTEM=1',
+
+        '-lidbfs.js',
     ])
 
     # env.Append(LIBS=[

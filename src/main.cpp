@@ -34,25 +34,9 @@ extern unsigned int effectofstbl[1024], startupofstbl[1024], magicofstbl[1024];
 namespace verge {
     const std::string gameRoot = "sully/";
     std::vector<std::string> manifest;
+    std::string saveGameRoot;
 
     void preload(std::string_view);
-
-    void downloadGameAssets(std::string_view content) {
-        auto append = [&](std::string_view name) {
-            if (!name.empty()) {
-                manifest.push_back(std::string{name});
-            }
-        };
-
-        while (!content.empty()) {
-            auto pos = content.find('\n');
-            if (pos == std::string::npos) {
-                append(content);
-                break;
-            }
-            content.remove_prefix(pos + 1);
-        }
-    }
 
     EM_JS(void, fetchSync, (const char* pathPtr, size_t* size, char** data), {
         return Asyncify.handleSleep(resume => {
@@ -128,6 +112,28 @@ namespace verge {
 
         // printf("Preloaded '%s' %zi bytes\n", filename.c_str(), vec.size());
         verge::vset(std::string{ path }, std::move(vec));
+    }
+
+    EM_JS(void, wasm_initFileSystem, (const char* c), {
+        let sgr = UTF8ToString(c);
+        if (sgr.endsWith('/'))
+            sgr = sgr.substr(0, sgr.length - 1);
+        FS.mkdir("/persist");
+        FS.mkdir(sgr);
+        // Then mount with IDBFS type
+        FS.mount(IDBFS, {}, sgr);
+
+        // Then sync
+        FS.syncfs(true, function (err) {
+            // Error
+            if (err)
+                console.error('wasm_initFileSystem failed!', err);
+        });
+    });
+
+    void initFileSystem() {
+        saveGameRoot = "/persist/" + gameRoot;
+        wasm_initFileSystem(saveGameRoot.c_str());
     }
 }
 
@@ -269,7 +275,6 @@ void StartNewGame(char* startp) {
 }
 
 void LoadGame(char* fn) {
-    VFILE* f;
     char i, b;
 
     quake = 0;
@@ -286,22 +291,24 @@ void LoadGame(char* fn) {
     drawentities = 1;
     cameratracking = 1;
     numchars = 0;
-    f = vopen(fn, "rb");
-    vread(strbuf, 1, 51, f);
-    vread(&gp, 1, 4, f);
-    vread(&hr, 1, 1, f);
-    vread(&min, 1, 1, f);
-    vread(&sec, 1, 1, f);
-    vread(&b, 1, 1, f);
-    vread(&menuactive, 1, 1, f);
-    vread(virscr, 1, 2560, f);
-    vread(&mapname, 1, 13, f);
-    vread(&party, 1, sizeof party, f);
-    vread(&partyidx, 1, 5, f);
-    vread(&flags, 1, 32000, f);
-    vread(&tchars, 1, 1, f);
-    vread(&pstats, 1, sizeof pstats, f);
-    vclose(f);
+
+    std::string realPath = verge::saveGameRoot + fn;
+    FILE* f = fopen(realPath.c_str(), "rb");
+    fread(strbuf, 1, 51, f);
+    fread(&gp, 1, 4, f);
+    fread(&hr, 1, 1, f);
+    fread(&min, 1, 1, f);
+    fread(&sec, 1, 1, f);
+    fread(&b, 1, 1, f);
+    fread(&menuactive, 1, 1, f);
+    fread(virscr, 1, 2560, f);
+    fread(&mapname, 1, 13, f);
+    fread(&party, 1, sizeof party, f);
+    fread(&partyidx, 1, 5, f);
+    fread(&flags, 1, 32000, f);
+    fread(&tchars, 1, 1, f);
+    fread(&pstats, 1, sizeof pstats, f);
+    fclose(f);
     for (i = 0; i < b; i++) {
         addcharacter(partyidx[i]);
     }
@@ -662,6 +669,7 @@ fadeloop:
 
 int main() {
     verge::downloadGame();
+    verge::initFileSystem();
 
     MiscSetup();
     PutOwnerText();

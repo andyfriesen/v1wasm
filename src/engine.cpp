@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <emscripten.h>
 #include "control.h"
 #include "entity.h"
 #include "engine.h"
@@ -842,33 +843,49 @@ void CreateSaveImage(unsigned char* buf) {
     }
 }
 
+namespace verge {
+    extern std::string saveGameRoot; // main.cpp
+}
+
 void SaveGame(char* fn) {
-    VFILE* f;
+    FILE* f;
     unsigned char cz;
     unsigned char temp[2560];
 
-    f = vopen(fn, "wb");
+    std::string realPath = verge::saveGameRoot + fn;
+    f = fopen(realPath.c_str(), "wb");
     cz = mapp[(((party[0].y / 16) * xsize) + (party[0].x / 16))] >> 1;
-    vwrite(&zone[cz].savedesc, 1, 30, f);
+    fwrite(&zone[cz].savedesc, 1, 30, f);
     cz = partyidx[0] - 1;
-    vwrite(&pstats[cz].name, 1, 9, f);
-    vwrite(&pstats[cz].lv, 1, 4, f);
-    vwrite(&pstats[cz].curhp, 1, 8, f);
-    vwrite(&gp, 1, 4, f);
-    vwrite(&hr, 1, 1, f);
-    vwrite(&min, 1, 1, f);
-    vwrite(&sec, 1, 1, f);
-    vwrite(&numchars, 1, 1, f);
-    vwrite(&menuactive, 1, 1, f);
+    fwrite(&pstats[cz].name, 1, 9, f);
+    fwrite(&pstats[cz].lv, 1, 4, f);
+    fwrite(&pstats[cz].curhp, 1, 8, f);
+    fwrite(&gp, 1, 4, f);
+    fwrite(&hr, 1, 1, f);
+    fwrite(&min, 1, 1, f);
+    fwrite(&sec, 1, 1, f);
+    fwrite(&numchars, 1, 1, f);
+    fwrite(&menuactive, 1, 1, f);
     CreateSaveImage((unsigned char*)&temp);
-    vwrite(&temp, 1, 2560, f);
-    vwrite(&mapname, 1, 13, f);
-    vwrite(&party, 1, sizeof party, f);
-    vwrite(&partyidx, 1, 5, f);
-    vwrite(&flags, 1, 32000, f);
-    vwrite(&tchars, 1, 1, f);
-    vwrite(&pstats, 1, sizeof pstats, f);
-    vclose(f);
+    fwrite(&temp, 1, 2560, f);
+    fwrite(&mapname, 1, 13, f);
+    fwrite(&party, 1, sizeof party, f);
+    fwrite(&partyidx, 1, 5, f);
+    fwrite(&flags, 1, 32000, f);
+    fwrite(&tchars, 1, 1, f);
+    fwrite(&pstats, 1, sizeof pstats, f);
+    fclose(f);
+
+    // WASM
+    {
+        EM_ASM(
+            FS.syncfs(false, err => {
+                if (err) {
+                    console.error("SaveGame failed!!", err);
+                }
+            });
+        );
+    }
 
     // NaCl
     // {

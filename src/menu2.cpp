@@ -25,8 +25,7 @@ char sg1[] = "SAVEDAT.000";
 char sg2[] = "SAVEDAT.001";
 char sg3[] = "SAVEDAT.002";
 char sg4[] = "SAVEDAT.003";
-char* savename[] =
-{ sg1, sg2, sg3, sg4 };
+char* savename[] = { sg1, sg2, sg3, sg4 };
 
 struct menu {
     unsigned short int posx, posy;
@@ -103,13 +102,16 @@ parseloop:
 
 }
 
+namespace verge {
+    extern std::string saveGameRoot; // main.cpp
+}
+
 void LoadSaveErase(char mode)
 // The Save Game / Load Game / Erase Game menu interface. Since the three
 // functions are almost identical in their interface, I crammed them all
 // into one function, using the Mode variable to specify the intent.
 // MODE: 0=Load Game, 1=Save Game, 2=Erase Game
 {
-    VFILE* f;
     int i, j, r = 0;
     unsigned char tbuf[2560], buf1[2560], buf2[2560], buf3[2560], buf4[2560];
     unsigned char rbuf[256];
@@ -122,39 +124,40 @@ redraw:
     drawStuff(mode);
 
     for (i = 0; i < 4; i++) {
-        f = vopen(savename[i], "r");
+        std::string savePath = verge::saveGameRoot + savename[i];
+        FILE* f = fopen(savePath.c_str(), "r");
         if (!f) {
             gotoxy(menus[i].posx + 100, menus[i].posy + 10);
             menus[i].linktype = 0;
             printstring("- NOT USED -");
         } else {
             menus[i].linktype = 1;
-            vread(strbuf, 1, 30, f);
+            fread(strbuf, 1, 30, f);
             gotoxy(menus[i].posx + 90, menus[i].posy + 1);
             printstring(strbuf);
-            vread(strbuf, 1, 9, f);
+            fread(strbuf, 1, 9, f);
             gotoxy(menus[i].posx + 90, menus[i].posy + 11);
             printstring(strbuf);
-            vread(&j, 1, 4, f);
+            fread(&j, 1, 4, f);
             dec_to_asciiz(j, strbuf);
             gotoxy(menus[i].posx + 162, menus[i].posy + 11);
             printstring("LV ");
             printstring(strbuf);
-            vread(&j, 1, 4, f);
+            fread(&j, 1, 4, f);
             gotoxy(menus[i].posx + 230, menus[i].posy + 11);
             dec_to_asciiz(j, strbuf);
             printstring(strbuf);
             printstring("/");
-            vread(&j, 1, 4, f);
+            fread(&j, 1, 4, f);
             dec_to_asciiz(j, strbuf);
             printstring(strbuf);
-            vread(&j, 1, 4, f);
+            fread(&j, 1, 4, f);
             gotoxy(menus[i].posx + 90, menus[i].posy + 21);
             dec_to_asciiz(j, strbuf);
             printstring(strbuf);
             printstring(" G");
             char b;
-            vread(&b, 1, 1, f);
+            fread(&b, 1, 1, f);
             gotoxy(menus[i].posx + 162, menus[i].posy + 21);
             dec_to_asciiz(b, strbuf);
             if (b < 10) {
@@ -162,14 +165,14 @@ redraw:
             }
             printstring(strbuf);
             printstring(":");
-            vread(&b, 1, 1, f);
+            fread(&b, 1, 1, f);
             dec_to_asciiz(b, strbuf);
             if (b < 10) {
                 printstring("0");
             }
             printstring(strbuf);
-            vread(&b, 1, 2, f);
-            vread(&j, 1, 1, f);
+            fread(&b, 1, 2, f);
+            fread(&j, 1, 1, f);
             if (!i) {
                 img = buf1;
             }
@@ -182,7 +185,7 @@ redraw:
             if (i == 3) {
                 img = buf4;
             }
-            vread(img, 1, 2560, f);
+            fread(img, 1, 2560, f);
             greyscale(80, 32, (unsigned char*)img, &tbuf[0]);
 
             tcopysprite(menus[i].posx, menus[i].posy, 16, 32, tbuf);
@@ -190,7 +193,7 @@ redraw:
             tcopysprite(menus[i].posx + 32, menus[i].posy, 16, 32, tbuf + 1024);
             tcopysprite(menus[i].posx + 48, menus[i].posy, 16, 32, tbuf + 1536);
             tcopysprite(menus[i].posx + 64, menus[i].posy, 16, 32, tbuf + 2048);
-            vclose(f);
+            fclose(f);
         }
     }
 
