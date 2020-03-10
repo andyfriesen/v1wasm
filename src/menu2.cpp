@@ -47,26 +47,13 @@ void greyscale(int width, int height, unsigned char* src, unsigned char* dest) {
     }
 }
 
-void LoadSaveErase(char mode)
-// The Save Game / Load Game / Erase Game menu interface. Since the three
-// functions are almost identical in their interface, I crammed them all
-// into one function, using the Mode variable to specify the intent.
-// MODE: 0=Load Game, 1=Save Game, 2=Erase Game
-{
-    VFILE* f;
-    int i, j, r = 0;
-    unsigned char tbuf[2560], buf1[2560], buf2[2560], buf3[2560], buf4[2560];
-    unsigned char rbuf[256];
-    unsigned char* img;
+static void drawStuff(int mode) {
     char mnu1[] = "LOADGAME.MNU";
     char mnu2[] = "SAVEGAME.MNU";
     char mnu3[] = "DELGAME.MNU";
     char* mnuname[] = { mnu1, mnu2, mnu3 };
 
-    playeffect(1);
-    fout();
-redraw:
-    f = vopen(mnuname[mode], "r");
+    VFILE* f = vopen(mnuname[mode], "r");
     if (!f) {
         err("Fatal Error: Could not open specified MNU file.");
     }
@@ -78,6 +65,8 @@ parseloop:
         loadpcx(strbuf, virscr);
         goto parseloop;
     }
+
+    int i, j;
 
     if (strcmp(strbuf, "print") == 0) {
         vscanf(f, "%u", &i);
@@ -111,6 +100,26 @@ parseloop:
         goto parseloop;
     }
     vclose(f);
+
+}
+
+void LoadSaveErase(char mode)
+// The Save Game / Load Game / Erase Game menu interface. Since the three
+// functions are almost identical in their interface, I crammed them all
+// into one function, using the Mode variable to specify the intent.
+// MODE: 0=Load Game, 1=Save Game, 2=Erase Game
+{
+    VFILE* f;
+    int i, j, r = 0;
+    unsigned char tbuf[2560], buf1[2560], buf2[2560], buf3[2560], buf4[2560];
+    unsigned char rbuf[256];
+    unsigned char* img;
+
+    playeffect(1);
+    fout();
+
+redraw:
+    drawStuff(mode);
 
     for (i = 0; i < 4; i++) {
         f = vopen(savename[i], "r");
@@ -1227,7 +1236,7 @@ void DrawMagicMenu(char c, char ptr) {
 void MagicUse(char c, char p) {
     int first = 1, ptr = 0, i, j;
     unsigned char l, t1, a;
-    int getTimerCount(), an;
+    int an;
 
     playeffect(1);
     a = partyidx[c] - 1;
