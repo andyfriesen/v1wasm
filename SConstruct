@@ -55,8 +55,9 @@ def EmscriptenEnvironment():
     env.Append(LINKFLAGS=[
         '-g4', '--source-map-base', 'http://localhost:8000/',
 
-        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","wasm_nextFrame","emscripten_sleep"]\'',
         '-s', 'ASYNCIFY',
+        '-s', 'ASYNCIFY_STACK_SIZE=16384',
+        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","wasm_nextFrame","emscripten_sleep"]\'',
         '-s', 'FETCH=1',
         '-s', 'FORCE_FILESYSTEM=1',
 

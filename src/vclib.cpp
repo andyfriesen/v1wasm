@@ -257,7 +257,7 @@ drawloop:
     textwindow(portrait, str1, str2, str3);
 
     vgadump();
-    readcontrols();
+    readcontrols_noSleep();
 
     if (first == 2) {
         if (b1 || b2 || b4) {
@@ -794,13 +794,7 @@ drawloop:
     drawmap();
     textwindow(portrait, st1, st2, st3);
     vgadump();
-
-    while (!getTimerCount()) {
-        gp--;
-        gp++;
-    }
-
-    readcontrols();
+    readcontrols_noSleep();
 
     if (first == 2) {
         if (b1 || b2 || b4) {

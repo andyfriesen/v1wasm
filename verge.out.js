@@ -5915,7 +5915,7 @@ function wasm_initTimer(count){ function incr() { HEAP32[count >> 2]++; } window
       } catch (e) {
         abort(e);
       }
-    }var Asyncify={State:{Normal:0,Unwinding:1,Rewinding:2},state:0,StackSize:4096,currData:null,handleSleepReturnValue:0,exportCallStack:[],callStackNameToId:{},callStackIdToFunc:{},callStackId:0,afterUnwind:null,asyncFinalizers:[],sleepCallbacks:[],getCallStackId:function(funcName) {
+    }var Asyncify={State:{Normal:0,Unwinding:1,Rewinding:2},state:0,StackSize:16384,currData:null,handleSleepReturnValue:0,exportCallStack:[],callStackNameToId:{},callStackIdToFunc:{},callStackId:0,afterUnwind:null,asyncFinalizers:[],sleepCallbacks:[],getCallStackId:function(funcName) {
         var id = Asyncify.callStackNameToId[funcName];
         if (id === undefined) {
           id = Asyncify.callStackId++;
