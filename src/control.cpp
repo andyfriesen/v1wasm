@@ -7,18 +7,13 @@
 #include <stdio.h>
 #include <emscripten.h>
 #include <emscripten/html5.h>
+#include "control.h"
 #include "wasm.h"
 #include "main.h"
 #include "keyboard.h"
 
 
-/* -- ric: 03/May/98 -- */
-struct keyb_map {
-    char      pressed;                  // keyboard flags
-    short int boundscript;
-};           // bound script
-
-struct keyb_map key_map[128];         // for recording bound keys
+keyb_map key_map[128];         // for recording bound keys
 
 char keyboard_map[128];
 char last_pressed;
@@ -82,9 +77,7 @@ namespace verge {
     }
 }
 
-
 void readKeyboard() {
-    emscripten_sleep(0);
     for (const auto& event: inputEvents) {
         //printf("Key event scan=%i down? %i\n", event.keyCode, event.type == verge::EventType::KeyDown);
         auto xl = verge::scanMap[DOMScanCode(event.keyCode)];
@@ -142,6 +135,11 @@ void readb() {
 }
 
 void readcontrols() {
+    emscripten_sleep(0);
+    readcontrols_noSleep();
+}
+
+void readcontrols_noSleep() {
     readKeyboard();
 
     int i;

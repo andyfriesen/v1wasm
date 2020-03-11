@@ -650,7 +650,7 @@ void process_controls() {
             downOk = 0;
         }
 
-        readcontrols();
+        readcontrols_noSleep();
         if (b1) {
             Activate();
         }
@@ -911,21 +911,15 @@ void startmap(char* fname) {
     tickctr = 0;
     zonedelay = 0;
 
-main_loop:
-    while (getTimerCount() != 0) {
-        decTimerCount();
-        game_ai();
-    }
+    while (!qabort) {
+        int q = getTimerCount();
+        while (q > 0) {
+            --q;
+            game_ai();
+        }
+        setTimerCount(0);
 
-    drawmap();
-    vgadump();
-
-    while (!getTimerCount()) {
-        gp--;
-        gp++;
-    }
-
-    if (!qabort) {
-        goto main_loop;
+        drawmap();
+        vgadump();
     }
 }
