@@ -106,6 +106,12 @@ namespace verge {
     extern std::string saveGameRoot; // main.cpp
 }
 
+namespace {
+    // This is global and not local to LoadSaveErase because Emscripten's Asyncify
+    // does not seem to consistently decide to destruct it at the right time.
+    std::string savePath;
+}
+
 void LoadSaveErase(char mode)
 // The Save Game / Load Game / Erase Game menu interface. Since the three
 // functions are almost identical in their interface, I crammed them all
@@ -117,6 +123,7 @@ void LoadSaveErase(char mode)
     unsigned char rbuf[256];
     unsigned char* img;
 
+
     playeffect(1);
     fout();
 
@@ -124,7 +131,7 @@ redraw:
     drawStuff(mode);
 
     for (i = 0; i < 4; i++) {
-        std::string savePath = verge::saveGameRoot + savename[i];
+        savePath = verge::saveGameRoot + savename[i];
         FILE* f = fopen(savePath.c_str(), "r");
         if (!f) {
             gotoxy(menus[i].posx + 100, menus[i].posy + 10);

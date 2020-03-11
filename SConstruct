@@ -41,6 +41,14 @@ def EmscriptenEnvironment():
         ]
     )
 
+    emscriptenOpts = [
+        '-s', 'ASYNCIFY',
+        '-s', 'ASYNCIFY_STACK_SIZE=16384',
+        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","wasm_nextFrame","emscripten_sleep"]\'',
+        '-s', 'FETCH=1',
+        '-s', 'FORCE_FILESYSTEM=1',
+    ]
+
     env.Append(CXXFLAGS=[
             '-O1', '-g',
             # '-O3',
@@ -49,20 +57,15 @@ def EmscriptenEnvironment():
             '-Wno-parentheses',
             '-Wno-long-long',
             '-Wno-dangling-else',
-        ]
+        ] + emscriptenOpts
     )
 
     env.Append(LINKFLAGS=[
         '-g4', '--source-map-base', 'http://localhost:8000/',
 
-        '-s', 'ASYNCIFY',
-        '-s', 'ASYNCIFY_STACK_SIZE=16384',
-        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","wasm_nextFrame","emscripten_sleep"]\'',
-        '-s', 'FETCH=1',
-        '-s', 'FORCE_FILESYSTEM=1',
 
         '-lidbfs.js',
-    ])
+    ] + emscriptenOpts)
 
     # env.Append(LIBS=[
     #         'ppapi',
