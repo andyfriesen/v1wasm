@@ -122,7 +122,7 @@ WriteScriptOutput ()
          remove("$$TMEP$$.MA_");
 }
 
-WriteOutput ()
+void WriteOutput ()
 { FILE *f;
   char i;
   short int mx, my;
@@ -132,10 +132,10 @@ WriteOutput ()
          memcpy (strbuf, &fname, i);
          strcpy(strbuf + i, ".MAP");
 
-         f = fopen (strbuf, "rb");
+         f = fopen (strbuf, "rb+");
          if (f == 0) {
            strcpy(strbuf + i, ".map");
-           f = fopen(strbuf, "rb");
+           f = fopen(strbuf, "rb+");
          }
 
          fseek (f, 68, 0);
