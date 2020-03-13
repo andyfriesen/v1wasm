@@ -1,4 +1,4 @@
-5event /* 0 */
+event /* 0 */
 {
  flags[151]=1;
  if(flags[106])

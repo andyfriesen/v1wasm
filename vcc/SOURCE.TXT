@@ -1,0 +1,23 @@
+You have no idea how many people have asked me for the VCC source.
+
+Well, here it is. There's not much to say about it.. I did get a few ideas
+from the QuakeC Compiler source released by id software, however when you study
+VC and QC, the two are so completely different that it's not even funny. The
+main things that I 'borrowed' from the QCC source are parts of the lexical
+parsing routines, but even those are quite starkly different than QCC's.
+
+I'm very proud of this piece of work, and unlike the VERGE and MAPED sources,
+this one will compile with NO warnings; unless of course you turn on -wall, but
+if anyone complains to me about that I will proceed to smack their face in.
+
+I've compiled it under DJGPP, Watcom for DOS, Watcom as a Win32s console app,
+and Visual C++ as a Win32s console app, all with NO source modifications
+whatsoever. I imagine it should compile under linux with little or no
+modifications as well.
+
+As I've mentioned before, the preprocessor (preproc.c) was written by zeromus
+(zeromus@flash.net), not myself.
+
+Have fun.
+
+- vecna@inlink.com
