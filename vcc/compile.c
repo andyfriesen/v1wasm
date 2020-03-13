@@ -80,8 +80,8 @@ void Expect(char*);
 void strupr(char* c)
 {
    while (*c) {
-      if (*c >= 'a' && *c <= 'Z')
-         *c |=32;
+      if (*c >= 'a' && *c <= 'z')
+         *c -= 32;
       ++c;
    }
 }
@@ -1113,7 +1113,7 @@ char Parse ()
         if (!*src) return 1;
         if (!NextIs(scripttoken) && !iex)
         {
-           if (!quiet) printf ("warning: Unknown token outside scripts (%d) \n",lines);
+           if (!quiet) printf ("warning: Unknown token '%s' outside scripts (%d) \n", token, lines);
            iex=1;
         }
         return 0;

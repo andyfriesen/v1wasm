@@ -130,13 +130,14 @@ WriteOutput ()
 
          i = strlen (fname);
          memcpy (strbuf, &fname, i);
-         strbuf [i] = '.';
-         strbuf [i+1] = 'M';
-         strbuf [i+2] = 'A';
-         strbuf [i+3] = 'P';
-         strbuf [i+4] = 0;
+         strcpy(strbuf + i, ".MAP");
 
-         f = fopen (strbuf, "rb+");
+         f = fopen (strbuf, "rb");
+         if (f == 0) {
+           strcpy(strbuf + i, ".map");
+           f = fopen(strbuf, "rb");
+         }
+
          fseek (f, 68, 0);
          fread (&mx, 1, 2, f);
          fread (&my, 1, 2, f);
@@ -179,7 +180,7 @@ main (int argc, char *argv[])
            case 2: { strbuf = argv[1];
                      for ( i=0; i<100; i++ )
                          fname[i] = strbuf[i];
-                     strupr (fname);
+                    //  strupr (fname);
                      if (!strcmp(fname,"EFFECTS")) effect=1;
 // NEW CODE
                      if (!strcmp(fname,"MAGIC")) magic=1;
