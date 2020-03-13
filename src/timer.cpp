@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include <emscripten.h>
+#include <emscripten/html5.h>
 
 #include "engine.h" // for valloc()
 
@@ -29,30 +30,22 @@ void sethz(unsigned int hz) {
 void restorehz() {
 }
 
-EM_JS(void, wasm_initTimer, (unsigned int* count), {
-    function incr() {
-        HEAP32[count >> 2]++;
-    }
-    window.vergeTimer = setInterval(incr, 10);
-});
-
-EM_JS(void, wasm_closeTimer, (), {
-    cancelTimer(window.vergeTimer);
-    window.vergeTimer = null;
-});
-
 namespace {
+    long globalTimer = 0;
     unsigned int timer_count = 0;
     int vc_timer;
 }
 
+void incTimerCount(void*);
+
 int timer_init() {
-    wasm_initTimer(&timer_count);
+    globalTimer = emscripten_set_interval(&incTimerCount, 10, nullptr);
     return 0;
 }
 
 int timer_close() {
-    wasm_closeTimer();
+    emscripten_clear_interval(globalTimer);
+    globalTimer = 0;
     return 0;
 }
 
@@ -67,9 +60,7 @@ void setTimerCount(int offset) {
     timer_count = offset;
 }
 
-// Don't do anything fancy here: this function runs on a different thread.
-// -- andy 21 August 2011
-void incTimerCount() {
+void incTimerCount(void*) {
     timer_count++;
     vc_timer++;
 
