@@ -1,16 +1,16 @@
-// ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-// ³                                                                    ³
-// ³                     The Verge-C Compiler v.0.10                    ³
-// ³                     Copyright (C)1997 BJ Eirich                    ³
-// ³                                                                    ³
-// ³ Module: FUNCLIB.C                                                  ³
-// ³                                                                    ³
-// ³ Description: This simply parses and generates the output code      ³
-// ³ for the built in library functions.                                ³
-// ³                                                                    ³
-// ³ Portability: ANSI C. Should compile on any 32-bit compiler.        ³
-// ³                                                                    ³
-// ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+// **********************************************************************
+// *                                                                    *
+// *                     The Verge-C Compiler v.0.10                    *
+// *                     Copyright (C)1997 BJ Eirich                    *
+// *                                                                    *
+// * Module: FUNCLIB.C                                                  *
+// *                                                                    *
+// * Description: This simply parses and generates the output code      *
+// * for the built in library functions.                                *
+// *                                                                    *
+// * Portability: ANSI C. Should compile on any 32-bit compiler.        *
+// *                                                                    *
+// **********************************************************************
 
 #include "code.h"
 #include "compile.h"
@@ -47,7 +47,7 @@
 #include "nichgvc.c"
 /* -- -- */
 
-GenericFunc (unsigned char idcode, int numargs)
+void GenericFunc (unsigned char idcode, int numargs)
 { char i;
 
          EmitC (EXEC);

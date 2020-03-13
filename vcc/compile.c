@@ -1,15 +1,15 @@
-// ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-// ³                                                                    ³
-// ³                     The Verge-C Compiler v.0.10                    ³
-// ³                     Copyright (C)1997 BJ Eirich                    ³
-// ³                                                                    ³
-// ³ Module: COMPILE.C                                                  ³
-// ³                                                                    ³
-// ³ Description: The main lexical parser and code generator.           ³
-// ³                                                                    ³
-// ³ Portability: ANSI C - should compile on any 32 bit compiler.       ³
-// ³                                                                    ³
-// ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+// **********************************************************************
+// *                                                                    *
+// *                     The Verge-C Compiler v.0.10                    *
+// *                     Copyright (C)1997 BJ Eirich                    *
+// *                                                                    *
+// * Module: COMPILE.C                                                  *
+// *                                                                    *
+// * Description: The main lexical parser and code generator.           *
+// *                                                                    *
+// * Portability: ANSI C - should compile on any 32 bit compiler.       *
+// *                                                                    *
+// **********************************************************************
 
 #include <stdio.h>
 #include "code.h"
@@ -68,7 +68,25 @@ char numlabels=0,numgotos=0;
 
 // ================================ Code =================================
 
-err(char *str)
+void ProcessFor();
+void ProcessSwitch();
+void ProcessWhile();
+void ProcessVar0Assign();
+void ProcessVar1Assign();
+void ProcessVar2Assign();
+void ProcessIf();
+void Expect(char*);
+
+void strupr(char* c)
+{
+   while (*c) {
+      if (*c >= 'a' && *c <= 'Z')
+         *c |=32;
+      ++c;
+   }
+}
+
+void err(char *str)
 { FILE *f;
 
          if (!quiet) printf("%s (%d) \n",str,lines);
@@ -87,7 +105,7 @@ char TokenIs(char *str)
          else return 0;
 }
 
-ParseWhitespace ()
+void ParseWhitespace ()
 { char c;
 
   // ParseWhitespace() does what you'd expect - sifts through any white
@@ -121,7 +139,7 @@ ParseWhitespace ()
          }
 }
 
-CheckLibFunc()
+void CheckLibFunc()
 { int i;
 
   // If the current token is a recognized library function, sets
@@ -374,7 +392,7 @@ char NextIs(char *str)
          return i;
 }
 
-Expect(char *str)
+void Expect(char *str)
 { FILE *f;
 
          GetToken ();
@@ -579,7 +597,7 @@ char HandleExpression()
          if (NextIs(":"))
             {
               memcpy(labels[numlabels].ident,lasttoken,40);
-              (int) labels[numlabels].pos=(int) cpos-(int) code;
+              labels[numlabels].pos=(char*)((int) cpos - (int) code);
               if (verbose) printf("label %s found on line %d, cpos: %d. \n",&lasttoken, lines, cpos-code);
               numlabels++;
               Expect (":");
@@ -588,7 +606,7 @@ char HandleExpression()
          return 0;                      // Not a valid command;
 }
 
-ProcessVar0Assign ()
+void ProcessVar0Assign ()
 { int a;
 
          EmitC (VAR0_ASSIGN);
@@ -616,7 +634,7 @@ ProcessVar0Assign ()
          Expect (";");
 }
 
-ProcessVar1Assign ()
+void ProcessVar1Assign ()
 { int a;
 
          EmitC (VAR1_ASSIGN);
@@ -648,7 +666,7 @@ ProcessVar1Assign ()
          Expect (";");
 }
 
-ProcessVar2Assign ()
+void ProcessVar2Assign ()
 { int a;
 
          EmitC (VAR2_ASSIGN);
@@ -682,7 +700,7 @@ ProcessVar2Assign ()
          Expect (";");
 }
 
-ProcessIf ()
+void ProcessIf ()
 { unsigned char numargs=0, excl=0, varidx;
   char *returnptr, *buf;
 
@@ -832,7 +850,7 @@ ProcessFor1 ()
          EmitC (ENDSCRIPT);
 }
 
-ProcessFor ()
+void ProcessFor ()
 {
          Expect ("(");
          GetToken ();
@@ -841,7 +859,7 @@ ProcessFor ()
          else err ("Parse error in FOR loop.");
 }
 
-ProcessWhile ()
+void ProcessWhile ()
 { unsigned char numargs=0, excl=0, varidx;
   char *buf, *start, *returnptr;
 
@@ -942,7 +960,7 @@ ProcessWhile ()
          }
 }
 
-ProcessSwitch ()
+void ProcessSwitch ()
 { char *buf,*retrptr;
 
   // Special thanks for Zeromus for giving me a good idea on how to implement
@@ -987,7 +1005,7 @@ ProcessGoto ()
          Expect (";");
 }
 
-ProcessEvent ()
+void ProcessEvent ()
 {
          Expect ("{");
          inevent = 1;
@@ -1044,7 +1062,7 @@ ProcessEvent ()
             if (token_type != FUNCTION && NextIs(":"))
             {
               memcpy(labels[numlabels].ident,lasttoken,40);
-              (int) labels[numlabels].pos=(int) cpos-(int) code;
+              labels[numlabels].pos=(char*)((int) cpos-(int) code);
               if (verbose) printf("label %s found on line %d, cpos: %d. \n",&lasttoken, lines, cpos-code);
               numlabels++;
               Expect (":");

@@ -1,6 +1,5 @@
 //preproc.c by Reverend Matthew B. Gambrell
 
-#include <io.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include "vcc.h"

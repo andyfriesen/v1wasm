@@ -1,17 +1,17 @@
 
-// ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-// ³                                                                    ³
-// ³                     The Verge-C Compiler v.0.10                    ³
-// ³                     Copyright (C)1997 BJ Eirich                    ³
-// ³                                                                    ³
-// ³ Module: VCC.C                                                      ³
-// ³                                                                    ³
-// ³ Description: Handles setup, command line parsing, determines       ³
-// ³ compilation target / mode, other misc things.                      ³
-// ³                                                                    ³
-// ³ Portability: ANSI C - should compile on any compiler.              ³
-// ³                                                                    ³
-// ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+// **********************************************************************
+// *                                                                    *
+// *                     The Verge-C Compiler v.0.10                    *
+// *                     Copyright (C)1997 BJ Eirich                    *
+// *                                                                    *
+// * Module: VCC.C                                                      *
+// *                                                                    *
+// * Description: Handles setup, command line parsing, determines       *
+// * compilation target / mode, other misc things.                      *
+// *                                                                    *
+// * Portability: ANSI C - should compile on any compiler.              *
+// *                                                                    *
+// **********************************************************************
 
 #include <malloc.h>
 #include <string.h>
