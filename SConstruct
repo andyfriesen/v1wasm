@@ -1,40 +1,25 @@
 import os
 import os.path
-import json
+import sys
+
+# Find emcc
+emcc = None
+path = os.environ['PATH'].split(os.path.pathsep)
+for p in path:
+    p2 = os.path.join(p, 'emcc')
+    if os.path.exists(p2):
+        emcc = p2
+        break
+
+if not emcc:
+    print('Could not find emcc.  Check your PATH?')
+    sys.exit(1)
 
 def EmscriptenEnvironment():
     env = Environment()
-    # env.AddMethod(Pexe, 'Pexe')
-
-    # env['NACL_HOST'] = 'host_x86_64'
-    # env['NACL_SDK_ROOT'] = '/Users/andy/src/nacl_sdk/pepper_35'
-    # env['NACL_TOOLCHAIN'] = '$NACL_SDK_ROOT/toolchain/mac_pnacl/$NACL_HOST'
-    # env['NACL_BIN'] = '$NACL_SDK_ROOT/toolchain/mac_pnacl/bin'
-    # env['CONFIG'] = 'Debug'
-
-    # env['NACL_ARCH'] = 'pnacl'
-
-    emcc = '/media/andy/spinner/src/emsdk/upstream/emscripten/emcc'
 
     env['CC'] = emcc
     env['CXX'] = emcc
-
-    # env.Append(LIBPATH=[
-    #         '$NACL_SDK_ROOT/lib/pnacl/$CONFIG'
-    #     ]
-    # )
-
-    # env.Append(CPPDEFINES=[
-    #         'NACL_ARCH=$NACL_ARCH',
-    #         'NACL_SDK_DEBUG',
-    #         # 'USE_TR1'
-    #     ]
-    # )
-
-    # env.Append(CPPPATH=[
-    #         '$NACL_SDK_ROOT/include'
-    #     ]
-    # )
 
     env.Append(CXXFLAGS=[
             '-fcolor-diagnostics'
@@ -66,12 +51,6 @@ def EmscriptenEnvironment():
 
         '-lidbfs.js',
     ] + emscriptenOpts)
-
-    # env.Append(LIBS=[
-    #         'ppapi',
-    #         'ppapi_cpp',
-    #     ]
-    # )
 
     return env
 
