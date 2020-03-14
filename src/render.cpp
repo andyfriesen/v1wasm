@@ -101,24 +101,8 @@ void drawchar(int i, int xw, int yw) {
         break;
     }
     if (party[i].moving && !party[i].specframe) {
-        if ((party[i].framectr > 10) && (party[i].framectr < 21)) {
-            fr += 1;
-        }
-        if ((party[i].framectr > 20) && (party[i].framectr < 31)) {
-            fr += 2;
-        }
-        if ((party[i].framectr > 30) && (party[i].framectr < 41)) {
-            fr += 1;
-        }
-        if ((party[i].framectr > 50) && (party[i].framectr < 61)) {
-            fr += 3;
-        }
-        if ((party[i].framectr > 60) && (party[i].framectr < 71)) {
-            fr += 4;
-        }
-        if ((party[i].framectr > 70) && (party[i].framectr < 81)) {
-            fr += 3;
-        }
+        const int incrTable[] = { 0, 1, 2, 1, 0, 3, 4, 3 };
+        fr += incrTable[party[i].framectr / 10];
     }
 
     if (party[i].specframe) {

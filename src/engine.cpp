@@ -735,24 +735,18 @@ void process_controls() {
         for (auto i = 0; i < numchars; i++) {
             if (party[i].moving == 1) {
                 party[i].y++;
-                party[i].movcnt--;
-                party[i].framectr++;
             }
             if (party[i].moving == 2) {
                 party[i].y--;
-                party[i].movcnt--;
-                party[i].framectr++;
             }
             if (party[i].moving == 3) {
                 party[i].x++;
-                party[i].movcnt--;
-                party[i].framectr++;
             }
             if (party[i].moving == 4) {
                 party[i].x--;
-                party[i].movcnt--;
-                party[i].framectr++;
             }
+            party[i].movcnt--;
+            party[i].framectr++;
             if (party[i].framectr == 80) {
                 party[i].framectr = 0;
             }

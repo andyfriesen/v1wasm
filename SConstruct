@@ -157,4 +157,4 @@ env.Append(
     ]
 )
 
-verge = env.Program('verge.out.js', sources + audiereSource)# + dumbSource)
+verge = env.Program('verge.out.js', sources) # + audiereSource)# + dumbSource)
