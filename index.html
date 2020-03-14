@@ -12,10 +12,31 @@
         }
 
         canvas {
-            -webkit-transform: scale(2) translate(0, 50px);
-            transform: scale(2) translate(0, 50px);
+            /* -webkit-transform: scale(2) translate(0, 50px); */
+            /* transform: scale(2) translate(0, 50px); */
+            width: 640px;
+            height: 400px;
             z-index: 999;
             margin: auto;
+        }
+
+        #loadingProgress {
+            width: 624px;
+            margin: auto;
+            border: 4px solid white;
+            padding: 4px;
+            height: 1em;
+            position: relative;
+        }
+
+        #loadingProgress div {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            top: 0;
+            right: 34%;
+            background-color: white;
+            margin: 4px;
         }
 
         #controls {
@@ -38,6 +59,7 @@
 <body>
 
     <canvas id="vergeCanvas" width="320" height="200"></canvas>
+    <div id='loadingProgress'><div></div></div>
     <div id='controls'>
         <h2>Controls</h2>
         <dl>
@@ -50,12 +72,22 @@
     </div>
     <footer>Last Updated 13 March 2020</footer>
     <script>
+        const verge = {};
+
+        verge.setLoadingProgress = function(percent) {
+            const div = document.querySelector('#loadingProgress div');
+            div.style.width = percent + '%';
+            if (percent == 100) {
+                setInterval(() => document.getElementById('loadingProgress').style.display = 'none', 1000);
+            }
+        };
+
         (function() {
             const ctx = document.getElementById('vergeCanvas').getContext('2d');
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, 320, 200);
 
-            ctx.fillStyle = 'black';
+            ctx.fillStyle = 'white';
             ctx.fillText('Loading! :D', 100, 100);
         })();
     </script>

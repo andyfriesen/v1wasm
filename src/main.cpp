@@ -67,8 +67,11 @@ namespace verge {
     struct FreeDelete { void operator()(char* p) { free(p); } };
     using Deleter = std::unique_ptr<char, FreeDelete>;
 
+    EM_JS(void, setLoadingProgress, (int progress), {
+        verge.setLoadingProgress(progress);
+    });
+
     void downloadGame() {
-        printf("downloadGame\n");
         std::string manifestPath = gameRoot + "manifest.txt";
         char* manifestPtr;
         size_t manifestLength;
@@ -93,10 +96,17 @@ namespace verge {
             manifest.remove_prefix(pos + 1);
         }
 
+        int i = 0;
+
         for (const auto& filename: files) {
             preload(filename);
+
+            int progress = i * 100 / files.size();
+            ++i;
+            setLoadingProgress(progress);
         }
-        printf("downloadGame complete\n");
+
+        setLoadingProgress(100);
     }
 
     void preload(std::string_view path) {
