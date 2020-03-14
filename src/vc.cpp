@@ -3,6 +3,7 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <stdio.h>
+#include <emscripten.h>
 #include "stack.h"
 #include "engine.h"
 #include "main.h"
@@ -32,6 +33,19 @@ int numscripts;                        // Number of scripts in current map VC
 unsigned int varl[10];                 // Chain/call pass variables
 unsigned int tvar[26];                 // Temporary/Throwaway variables
 char killvc = 0;                       // abort VC loop;
+
+namespace {
+    const int SLEEP_COUNT = 100;
+    int sleepCount = SLEEP_COUNT;
+
+    void maybeSleep() {
+        --sleepCount;
+        if (sleepCount < 0) {
+            sleepCount = SLEEP_COUNT;
+            emscripten_sleep(0);
+        }
+    }
+}
 
 void InitVCMem() {
     printf("InitVCMem\n");
@@ -517,6 +531,8 @@ void ExecuteBlock() {
     unsigned char c;
 
     while (1) {
+        maybeSleep();
+
         if (killvc) {
             killvc = 0;
             break;
