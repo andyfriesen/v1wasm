@@ -27,6 +27,7 @@
             padding: 4px;
             height: 1em;
             position: relative;
+            transition: opacity 2s;
         }
 
         #loadingProgress div {
@@ -34,7 +35,7 @@
             left: 0;
             bottom: 0;
             top: 0;
-            right: 34%;
+            right: 100%;
             background-color: white;
             margin: 4px;
         }
@@ -70,15 +71,15 @@
             <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
         </dl>
     </div>
-    <footer>Last Updated 13 March 2020</footer>
+    <footer>Last Updated 14 March 2020</footer>
     <script>
         const verge = {};
 
         verge.setLoadingProgress = function(percent) {
             const div = document.querySelector('#loadingProgress div');
-            div.style.width = percent + '%';
+            div.style.right = (100 - percent) + '%';
             if (percent == 100) {
-                setInterval(() => document.getElementById('loadingProgress').style.display = 'none', 1000);
+                setTimeout(() => document.getElementById('loadingProgress').style.opacity = '0', 1000);
             }
         };
 
