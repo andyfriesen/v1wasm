@@ -8,13 +8,10 @@
             font-family: sans-serif;
             background-color: black;
             color: white;
-        }
-
-        #listener {
             text-align: center;
         }
 
-        #listener embed {
+        canvas {
             -webkit-transform: scale(2) translate(0, 50px);
             transform: scale(2) translate(0, 50px);
             z-index: 999;
@@ -22,14 +19,11 @@
         }
 
         #controls {
+            text-align: left;
             position: absolute;
             top: 0;
             right: 0;
             z-index: -1;
-        }
-
-        canvas {
-            background-color: green;
         }
 
         footer {
@@ -40,76 +34,6 @@
         }
 
     </style>
-    <script type="text/aoeuaoeuaoeua-dont-run-me-yet">
-        V1naclModule = null;    // Global application object.
-        statusText = 'NO-STATUS';
-
-        // When the NaCl module has loaded, hook up an event listener to handle
-        // messages coming from it via PPB_Messaging.PostMessage() (in C) or
-        // pp::Instance.PostMessage() (in C++), and indicate success.
-        function moduleDidLoad() {
-            V1naclModule = document.getElementById('verge');
-            V1naclModule.addEventListener('message', handleMessage, false);
-            updateStatus('SUCCESS');
-        }
-
-        // The 'message' event handler.  This handler is fired when the NaCl module
-        // posts a message to the browser by calling PPB_Messaging.PostMessage()
-        // (in C) or pp::Instance.PostMessage() (in C++).  This implementation
-        // simply displays the content of the message in an alert panel.
-        function handleMessage(message_event) {
-            var d = message_event.data;
-
-            if (!d) {
-                console.log("Bad message data :(");
-                return;
-            }
-
-            var s = d.split(':');
-            if (s[0] == 'clear') {
-                var index = s[1];
-                localStorage.setItem('save' + index, '');
-                return;
-            } else if (s[0] == 'append') {
-                var index = s[1];
-                var data = s[2];
-                var key = 'save' + index;
-                var newValue = localStorage.getItem(key) + data;
-                localStorage.setItem(key, newValue);
-            } else {
-                alert("Unknown message: " + d);
-            }
-        }
-
-        // If the page loads before the Native Client module loads, then set the
-        // status message indicating that the module is still loading.  Otherwise,
-        // do not change the status message.
-        function pageDidLoad() {
-            if (V1naclModule == null) {
-                updateStatus('LOADING...');
-            } else {
-                // It's possible that the Native Client module onload event fired
-                // before the page's onload event.  In this case, the status message
-                // will reflect 'SUCCESS', but won't be displayed.  This call will
-                // display the current message.
-                updateStatus();
-            }
-        }
-
-        // Set the global status message.  If the element with id 'statusField'
-        // exists, then set its HTML to the status message as well.
-        // opt_message The message test.  If this is null or undefined, then
-        // attempt to set the element with id 'statusField' to the value of
-        // |statusText|.
-        function updateStatus(opt_message) {
-            if (opt_message)
-            statusText = opt_message;
-            var statusField = document.getElementById('status_field');
-            if (statusField) {
-                statusField.innerHTML = statusText;
-            }
-        }
-    </script>
 </head>
 <body>
 
@@ -124,7 +48,7 @@
             <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
         </dl>
     </div>
-    <footer>Last Updated 12 March 2020</footer>
+    <footer>Last Updated 13 March 2020</footer>
     <script>
         (function() {
             const ctx = document.getElementById('vergeCanvas').getContext('2d');
@@ -133,19 +57,6 @@
 
             ctx.fillStyle = 'black';
             ctx.fillText('Loading! :D', 100, 100);
-
-
-            // const imageData = new ImageData(320, 200);
-            // const imageArray = imageData.data;
-
-            // for (let x = 0; x < 256; ++x) {
-            //     for (let y = 0; y < 200; ++y) {
-            //         const i = (y * 320 + x) * 4;
-            //         imageArray[i] = x;
-            //         imageArray[i + 3] = 0xFF;
-            //     }
-            // }
-            // ctx.putImageData(imageData, 0, 0);
         })();
     </script>
     <script async type="text/javascript" src="verge.out.js"></script>
