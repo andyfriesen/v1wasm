@@ -17,7 +17,7 @@
 #include "render.h"
 #include "vga.h"
 
-#define bgcolor 154
+const char bgcolor = char(154);
 #define grey1 14
 #define grey2 26
 #define white 31

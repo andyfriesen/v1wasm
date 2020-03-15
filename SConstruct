@@ -42,6 +42,7 @@ def EmscriptenEnvironment():
             '-Wno-parentheses',
             '-Wno-long-long',
             '-Wno-dangling-else',
+            '-Wno-writable-strings',
         ] + emscriptenOpts
     )
 
