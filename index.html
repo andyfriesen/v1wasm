@@ -4,18 +4,46 @@
     <meta charset="UTF-8">
     <title>VERGE!</title>
     <style>
+        html, body {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         body {
             font-family: sans-serif;
-            background-color: black;
-            color: white;
+            background-color: #0a0804;
+            color: #a8a0a0;
             text-align: center;
         }
 
+        .vergeContainer {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: grid;
+            grid-template-columns: 225px auto 225px;
+            grid-template-rows: 75px auto 50px 25px;
+            grid-template-areas: 
+                "header header header"
+                "leftside playarea controls"
+                "leftside loadingbar controls"
+                "footer footer footer"
+            ;
+        }
+
+        #canvasContainer {
+            grid-area: playarea;
+            align-self: stretch;
+            justify-self: stretch;
+            display: flex;
+            align-items: center;
+            justify-items: center;
+        }
+
         canvas {
-            /* -webkit-transform: scale(2) translate(0, 50px); */
-            /* transform: scale(2) translate(0, 50px); */
-            width: 640px;
-            height: 400px;
+            image-rendering: pixelated;
             z-index: 999;
             margin: auto;
         }
@@ -23,55 +51,64 @@
         #loadingProgress {
             width: 624px;
             margin: auto;
-            border: 4px solid white;
+            border: 4px solid gray;
             padding: 4px;
             height: 1em;
             position: relative;
             transition: opacity 2s;
+            grid-area: loadingbar;
+            align-self: center;
+            justify-self: center;
         }
 
         #loadingProgress div {
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            top: 0;
-            right: 100%;
-            background-color: white;
+            background-color: green;
             margin: 4px;
         }
 
         #controls {
             text-align: left;
-            position: absolute;
-            top: 0;
-            right: 0;
             z-index: -1;
+            grid-area: controls;
+            padding: 0.5em;
+        }
+
+        header {
+            font-size: 32px;
+            grid-area: header;
+            align-self: center;
+            justify-self: center;
         }
 
         footer {
-            position: absolute;
-            right: 0;
-            bottom: 0;
             font-size: 9px;
+            grid-area: footer;
+            align-self: center;
+            justify-self: center;
         }
 
     </style>
 </head>
 <body>
-
-    <canvas id="vergeCanvas" width="320" height="200"></canvas>
-    <div id='loadingProgress'><div></div></div>
-    <div id='controls'>
-        <h2>Controls</h2>
-        <dl>
-            <dt>Arrow keys</dt><dd>Move</dd>
-            <dt>Enter</dt><dd>Interact, select menu options</dd>
-            <dt>Tab</dt><dd>Cancel out of menus</dd>
-            <dt>Space</dt><dd>Main menu (items, equipment, etc)</dd>
-            <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
-        </dl>
+    <div class="vergeContainer">
+        <header>VERGE</header>
+        <div id="canvasContainer">
+            <canvas id="vergeCanvas" width="320" height="200"></canvas>
+        </div>
+        <div id='loadingProgress'><div></div></div>
+        <div id='controls'>
+            <h2>Controls</h2>
+            <dl>
+                <dt>Arrow keys</dt><dd>Move</dd>
+                <dt>Enter</dt><dd>Interact, select menu options</dd>
+                <dt>Tab</dt><dd>Cancel out of menus</dd>
+                <dt>Space</dt><dd>Main menu (items, equipment, etc)</dd>
+                <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
+            </dl>
+        </div>
+        <footer>Last Updated 14 March 2020</footer>
     </div>
-    <footer>Last Updated 14 March 2020</footer>
+
     <script>
         const verge = {};
 
@@ -84,12 +121,38 @@
         };
 
         (function() {
+            const screen_size = [320, 200];
+            const canvas = document.getElementById('vergeCanvas');
+            const canvasContainer = canvas.parentNode;
+            canvas.setAttribute('width', screen_size[0]);
+            canvas.setAttribute('height', screen_size[1]);
+
+            const resizeCallback = (e) => {
+                canvas.style.display = "none";
+
+                const parentRect = canvasContainer.getClientRects()[0];
+                const scaleX = (parentRect.width / screen_size[0]) | 0;
+                const scaleY = (parentRect.height / screen_size[1]) | 0;
+                const scale = Math.max(Math.min(scaleX, scaleY), 1);
+
+                canvas.style.width = (screen_size[0] * scale) + "px";
+                canvas.style.height = (screen_size[1] * scale) + "px";
+                canvas.style.display = "";
+            };
+
+            window.addEventListener('resize', resizeCallback);
+            resizeCallback();
+        })();
+
+
+        (function() {
             const ctx = document.getElementById('vergeCanvas').getContext('2d');
             ctx.fillStyle = 'black';
             ctx.fillRect(0, 0, 320, 200);
 
             ctx.fillStyle = 'white';
-            ctx.fillText('Loading! :D', 100, 100);
+            ctx.textAlign = 'center';
+            ctx.fillText('Loading! :D', 160, 100);
         })();
     </script>
     <script async type="text/javascript" src="verge.out.js"></script>
