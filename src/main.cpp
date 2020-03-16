@@ -32,7 +32,7 @@ extern char fade;
 extern unsigned int effectofstbl[1024], startupofstbl[1024], magicofstbl[1024];
 
 namespace verge {
-    const std::string gameRoot = "sully/";
+    std::string gameRoot = "sully/";
     std::vector<std::string> manifest;
     std::string saveGameRoot;
 
@@ -677,7 +677,9 @@ fadeloop:
     }
 }
 
-int main() {
+int main(int argc, const char* argv[]) {
+    gameRoot = argv[1];
+
     verge::downloadGame();
     verge::initFileSystem();
 

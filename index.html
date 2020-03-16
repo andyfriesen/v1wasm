@@ -25,7 +25,7 @@
             display: grid;
             grid-template-columns: 225px auto 225px;
             grid-template-rows: 75px auto 50px 25px;
-            grid-template-areas: 
+            grid-template-areas:
                 "header header header"
                 "leftside playarea controls"
                 "leftside loadingbar controls"
@@ -111,7 +111,7 @@
                 <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
             </dl>
         </div>
-        <footer>Last Updated 14 March 2020</footer>
+        <footer>Last Updated 16 March 2020</footer>
     </div>
 
     <script>
@@ -149,6 +149,7 @@
             resizeCallback();
         })();
 
+        window.Module = {arguments: ["sully/"]};
 
         (function() {
             const ctx = document.getElementById('vergeCanvas').getContext('2d');
@@ -158,8 +159,10 @@
             ctx.fillStyle = 'white';
             ctx.textAlign = 'center';
             ctx.fillText('Loading! :D', 160, 100);
+
+
         })();
-    </script>
-    <script async type="text/javascript" src="verge.out.js"></script>
+        </script>
+        <script async type="text/javascript" src="verge.out.js"></script>
 </body>
 </html>
