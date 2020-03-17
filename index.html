@@ -115,16 +115,6 @@
     </div>
 
     <script>
-        const verge = {};
-
-        verge.setLoadingProgress = function(percent) {
-            const div = document.querySelector('#loadingProgress div');
-            div.style.right = (100 - percent) + '%';
-            if (percent == 100) {
-                setTimeout(() => document.getElementById('loadingProgress').style.opacity = '0', 1000);
-            }
-        };
-
         (function() {
             const screen_size = [320, 200];
             const canvas = document.getElementById('vergeCanvas');
@@ -149,8 +139,6 @@
             resizeCallback();
         })();
 
-        window.Module = {arguments: ["sully/"]};
-
         (function() {
             const ctx = document.getElementById('vergeCanvas').getContext('2d');
             ctx.fillStyle = 'black';
@@ -162,6 +150,36 @@
 
 
         })();
+        </script>
+
+        <!--
+            DIRECTIONS:
+
+            Have a 320x200 canvas with the id vergeCanvas.
+
+            Define a function window.verge.setLoadingProgress.  It takes a number which describes
+            the loading progress.  The application will always call setLoadingProgress with a value of
+            100 when loading is complete.
+
+            Set window.Module to {arguments: ["gameroot_dir/"]}
+            The game root dir is a relative path to a manifest.txt.  This file describes all the stuff
+            needed to run the game.
+
+            Once you have done all of this, include verge.out.js with a script tag.
+        -->
+        <script>
+            const verge = {};
+
+            verge.setLoadingProgress = function(percent) {
+                const div = document.querySelector('#loadingProgress div');
+                div.style.right = (100 - percent) + '%';
+                if (percent == 100) {
+                    setTimeout(() => document.getElementById('loadingProgress').style.opacity = '0', 1000);
+                }
+            };
+
+            window.Module = {arguments: ["sully/"]};
+
         </script>
         <script async type="text/javascript" src="verge.out.js"></script>
 </body>

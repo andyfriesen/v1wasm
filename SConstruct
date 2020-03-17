@@ -32,6 +32,7 @@ def EmscriptenEnvironment():
         '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","wasm_nextFrame","emscripten_sleep"]\'',
         '-s', 'FETCH=1',
         '-s', 'FORCE_FILESYSTEM=1',
+        '-s', 'ALLOW_MEMORY_GROWTH=1',
     ]
 
     env.Append(CXXFLAGS=[
