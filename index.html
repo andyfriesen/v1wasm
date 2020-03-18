@@ -111,7 +111,7 @@
                 <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
             </dl>
         </div>
-        <footer>Last Updated 16 March 2020</footer>
+        <footer>Last Updated 17 March 2020</footer>
     </div>
 
     <script>
@@ -168,7 +168,8 @@
             Once you have done all of this, include verge.out.js with a script tag.
         -->
         <script>
-            const verge = {};
+            window.verge = {};
+            const verge = window.verge;
 
             verge.setLoadingProgress = function(percent) {
                 const div = document.querySelector('#loadingProgress div');

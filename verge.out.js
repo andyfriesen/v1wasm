@@ -664,8 +664,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 65,
-  'maximum': 65 + 0,
+  'initial': 66,
+  'maximum': 66 + 0,
   'element': 'anyfunc'
 });
 
@@ -1292,11 +1292,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5747792,
+    STACK_BASE = 5748784,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 504912,
-    DYNAMIC_BASE = 5747792,
-    DYNAMICTOP_PTR = 504736;
+    STACK_MAX = 505904,
+    DYNAMIC_BASE = 5748784,
+    DYNAMICTOP_PTR = 505728;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1825,16 +1825,19 @@ var ASM_CONSTS = {
 function _emscripten_asm_const_iii(code, sigPtr, argbuf) {
   var args = readAsmConstArgs(sigPtr, argbuf);
   return ASM_CONSTS[code].apply(null, args);
-}function wasm_nextFrame(){ return Asyncify.handleSleep(requestAnimationFrame); }
+}function wasm_initSound(){ window.verge.audioContext = new AudioContext(); window.verge.sounds = {}; }
+function wasm_nextFrame(){ return Asyncify.handleSleep(requestAnimationFrame); }
 function wasm_initFileSystem(c){ let sgr = UTF8ToString(c); if (sgr.endsWith('/')) sgr = sgr.substr(0, sgr.length - 1); FS.mkdir("/persist"); FS.mkdir(sgr); FS.mount(IDBFS, {}, sgr); FS.syncfs(true, function (err) { if (err) console.error('wasm_initFileSystem failed!', err); }); }
 function fetchSync(pathPtr,size,data){ return Asyncify.handleSleep(resume => { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; resume(); return; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); HEAP32[size >> 2] = bytes.length; const dataPtr = _malloc(bytes.length); HEAP32[data >> 2] = dataPtr; HEAP8.set(bytes, dataPtr); resume(); }); }); }
 function wasm_vgadump(frameBuffer,frameBufferSize,palette){ const pal = HEAPU8.subarray(palette, palette + 768); const fb = HEAPU8.subarray(frameBuffer, frameBuffer + frameBufferSize); const stride = 0; let srcIndex = 0; let destIndex = 0; const ia = window.vergeImageArray; for (let y = 0; y < 200; ++y) { for (let x = 0; x < 320; ++x) { let c = fb[srcIndex++]; ia[destIndex++] = pal[c * 3]; ia[destIndex++] = pal[c * 3 + 1]; ia[destIndex++] = pal[c * 3 + 2]; ia[destIndex++] = 0xFF; } srcIndex += stride; } window.vergeContext.putImageData(window.vergeImageData, 0, 0); }
 function setLoadingProgress(progress){ verge.setLoadingProgress(progress); }
+function wasm_playSound(filename){ const name = UTF8ToString(filename); const sound = window.verge.sounds[name]; if (!sound) { console.error("Unknown sound ", name); return; } console.log("Playing ", name); const source = window.verge.audioContext.createBufferSource(); source.connect(window.verge.audioContext.destination); source.buffer = sound; source.start(0); }
+function wasm_loadSound(filename,soundData,soundDataSize){ const name = UTF8ToString(filename); const audioData = HEAPU8.buffer.slice(soundData, soundData + soundDataSize); window.verge = window.verge || {}; window.verge.audioContext.decodeAudioData( audioData, decoded => { console.log("Loaded ", name, " ok!"); window.verge.sounds[name] = decoded; }, () => { console.log("Unable to load sound data for ", name); } ) }
 function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanvas'); window.vergeContext = window.vergeCanvas.getContext('2d'); window.vergeImageData = new ImageData(320, 200); window.vergeImageArray = window.vergeImageData.data; }
 
 
 
-// STATICTOP = STATIC_BASE + 503888;
+// STATICTOP = STATIC_BASE + 504880;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -4750,7 +4753,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 504736;
+      return 505728;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
@@ -6196,7 +6199,7 @@ function intArrayToString(array) {
 // ASM_LIBRARY EXTERN PRIMITIVES: Int8Array,Int32Array
 
 var asmGlobalArg = {};
-var asmLibraryArg = { "__assert_fail": ___assert_fail, "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "__syscall221": ___syscall221, "__syscall5": ___syscall5, "__syscall54": ___syscall54, "abort": _abort, "emscripten_asm_const_iii": _emscripten_asm_const_iii, "emscripten_clear_interval": _emscripten_clear_interval, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "emscripten_set_interval": _emscripten_set_interval, "emscripten_set_keydown_callback_on_thread": _emscripten_set_keydown_callback_on_thread, "emscripten_set_keyup_callback_on_thread": _emscripten_set_keyup_callback_on_thread, "emscripten_sleep": _emscripten_sleep, "exit": _exit, "fd_close": _fd_close, "fd_read": _fd_read, "fd_seek": _fd_seek, "fd_write": _fd_write, "fetchSync": fetchSync, "memory": wasmMemory, "setLoadingProgress": setLoadingProgress, "setTempRet0": _setTempRet0, "table": wasmTable, "wasm_initFileSystem": wasm_initFileSystem, "wasm_initvga": wasm_initvga, "wasm_nextFrame": wasm_nextFrame, "wasm_vgadump": wasm_vgadump };
+var asmLibraryArg = { "__assert_fail": ___assert_fail, "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "__syscall221": ___syscall221, "__syscall5": ___syscall5, "__syscall54": ___syscall54, "abort": _abort, "emscripten_asm_const_iii": _emscripten_asm_const_iii, "emscripten_clear_interval": _emscripten_clear_interval, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "emscripten_set_interval": _emscripten_set_interval, "emscripten_set_keydown_callback_on_thread": _emscripten_set_keydown_callback_on_thread, "emscripten_set_keyup_callback_on_thread": _emscripten_set_keyup_callback_on_thread, "emscripten_sleep": _emscripten_sleep, "exit": _exit, "fd_close": _fd_close, "fd_read": _fd_read, "fd_seek": _fd_seek, "fd_write": _fd_write, "fetchSync": fetchSync, "memory": wasmMemory, "setLoadingProgress": setLoadingProgress, "setTempRet0": _setTempRet0, "table": wasmTable, "wasm_initFileSystem": wasm_initFileSystem, "wasm_initSound": wasm_initSound, "wasm_initvga": wasm_initvga, "wasm_loadSound": wasm_loadSound, "wasm_nextFrame": wasm_nextFrame, "wasm_playSound": wasm_playSound, "wasm_vgadump": wasm_vgadump };
 Asyncify.instrumentWasmImports(asmLibraryArg);
 var asm = createWasm();
 Module["asm"] = asm;

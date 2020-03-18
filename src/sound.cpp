@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <emscripten.h>
 #include "main.h"
 #include "keyboard.h"
 #include "engine.h"
@@ -27,6 +28,50 @@ int vcbufm = 0;
 
 unsigned char mp_volume = 100;
 signed short mp_sngpos = 0;
+
+namespace {
+    std::vector<std::string> soundNames;
+}
+
+EM_JS(void, wasm_initSound, (), {
+    window.verge.audioContext = new AudioContext();
+    window.verge.sounds = {};
+});
+
+EM_JS(void, wasm_loadSound, (const char* filename, const char* soundData, int soundDataSize), {
+    const name = UTF8ToString(filename);
+    const audioData = HEAPU8.buffer.slice(soundData, soundData + soundDataSize);
+    window.verge = window.verge || {};
+    window.verge.audioContext.decodeAudioData(
+        audioData,
+        decoded => {
+            // This is super, super sloppy.  We don't do anything to wait for this decode step to finish.
+            // Instead, we just pray that it finishes before the sound is needed for the first time!
+            // wasm_plyaSound is coded to silently do nothing if you try to play something that's not loaded.
+            // -- andy 17 March 2020
+            console.log("Loaded ", name, " ok!");
+            window.verge.sounds[name] = decoded;
+        },
+        () => {
+            console.log("Unable to load sound data for ", name); // fixme
+        }
+    )
+});
+
+EM_JS(void, wasm_playSound, (const char* filename), {
+    const name = UTF8ToString(filename);
+    const sound = window.verge.sounds[name];
+    if (!sound) {
+        console.error("Unknown sound ", name);
+        return;
+    }
+
+    console.log("Playing ", name);
+    const source = window.verge.audioContext.createBufferSource();
+    source.connect(window.verge.audioContext.destination);
+    source.buffer = sound;
+    source.start(0);
+});
 
 void ParseSetup() {
     char strbuf[256];
@@ -173,7 +218,15 @@ void sound_loadsfx(const char* fname) {
     for (auto i = 0; i < numfx; ++i) {
         char filename[255];
         vscanf(f, "%s", filename);
-        // verge::plugin->loadSound(filename);
+
+        VFILE* f = vopen(filename, "r");
+        if (!f) {
+            continue;
+        }
+
+        wasm_loadSound(filename, f->getData().c_str(), f->getData().size());
+        vclose(f);
+        soundNames.push_back(filename);
     }
 
     vclose(f);
@@ -193,6 +246,7 @@ void sound_init() {
     allocbuffers();
     initcontrols(jf);
 
+    wasm_initSound();
     sound_loadsfx("MAIN.SFX");
 }
 
@@ -218,6 +272,11 @@ void stopsound() {
 
 void playeffect(int efc) {
     // verge::plugin->playEffect(efc);
+    if (efc < 0 || efc >= soundNames.size()) {
+        printf("playeffect(%d) bad effect ID\n", efc);
+        return;
+    }
+    wasm_playSound(soundNames[efc].c_str());
 }
 
 /*playsound(char *fname,int rate)
