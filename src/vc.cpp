@@ -86,10 +86,8 @@ unsigned char GrabC() {
 
 unsigned short int GrabW() {
     unsigned short int c;
-    unsigned short int* ptr;
 
-    ptr = (unsigned short*)code;
-    c = *ptr;
+    memcpy(&c, code, 2);
     code += 2;
 
     return c;
@@ -97,10 +95,8 @@ unsigned short int GrabW() {
 
 unsigned int GrabD() {
     unsigned int c;
-    unsigned int* ptr;
 
-    ptr = (unsigned int*)code;
-    c = *ptr;
+    memcpy(&c, code, 4);
     code += 4;
 
     return c;
@@ -281,6 +277,8 @@ int ProcessOperand() {
     case OP_GROUP:
         return ResolveOperand();
     }
+
+    throw std::runtime_error("ProcessOperand: Unknown op " + std::to_string(op_desc));
 }
 
 void ProcessIf() {

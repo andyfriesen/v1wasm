@@ -28,17 +28,36 @@ def EmscriptenEnvironment():
 
     emscriptenOpts = [
         '-s', 'ASYNCIFY',
-        '-s', 'ASYNCIFY_STACK_SIZE=16384',
+        '-s', 'ASYNCIFY_STACK_SIZE=32768',
         '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","wasm_nextFrame","emscripten_sleep"]\'',
         '-s', 'FETCH=1',
         '-s', 'FORCE_FILESYSTEM=1',
         '-s', 'ALLOW_MEMORY_GROWTH=1',
     ]
 
-    env.Append(CXXFLAGS=[
-            '-O1', '-g',
-            # '-O3',
+    if ARGUMENTS.get('debug', 0):
+        emscriptenOpts += [
+            '-s', 'SAFE_HEAP=1',
+            '-s', 'ASSERTIONS=1',
+            '-s', 'STACK_OVERFLOW_CHECK=1',
+            '-s', 'DEMANGLE_SUPPORT=1',
+        ]
 
+        env.Append(CXXFLAGS=[
+            '-g',
+        ])
+
+        env.Append(LINKFLAGS=[
+            '-g4',
+            '--source-map-base', 'http://localhost:8000/',
+        ])
+
+    else:
+        env.Append(CXXFLAGS=[
+            '-O3'
+        ])
+
+    env.Append(CXXFLAGS=[
             '-MMD',
             '-Wno-parentheses',
             '-Wno-long-long',
@@ -48,9 +67,6 @@ def EmscriptenEnvironment():
     )
 
     env.Append(LINKFLAGS=[
-        '-g4', '--source-map-base', 'http://localhost:8000/',
-
-
         '-lidbfs.js',
     ] + emscriptenOpts)
 
@@ -105,6 +121,7 @@ audiereSource = ['src/audiere/' + s for s in Split("""
     device.cpp
     device_mixer.cpp
     device_null.cpp
+    device_wasm.cpp
     dumb_resample.cpp
     file_ansi.cpp
     input.cpp
@@ -122,7 +139,7 @@ audiereSource = ['src/audiere/' + s for s in Split("""
     sound.cpp
     sound_effect.cpp
     square_wave.cpp
-    threads_posix.cpp
+    threads_nope.cpp
     timer_posix.cpp
     tone.cpp
     utility.cpp
@@ -145,18 +162,22 @@ env.Append(
         'src/dumb/include'
     ],
     CXXFLAGS=[
-        # '-std=c++11',
         '-std=c++17',
         #'-Werror', # Hahaha no way.  This code dates back to like 1997.
     ],
+)
+
+audiereEnv = env.Clone()
+
+audiereEnv.Append(
     CPPDEFINES=[
         'NO_FLAC',
         'NO_SPEEX',
         'NO_OGG',
         'NO_MP3',
-        'AUDIERE_NACL',
-        'VERGE_AUDIO'
     ]
 )
 
-verge = env.Program('verge.out.js', sources) # + audiereSource)# + dumbSource)
+audiere = audiereEnv.Object(audiereSource + dumbSource)
+
+verge = env.Program('verge.out.js', sources + audiere)

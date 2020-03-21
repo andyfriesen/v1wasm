@@ -30,17 +30,17 @@ namespace verge {
 
         size_t read(void* dest, size_t length);
         int seek(long int offset, int origin);
-        int tell();
+        int tell() override;
 
         size_t write(const void* src, size_t length);
 
         std::string getData();
 
         // audiere::File implementation
-        virtual void ref();
-        virtual void unref();
-        virtual int read(void* dest, int length);
-        virtual bool seek(int position, audiere::File::SeekMode seekMode);
+        void ref() override;
+        void unref() override;
+        int read(void* dest, int length) override;
+        bool seek(int position, audiere::File::SeekMode seekMode) override;
 
     private:
         FileMode mode;
