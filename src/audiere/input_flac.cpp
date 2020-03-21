@@ -132,7 +132,7 @@ namespace audiere {
       }
 
       // read what we've got!
-      const int to_read = std::min(
+      const int to_read = (std::min)(
         frame_count - frames_read,
         m_buffer.getSize() / frame_size);
       m_buffer.read(out, to_read * frame_size);
@@ -221,7 +221,7 @@ namespace audiere {
   FLAC__StreamDecoderReadStatus FLACInputStream::read_callback(
     const FLAC__StreamDecoder* decoder,
     FLAC__byte buffer[],
-    unsigned *bytes,
+    size_t *bytes,
     void* client_data)
   {
     *bytes = getFile(client_data)->read(buffer, *bytes);

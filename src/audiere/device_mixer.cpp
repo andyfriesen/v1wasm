@@ -65,7 +65,7 @@ namespace audiere {
     s16* out = (s16*)samples;
     int left = sample_count;
     while (left > 0) {
-      int to_mix = std::min(BUFFER_SIZE, left);
+      int to_mix = (std::min)(BUFFER_SIZE, left);
 
       s32 mix_buffer[BUFFER_SIZE];
       memset(mix_buffer, 0, sizeof(mix_buffer));

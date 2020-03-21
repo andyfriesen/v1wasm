@@ -33,9 +33,6 @@ namespace audiere {
       return false;
     }
 
-    // NaCl plugins don't get to set thread priority, I think.
-    // -- andy 30 August 2011
-#if !defined(AUDIERE_NACL)
     // get default scheduling policy
     int policy;
     if (pthread_attr_getschedpolicy(&attr, &policy)) {
@@ -66,7 +63,6 @@ namespace audiere {
         delete ti;
         return false;
     }
-#endif
 
     pthread_t thread;
     int result = pthread_create(&thread, &attr, ThreadRoutine, ti);

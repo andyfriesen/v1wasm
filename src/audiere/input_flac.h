@@ -37,7 +37,7 @@ namespace audiere {
     static FLAC__StreamDecoderReadStatus read_callback(
       const FLAC__StreamDecoder* decoder,
       FLAC__byte buffer[],
-      size_t* bytes,
+      size_t *bytes,
       void* client_data);
     static FLAC__StreamDecoderSeekStatus seek_callback(
       const FLAC__StreamDecoder* decoder,

@@ -6,7 +6,8 @@
 
 #ifndef NO_MPAUDEC
 
-#include <string.h>
+#include <string>
+
 #include "input_mp3.h"
 #include "utility.h"
 #include "debug.h"
@@ -121,7 +122,7 @@ namespace audiere {
     // before the target frame whenever possible, presumably to ensure correct
     // output when jumping into the middle of a stream.  So we'll do that here.
     const int MAX_FRAME_DEPENDENCY = 10;
-    target_frame = std::max(0, target_frame - MAX_FRAME_DEPENDENCY);
+    target_frame = (std::max)(0, target_frame - MAX_FRAME_DEPENDENCY);
     reset();
     m_file->seek(m_frame_offsets[target_frame], File::BEGIN);
     int i;
@@ -182,7 +183,7 @@ namespace audiere {
       }
 
       const int frames_left = frame_count - frames_read;
-      const int frames_to_read = std::min(
+      const int frames_to_read = (std::min)(
         frames_left,
         m_buffer.getSize() / frame_size);
 
@@ -404,14 +405,14 @@ namespace audiere {
   }
 
   void
-  MP3InputStream::ID3v2Parse(u8* buf, int len, u8 version, u8 flags)
+  MP3InputStream::ID3v2Parse(u8* /*buf*/, int len, u8 /*version*/, u8 /*flags*/)
   {
     // skips the ID3v2 frame.
     // the maximium of frame length is 16M.
     u8 buffer[4096];
     while (len > 0) {
-      m_file->read(buffer, std::min(len, 4096));
-      len -= std::min(len, 4096);
+      m_file->read(buffer, (std::min)(len, 4096));
+      len -= (std::min)(len, 4096);
     }
   }
 

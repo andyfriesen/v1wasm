@@ -6,7 +6,7 @@
 #pragma warning(disable : 4786)
 #endif
 
-#include <stdlib.h>
+
 #include <algorithm>
 #include <map>
 #include <string>
@@ -53,7 +53,7 @@ namespace audiere {
 
   template<typename T>
   T clamp(T min, T x, T max) {
-    return std::max(std::min(x, max), min);
+    return (std::max)((std::min)(x, max), min);
   }
 
 
@@ -167,7 +167,7 @@ namespace audiere {
     }
 
     int read(void* buffer, int size) {
-      int to_read = std::min(size, m_size);
+      int to_read = (std::min)(size, m_size);
       memcpy(buffer, m_buffer, to_read);
       memmove(m_buffer, m_buffer + to_read, m_size - to_read);
       m_size -= to_read;

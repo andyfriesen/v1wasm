@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string>
-
+#include <cstdlib>
 
 namespace audiere {
 
@@ -60,7 +60,8 @@ namespace audiere {
   #define ADR_IF_DEBUG     if (true)
 
   #ifdef _MSC_VER
-    #define ADR_ASSERT(condition, label) if (!(condition)) { __asm int 3 }
+    #include <intrin.h>
+    #define ADR_ASSERT(condition, label) if (!(condition)) { __debugbreak(); }
   #else  // assume x86 gcc
     #define ADR_ASSERT(condition, label) assert(condition && label);
   #endif

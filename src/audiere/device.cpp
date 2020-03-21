@@ -11,13 +11,17 @@
 #include "internal.h"
 #include "threads.h"
 
-#ifdef _MSC_VER
-
+#ifdef _WIN32
   #include <windows.h>
-  #include <mmsystem.h>
-  #include "device_ds.h"
-  #include "device_mm.h"
+#endif
 
+#ifdef HAVE_WINMM
+  #include <mmsystem.h>
+  #include "device_mm.h"
+#endif
+
+#ifdef HAVE_DSOUND
+  #include "device_ds.h"
 #endif
 
 #ifdef HAVE_ALSA
@@ -28,8 +32,16 @@
   #include "device_oss.h"
 #endif
 
+#ifdef HAVE_PULSE
+  #include "device_pulse.h"
+#endif
+
 #ifdef HAVE_AL
   #include "device_al.h"
+#endif
+
+#ifdef HAVE_SDL
+  #include "device_sdl.h"
 #endif
 
 #ifdef HAVE_DSOUND
@@ -156,15 +168,17 @@ namespace audiere {
 
   ADR_EXPORT(const char*) AdrGetSupportedAudioDevices() {
     return
-#ifdef _MSC_VER
-      "directsound:DirectSound (high-performance)"  ";"
-      "winmm:Windows Multimedia (compatible)"  ";"
-#else
 #ifdef HAVE_ALSA
       "alsa:Advanced Linux Sound Architecture"  ";"
 #endif
+#ifdef HAVE_SDL
+      "sdl:Simple Direct Media sound device" ";"
+#endif
 #ifdef HAVE_OSS
       "oss:Open Sound System"  ";"
+#endif
+#ifdef HAVE_PULSE
+      "pulse: PulseAudio"  ";"
 #endif
 #ifdef HAVE_DSOUND
       "directsound:DirectSound (high-performance)"  ";"
@@ -176,32 +190,22 @@ namespace audiere {
       "al:SGI AL"  ";"
 #endif
 #ifdef HAVE_PA
-      "pa:portaudo compatible"  ";"
+      "pa:portaudio compatible"  ";"
 #endif
 #ifdef HAVE_CORE_AUDIO
       "coreaudio:Core Audio (Mac OS X)"  ";"
 #endif
-
-#endif
       "null:Null output (no sound)"  ;
   }
 
-
-  #define NEED_SEMICOLON do ; while (false)
-
-  #define TRY_GROUP(group_name) {                               \
-    AudioDevice* device = DoOpenDevice(group_name, parameters); \
+  #define TRY_RECURSE(NAME) do {                                \
+    AudioDevice* device = DoOpenDevice(NAME, parameters);       \
     if (device) {                                               \
       return device;                                            \
     }                                                           \
-  } NEED_SEMICOLON
+  } while (0)
 
-  #define TRY_DEVICE(DeviceType) {                         \
-    DeviceType* device = DeviceType::create(parameters);   \
-    if (device) {                                          \
-      return device;                                       \
-    }                                                      \
-  } NEED_SEMICOLON
+  #define MAKE_DEVICE(DeviceType) (DeviceType::create(parameters))
 
 
   AudioDevice* DoOpenDevice(
@@ -210,98 +214,77 @@ namespace audiere {
   {
     ADR_GUARD("DoOpenDevice");
 
-    #ifdef _MSC_VER
+    if (name == "" || name == "autodetect") {
+      // in decreasing order of sound API quality
+      TRY_RECURSE("alsa");
+      TRY_RECURSE("al");
+      TRY_RECURSE("directsound");
+      TRY_RECURSE("winmm");
+      TRY_RECURSE("sdl");
+      TRY_RECURSE("pulse");
+      TRY_RECURSE("oss");
+      TRY_RECURSE("portaudio");
+      TRY_RECURSE("coreaudio");
+      return 0;
+    }
 
-      if (name == "" || name == "autodetect") {
-        TRY_GROUP("directsound");
-        TRY_GROUP("winmm");
-        return 0;
+    #ifdef HAVE_ALSA
+      if (name == "alsa") {
+        return MAKE_DEVICE(ALSAAudioDevice);
       }
-
-      if (name == "directsound") {
-        TRY_DEVICE(DSAudioDevice);
-        return 0;
-      }
-
-      if (name == "winmm") {
-        TRY_DEVICE(MMAudioDevice);
-        return 0;
-      }
-
-      if (name == "null") {
-        TRY_DEVICE(NullAudioDevice);
-        return 0;
-      }
-
-    #else  // not Win32 - assume autoconf UNIX
-
-      if (name == "" || name == "autodetect") {
-        // in decreasing order of sound API quality
-        TRY_GROUP("alsa");
-        TRY_GROUP("al");
-        TRY_GROUP("directsound");
-        TRY_GROUP("winmm");
-        TRY_GROUP("oss");
-        TRY_GROUP("portaudio");
-        TRY_GROUP("coreaudio");
-        return 0;
-      }
-
-      #ifdef HAVE_ALSA
-        if (name == "alsa") {
-          TRY_DEVICE(ALSAAudioDevice);
-          return 0;
-        }
-      #endif
-
-      #ifdef HAVE_OSS
-        if (name == "oss") {
-          TRY_DEVICE(OSSAudioDevice);
-          return 0;
-        }
-      #endif
-
-      #ifdef HAVE_DSOUND
-        if (name == "directsound") {
-          TRY_DEVICE(DSAudioDevice);
-          return 0;
-        }
-      #endif
-
-      #ifdef HAVE_WINMM
-        if (name == "winmm") {
-          TRY_DEVICE(MMAudioDevice);
-          return 0;
-        }
-      #endif
-
-      #ifdef HAVE_AL
-        if (name == "al") {
-          TRY_DEVICE(ALAudioDevice);
-          return 0;
-        }
-      #endif
-
-      #ifdef HAVE_PA
-	if (name == "portaudio") {
-          TRY_DEVICE(PAAudioDevice);
-          return 0;
-	}
-      #endif
-
-      #ifdef HAVE_CORE_AUDIO
-	if (name == "coreaudio") {
-          TRY_DEVICE(CAAudioDevice);
-          return 0;
-	}
-      #endif
-
-      if (name == "null") {
-        TRY_DEVICE(NullAudioDevice);
-        return 0;
-      }
-
     #endif
+
+    #ifdef HAVE_OSS
+      if (name == "oss") {
+        return MAKE_DEVICE(OSSAudioDevice);
+      }
+    #endif
+
+    #ifdef HAVE_SDL
+      if (name == "sdl") {
+        return MAKE_DEVICE(SDLAudioDevice);
+      }
+    #endif
+
+    #ifdef HAVE_PULSE
+      if (name == "pulse") {
+        return MAKE_DEVICE(PulseAudioDevice);
+      }
+    #endif
+
+    #ifdef HAVE_DSOUND
+      if (name == "directsound") {
+        return MAKE_DEVICE(DSAudioDevice);
+      }
+    #endif
+
+    #ifdef HAVE_WINMM
+      if (name == "winmm") {
+        return MAKE_DEVICE(MMAudioDevice);
+      }
+    #endif
+
+    #ifdef HAVE_AL
+      if (name == "al") {
+        return MAKE_DEVICE(ALAudioDevice);
+      }
+    #endif
+
+    #ifdef HAVE_PA
+      if (name == "portaudio") {
+        return MAKE_DEVICE(PAAudioDevice);
+      }
+    #endif
+
+    #ifdef HAVE_CORE_AUDIO
+      if (name == "coreaudio") {
+        return MAKE_DEVICE(CAAudioDevice);
+      }
+    #endif
+
+    if (name == "null") {
+      return MAKE_DEVICE(NullAudioDevice);
+    }
 
     // no devices
     return 0;
@@ -387,7 +370,7 @@ namespace audiere {
         ADR_LOG("arg is not valid");
       }
 
-      ThreadedDevice* This = (ThreadedDevice*)arg;
+      ThreadedDevice* This = static_cast<ThreadedDevice*>(arg);
       This->run();
     }
 

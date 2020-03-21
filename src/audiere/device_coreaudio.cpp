@@ -1,9 +1,11 @@
 #include <algorithm>
 #include <string>
 #include <stdio.h>
+
 #include "device_coreaudio.h"
 #include "debug.h"
 
+#include <CoreServices/CoreServices.h>
 
 namespace audiere {
 
@@ -30,9 +32,9 @@ namespace audiere {
                                     requestedDesc.mFramesPerPacket;
 
     // Locate the default output audio unit
-    desc.componentType = kAudioUnitComponentType;
-    desc.componentSubType = kAudioUnitSubType_Output;
-    desc.componentManufacturer = kAudioUnitID_DefaultOutput;
+    desc.componentType = kAudioUnitType_Output;
+    desc.componentSubType = kAudioUnitSubType_DefaultOutput;
+    desc.componentManufacturer = kAudioUnitManufacturer_Apple;
     desc.componentFlags = 0;
     desc.componentFlagsMask = 0;
 
@@ -79,12 +81,12 @@ namespace audiere {
       m_output_audio_unit (output_audio_unit)
   {
     // Set the audio callback
-    struct AudioUnitInputCallback callback;
+    AURenderCallbackStruct callback;
 
     callback.inputProc = fillInput;
     callback.inputProcRefCon = this;
     AudioUnitSetProperty(m_output_audio_unit,
-                         kAudioUnitProperty_SetInputCallback,
+                         kAudioUnitProperty_SetRenderCallback,
                          kAudioUnitScope_Input,
                          0,
                          &callback,
@@ -97,7 +99,7 @@ namespace audiere {
   CAAudioDevice::~CAAudioDevice() {
     ADR_GUARD("CAAudioDevice::~CAAudioDevice");
     OSStatus result;
-    struct AudioUnitInputCallback callback;
+    AURenderCallbackStruct callback;
 
     // stop processing the audio unit
     result = AudioOutputUnitStop(m_output_audio_unit);
@@ -106,7 +108,7 @@ namespace audiere {
     callback.inputProc = 0;
     callback.inputProcRefCon = 0;
     result = AudioUnitSetProperty(m_output_audio_unit,
-                                  kAudioUnitProperty_SetInputCallback,
+                                  kAudioUnitProperty_SetRenderCallback,
                                   kAudioUnitScope_Input,
                                   0,
                                   &callback,
@@ -116,20 +118,25 @@ namespace audiere {
 
 
   OSStatus CAAudioDevice::fillInput(void                         *inRefCon,
-                                    AudioUnitRenderActionFlags   inActionFlags,
+                                    AudioUnitRenderActionFlags   *inActionFlags,
                                     const AudioTimeStamp         *inTimeStamp,
                                     UInt32                       inBusNumber,
-                                    AudioBuffer                  *ioData) {
+                                    UInt32                       inNumberFrames,
+                                    AudioBufferList              *ioData) {
     CAAudioDevice* device = static_cast<CAAudioDevice*>(inRefCon);
     UInt32 remaining, len;
     void* ptr;
+    AudioBuffer *curBuffer;
 
-    remaining = ioData->mDataByteSize;
-    ptr = ioData->mData;
-    while (remaining > 0) {
-      len = device->read(remaining / 4, ptr);
-      ptr = (char *)ptr + len;
-      remaining -= len * 4;
+    for (unsigned int currentBuffer = 0; currentBuffer < ioData->mNumberBuffers; currentBuffer++) {
+        curBuffer = &ioData->mBuffers[currentBuffer];
+        remaining = curBuffer->mDataByteSize;
+        ptr = curBuffer->mData;
+        while (remaining > 0) {
+          len = device->read(remaining / 4, ptr);
+          ptr = (char *)ptr + len;
+          remaining -= len * 4;
+        }
     }
 
     return noErr;

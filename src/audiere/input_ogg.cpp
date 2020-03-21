@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <string.h>
+#include <string>
 #include "input_ogg.h"
 #include "types.h"
 #include "utility.h"
@@ -111,7 +111,7 @@ namespace audiere {
         break;
       }
 
-#ifdef WORDS_BIGENDIAN
+#if defined(WORDS_BIGENDIAN) || defined(__BIG_ENDIAN__)
 #define ENDIANNESS 1
 #else
 #define ENDIANNESS 0

@@ -2,7 +2,7 @@
  * @file
  *
  * Audiere Sound System
- * Version 1.9.4
+ * Version 1.10.1
  * (c) 2001-2003 Chad Austin
  *
  * This API uses principles explained at
@@ -31,6 +31,7 @@
 #include <cstring>
 
 #ifdef _MSC_VER
+#pragma warning(push)
 #pragma warning(disable : 4786)
 #endif
 
@@ -43,7 +44,7 @@
 
 // DLLs in Windows should use the standard (Pascal) calling convention
 #ifndef ADR_CALL
-  #if defined(WIN32) || defined(_WIN32)
+  #if defined(_WIN32)
     #define ADR_CALL __stdcall
   #else
     #define ADR_CALL
@@ -52,7 +53,7 @@
 
 // Export functions from the DLL
 #ifndef ADR_DECL
-#  if defined(WIN32) || defined(_WIN32)
+#  if defined(_WIN32)
 #    ifdef AUDIERE_EXPORTS
 #      define ADR_DECL __declspec(dllexport)
 #    else
@@ -1592,5 +1593,8 @@ namespace audiere {
 
 }
 
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 #endif

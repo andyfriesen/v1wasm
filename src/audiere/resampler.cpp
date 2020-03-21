@@ -39,7 +39,7 @@ namespace audiere {
       delta = float(m_native_sample_rate / m_rate);
     }
     while (left > 0) {
-      int transfer = std::min(left, int(BUFFER_SIZE));
+      int transfer = (std::min)(left, int(BUFFER_SIZE));
       memset(tmp_l, 0, transfer * sizeof(sample_t));
       int rv = dumb_resample(&m_resampler_l, tmp_l, transfer, 1.0, delta);
       if (rv == 0) {

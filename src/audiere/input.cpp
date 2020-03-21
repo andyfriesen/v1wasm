@@ -1,5 +1,5 @@
 #include <memory>
-#include <string.h>
+#include <string>
 #include "debug.h"
 #include "default_file.h"
 #ifndef NO_FLAC

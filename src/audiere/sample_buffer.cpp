@@ -35,7 +35,7 @@ namespace audiere {
 
 
     int doRead(int frame_count, void* buffer) {
-      int to_read = std::min(frame_count, m_frame_count - m_position);
+      int to_read = (std::min)(frame_count, m_frame_count - m_position);
       memcpy(
         buffer,
         m_samples + m_position * m_frame_size,

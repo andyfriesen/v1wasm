@@ -102,7 +102,7 @@ namespace audiere {
         int next_point = (next_point_idx == -1
                             ? m_length
                             : m_loop_points[next_point_idx].location);
-        int to_read = std::min(frames_left, next_point - position);
+        int to_read = (std::min)(frames_left, next_point - position);
         ADR_ASSERT(to_read >= 0, "How can we read a negative number of frames?");
 
         int read = m_source->read(to_read, out);

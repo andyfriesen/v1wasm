@@ -125,7 +125,7 @@ namespace audiere {
       const int BUFFER_SIZE = 1024;
       float read_buffer[BUFFER_SIZE];
 
-      int should_read = std::min(frame_count, BUFFER_SIZE);
+      int should_read = (std::min)(frame_count, BUFFER_SIZE);
       int actual_read = m_read_buffer.read(read_buffer, should_read * sizeof(float)) / sizeof(float);
       ADR_ASSERT(actual_read != 0, "Read queue should have data");
 

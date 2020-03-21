@@ -39,7 +39,7 @@ namespace audiere {
   }
 
   int ADR_CALL MemoryFile::read(void* buffer, int size) {
-    int real_read = std::min((m_size - m_position), size);
+    int real_read = (std::min)((m_size - m_position), size);
     memcpy(buffer, m_buffer + m_position, real_read);
     m_position += real_read;
     return real_read;

@@ -1,4 +1,4 @@
-#include <string.h>
+#include <string>
 #include "debug.h"
 #include "input_wav.h"
 #include "utility.h"
@@ -82,14 +82,14 @@ namespace audiere {
       return 0;
     }
 
-    const int frames_to_read = std::min(frame_count, m_frames_left_in_chunk);
+    const int frames_to_read = (std::min)(frame_count, m_frames_left_in_chunk);
     const int frame_size = m_channel_count * GetSampleSize(m_sample_format);
     const int bytes_to_read = frames_to_read * frame_size;
 
     const int read = m_file->read(buffer, bytes_to_read);
     const int frames_read = read / frame_size;
 
-#if WORDS_BIGENDIAN
+#if defined(WORDS_BIGENDIAN) || defined(__BIG_ENDIAN__)
     if (m_sample_format == SF_S16) {
       // make little endian into host endian
       u8* out = (u8*)buffer;

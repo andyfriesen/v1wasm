@@ -5,10 +5,6 @@
 #include "audiere.h"
 #include "device_mixer.h"
 #include <AudioUnit/AudioUnit.h>
-#ifdef AVAILABLE_MAC_OS_X_VERSION_10_5_AND_LATER
-#include <AudioUnit/AUNTComponent.h>
-#endif
-
 
 namespace audiere {
 
@@ -17,7 +13,7 @@ namespace audiere {
     static CAAudioDevice* create(const ParameterList& parameters);
 
   private:
-    CAAudioDevice(ComponentInstance output_audio_unit);
+    CAAudioDevice(AudioUnit output_audio_unit);
     ~CAAudioDevice();
 
   public:
@@ -25,13 +21,14 @@ namespace audiere {
     const char* ADR_CALL getName();
 
     static OSStatus fillInput(void                        *inRefCon,
-			      AudioUnitRenderActionFlags  inActionFlags,
+			      AudioUnitRenderActionFlags  *inActionFlags,
 			      const AudioTimeStamp        *inTimeStamp,
 			      UInt32                      inBusNumber,
-			      AudioBuffer                 *ioData);
+			      UInt32                      inNumberFlags,
+			      AudioBufferList             *ioData);
 
   private:
-      ComponentInstance m_output_audio_unit;
+      AudioUnit m_output_audio_unit;
   };
 
 }

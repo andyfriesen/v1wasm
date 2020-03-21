@@ -41,7 +41,7 @@ namespace audiere {
                                 SND_PCM_ACCESS_RW_INTERLEAVED,
                                 2, rate, 1, 0);
     if (status < 0) {
-      rate = 441000;
+      rate = 44100;
       status = snd_pcm_set_params(pcm_handle,
                                   SND_PCM_FORMAT_S16_LE,
                                   SND_PCM_ACCESS_RW_INTERLEAVED,
