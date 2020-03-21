@@ -67,7 +67,7 @@ namespace audiere {
     while (left > 0) {
       int to_mix = (std::min)(BUFFER_SIZE, left);
 
-      s32 mix_buffer[BUFFER_SIZE];
+      s32 mix_buffer[BUFFER_SIZE * 2];
       memset(mix_buffer, 0, sizeof(mix_buffer));
     
       for (std::list<MixerStream*>::iterator s = m_streams.begin();
