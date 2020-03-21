@@ -27,57 +27,31 @@ EM_JS(void, audiere_createDevice, (void* devicePtr, CB process), {
 
     Module.dynCall_viii(process, devicePtr, device.inputPtr, framesToRender);
 
-    try {
+    const leftInPtr   = HEAPU32[(device.inputPtr >> 2) + 0];
+    const leftInSize  = HEAPU32[(device.inputPtr >> 2) + 1];
+    const rightInPtr  = HEAPU32[(device.inputPtr >> 2) + 2];
+    const rightInSize = HEAPU32[(device.inputPtr >> 2) + 3];
 
-    const leftInPtr   = HEAPU32[device.inputPtr >> 2 + 0];
-    const leftInSize  = HEAPU32[device.inputPtr >> 2 + 1];
-    // const rightInPtr  = HEAPU32[device.inputPtr >> 2 + 2];
-    // const rightInSize = HEAPU32[device.inputPtr >> 2 + 3];
-
-    const leftSourceData = HEAPF32.subarray(leftInPtr >> 2, leftInPtr >> 2 + leftInSize);
-    // const rightSourceData = HEAPF32.subarray(rigthInPtr >> 2, rightInPtr >> 2 + rightInSize);
+    const leftSourceData = HEAPF32.subarray(leftInPtr >> 2, (leftInPtr >> 2) + leftInSize);
+    const rightSourceData = HEAPF32.subarray(rightInPtr >> 2, (rightInPtr >> 2) + rightInSize);
 
     outputBuffer.copyToChannel(leftSourceData, 0, 0);
-    } catch (e) {
-      console.exception('NO', e);
-      throw e;
-    }
-
-    // copy leftInPtr into left and rightInPtr into right
-    // clear everything after the end of l and r.  Fill with 0s.
-
+    outputBuffer.copyToChannel(rightSourceData, 1, 0);
   };
   device.scriptNode.connect(device.audioContext.destination);
 });
 
 EM_JS(void, audiere_deleteDevice, (void* devicePtr), {
-    
+  // FIXME!!!
 });
 
 namespace audiere {
   WasmAudioDevice::WasmAudioDevice()
     : MixerDevice(44100)
   {
-    //   sampleFrameCount = pp::AudioConfig::RecommendSampleFrameCount(
-    //       instance,
-    //       PP_AUDIOSAMPLERATE_44100,
-    //       SAMPLE_FRAME_COUNT
-    //   );
-
-    //   pp::AudioConfig audio_config = pp::AudioConfig(
-    //       instance,
-    //       PP_AUDIOSAMPLERATE_44100,
-    //       sampleFrameCount
-    //   );
-
-    //   audio = new pp::Audio(
-    //       instance,
-    //       audio_config,
-    //       &WasmAudioDevice::_audioCallback,
-    //       this
-    //   );
-
-    //   audio->StartPlayback();
+    sampleBuffer.reserve(4096);
+    leftOut.reserve(4096);
+    rightOut.reserve(4096);
     audiere_createDevice((void*)this, &WasmAudioDevice::_audioCallback);
   }
 
@@ -100,10 +74,10 @@ namespace audiere {
 
   struct WasmAudioBuffers {
       float* left;
-      int leftSize;
+      intptr_t leftSize;
       float* right;
-      int rightSize;
-  };
+      intptr_t rightSize;
+  } __attribute__((packed));
 
   void WasmAudioDevice::_audioCallback(void* self, WasmAudioBuffers* dest, int framesToRender) {
     WasmAudioDevice* self_ = static_cast<WasmAudioDevice*>(self);
@@ -112,16 +86,17 @@ namespace audiere {
 
 
   void WasmAudioDevice::audioCallback(WasmAudioBuffers* dest, int framesToRender) {
-      // TODO: _somewhere_ we need to allocate a block of memory, call this->read to fill it with samples,
-      // and then set the properties of dest to point into that memory.  std::vector<float> should be fine?
-    if (framesToRender > sampleBuffer.size()) {
-      printf("resize %d\n", framesToRender);
-      sampleBuffer.resize(framesToRender * 2);
-    }
-
     this->read(framesToRender, sampleBuffer.data());
 
-    dest->left = sampleBuffer.data();
-    dest->leftSize = sampleBuffer.size();
+    // Deinterlace and convert from signed short to float32
+    for (int i = 0; i < framesToRender; ++i) {
+      leftOut[i]  = float(sampleBuffer[i * 2]) / 32768;
+      rightOut[i] = float(sampleBuffer[i * 2 + 1]) / 32768;
+    }
+
+    dest->left = leftOut.data();
+    dest->leftSize = framesToRender;
+    dest->right = rightOut.data();
+    dest->rightSize = framesToRender;
   }
 }

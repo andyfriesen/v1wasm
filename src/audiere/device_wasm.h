@@ -29,7 +29,10 @@ namespace audiere {
 
   private:
     uint32_t sampleFrameCount;
-    std::vector<float> sampleBuffer;
+    std::vector<signed short> sampleBuffer;
+
+    std::vector<float> leftOut;
+    std::vector<float> rightOut;
   };
 
 }
