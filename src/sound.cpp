@@ -14,6 +14,8 @@
 #include "timer.h"
 #include "render.h"
 #include "fs.h"
+#include "audiere/audiere.h"
+#include "audiere/device_wasm.h"
 
 using namespace verge;
 
@@ -31,6 +33,9 @@ signed short mp_sngpos = 0;
 
 namespace {
     std::vector<std::string> soundNames;
+
+    audiere::AudioDevicePtr audioDevice;
+    audiere::OutputStreamPtr currentMusic;
 }
 
 EM_JS(void, wasm_initSound, (), {
@@ -49,13 +54,13 @@ EM_JS(void, wasm_loadSound, (const char* filename, const char* soundData, int so
             // Instead, we just pray that it finishes before the sound is needed for the first time!
             // wasm_plyaSound is coded to silently do nothing if you try to play something that's not loaded.
             // -- andy 17 March 2020
-            console.log("Loaded ", name, " ok!");
+            // console.log("Loaded ", name, " ok!");
             window.verge.sounds[name] = decoded;
         },
         () => {
             console.log("Unable to load sound data for ", name); // fixme
         }
-    )
+    );
 });
 
 EM_JS(void, wasm_playSound, (const char* filename), {
@@ -246,6 +251,8 @@ void sound_init() {
     allocbuffers();
     initcontrols(jf);
 
+    audioDevice = new audiere::WasmAudioDevice();
+
     wasm_initSound();
     sound_loadsfx("MAIN.SFX");
 }
@@ -259,11 +266,29 @@ namespace {
     std::string playingSong;
 }
 
+namespace audiere {
+    SampleSource* OpenSource(
+        const FilePtr& file,
+        const char* filename,
+        FileFormat file_format
+    );
+}
+
 void playsong(const std::string& songName) {
     if (songName != playingSong) {
         playingSong = songName;
         // verge::plugin->playSong(songName);
     }
+
+    auto f = verge::vopen(songName.c_str(), "r");
+    auto file_format = audiere::FF_MOD;
+    auto ss = audiere::OpenSource(audiere::FilePtr(f), songName.c_str(), file_format);
+    currentMusic = audiere::OpenSound(audioDevice, ss, false);
+    if (currentMusic) {
+        currentMusic->setRepeat(true);
+        currentMusic->play();
+    }
+    verge::vclose(f);
 }
 
 void stopsound() {
