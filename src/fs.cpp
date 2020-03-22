@@ -20,7 +20,7 @@ namespace verge {
 
     File::File(DataVec data)
         : mode(FileMode::None)
-        , data(data)
+        , data(std::move(data))
         , pos(0)
     {
     }
@@ -138,8 +138,11 @@ namespace verge {
             f.reset(new File(DataVec()));
             FilePtr g(f);
             files[fn] = f;
-        } else if (files.count(fn)) {
-            f = files[fn];
+        } else {
+            auto it = files.find(fn);
+            if (it != files.end()) {
+                f = it->second;
+            }
         }
 
         if (f) {

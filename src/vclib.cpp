@@ -1558,7 +1558,6 @@ void VCLoadRaw() {
 
 void ExecLibFunc(unsigned char func) {
     STACK;
-    printf("ExecLibFunc %i\n", func);
 
     switch (func) {
     case 1:
@@ -1880,7 +1879,6 @@ void ExecLibFunc(unsigned char func) {
     default:
         err("*error* Unknown library function in VC code");
     }
-    printf("\tExecLibFunc %i OK\n", func);
 }
 
 int ReadVar0(int var) {

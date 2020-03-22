@@ -29,7 +29,7 @@ def EmscriptenEnvironment():
     emscriptenOpts = [
         '-s', 'ASYNCIFY',
         '-s', 'ASYNCIFY_STACK_SIZE=32768',
-        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","wasm_nextFrame","emscripten_sleep"]\'',
+        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","downloadAll","wasm_nextFrame","emscripten_sleep"]\'',
         '-s', 'FETCH=1',
         '-s', 'FORCE_FILESYSTEM=1',
         '-s', 'ALLOW_MEMORY_GROWTH=1',

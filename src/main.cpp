@@ -38,6 +38,49 @@ namespace verge {
 
     void preload(std::string_view);
 
+    using DownloadCB = void(*)(char* filename, size_t size, char* data);
+
+    EM_JS(void, downloadAll, (const char** manifest, DownloadCB putFile), {
+        return Asyncify.handleSleep(resume => {
+            let promises = [];
+            let count = 0;
+
+            function download(pathPtr) {
+                const path = UTF8ToString(pathPtr);
+                return fetch(path).then(response => {
+                    if (!response.ok) {
+                        console.error('fetchSync failed', path);
+                        HEAP32[size >> 2] = 0;
+                        HEAP32[data >> 2] = 0;
+                        throw 'fetchSync failed';
+                    }
+                    return response.blob();
+                }).then(blob =>
+                    blob.arrayBuffer()
+                ).then(array => {
+                    const bytes = new Uint8Array(array);
+                    const dataPtr = _malloc(bytes.length);
+                    HEAP8.set(bytes, dataPtr);
+                    Module.dynCall_viii(putFile, pathPtr, bytes.length, dataPtr);
+
+                    ++count;
+                    verge.setLoadingProgress((100 * count / promises.length) | 0)
+                });
+            }
+
+            while (true) {
+                let pathPtr = HEAPU32[manifest >> 2];
+                if (pathPtr == 0) {
+                    break;
+                }
+                manifest += 4;
+                promises.push(download(pathPtr));
+            }
+
+            Promise.all(promises).then(() => { resume(); });
+        });
+    });
+
     EM_JS(void, fetchSync, (const char* pathPtr, size_t* size, char** data), {
         return Asyncify.handleSleep(resume => {
             const path = UTF8ToString(pathPtr);
@@ -67,10 +110,6 @@ namespace verge {
     struct FreeDelete { void operator()(char* p) { free(p); } };
     using Deleter = std::unique_ptr<char, FreeDelete>;
 
-    EM_JS(void, setLoadingProgress, (int progress), {
-        verge.setLoadingProgress(progress);
-    });
-
     void downloadGame() {
         std::string manifestPath = gameRoot + "manifest.txt";
         char* manifestPtr;
@@ -80,33 +119,39 @@ namespace verge {
 
         std::string_view manifest{ manifestPtr, manifestLength };
 
-        std::vector<std::string_view> files;
+        std::vector<std::string> files;
         auto append = [&](std::string_view name) {
             if (!name.empty())
-                files.push_back(name);
+                files.push_back(gameRoot + std::string{ name });
         };
 
         while (!manifest.empty()) {
             auto pos = manifest.find('\n');
             if (pos == std::string::npos) {
-                append(manifest);
+                append(std::string{ manifest });
                 break;
             }
-            append(manifest.substr(0, pos));
+            append(std::string{ manifest.substr(0, pos) });
             manifest.remove_prefix(pos + 1);
         }
 
-        int i = 0;
-
-        for (const auto& filename: files) {
-            preload(filename);
-
-            int progress = i * 100 / files.size();
-            ++i;
-            setLoadingProgress(progress);
+        char** stuff = new char*[files.size() + 1];
+        for (int i = 0; i < files.size(); ++i) {
+            stuff[i] = (char*)files[i].c_str();
         }
+        stuff[files.size()] = nullptr;
 
-        setLoadingProgress(100);
+        downloadAll((const char**)stuff, [](char* filename, size_t size, char* data) {
+            verge::DataVec vec(data, data + size);
+            // filename always has gameRoot prefix.  Strip it off.
+            verge::vset(std::string{ filename + gameRoot.size() }, std::move(vec));
+        });
+
+        delete[] stuff;
+
+        EM_ASM({
+            window.verge.setLoadingProgress(100);
+        });
     }
 
     void preload(std::string_view path) {
@@ -120,7 +165,6 @@ namespace verge {
 
         verge::DataVec vec(content, content + contentLength);
 
-        // printf("Preloaded '%s' %zi bytes\n", filename.c_str(), vec.size());
         verge::vset(std::string{ path }, std::move(vec));
     }
 
