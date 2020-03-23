@@ -70,9 +70,9 @@ namespace audiere {
   WasmAudioDevice::WasmAudioDevice()
     : MixerDevice(44100)
   {
-    sampleBuffer.reserve(8192);
-    leftOut.reserve(8192);
-    rightOut.reserve(8192);
+    sampleBuffer.resize(8192);
+    leftOut.resize(4096);
+    rightOut.resize(4096);
     audiere_createDevice((void*)this, &WasmAudioDevice::_audioCallback);
   }
 
@@ -107,6 +107,12 @@ namespace audiere {
 
 
   void WasmAudioDevice::audioCallback(WasmAudioBuffers* dest, int framesToRender) {
+    if (framesToRender * 2 > sampleBuffer.size()) {
+      sampleBuffer.resize(framesToRender * 2);
+      leftOut.resize(framesToRender);
+      rightOut.resize(framesToRender);
+    }
+
     this->read(framesToRender, sampleBuffer.data());
 
     // Deinterlace and convert from signed short to float32
