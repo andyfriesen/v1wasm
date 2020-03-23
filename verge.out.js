@@ -1292,11 +1292,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5760288,
+    STACK_BASE = 5764976,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 517408,
-    DYNAMIC_BASE = 5760288,
-    DYNAMICTOP_PTR = 517232;
+    STACK_MAX = 522096,
+    DYNAMIC_BASE = 5764976,
+    DYNAMICTOP_PTR = 521920;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1827,20 +1827,20 @@ function _emscripten_asm_const_iii(code, sigPtr, argbuf) {
   var args = readAsmConstArgs(sigPtr, argbuf);
   return ASM_CONSTS[code].apply(null, args);
 }function wasm_initSound(){ window.verge.audioContext = new AudioContext(); window.verge.sounds = {}; }
-function audiere_deleteDevice(devicePtr){ }
+function audiere_deleteDevice(devicePtr){ if (!window.audiereDevices) { console.error('audiere_deleteDevice before audiere_createDevice?', devicePtr); return; } const device = window.audiereDevices[devicePtr]; if (!device) { console.error('audiere_deleteDevice got a bad pointer', devicePtr); return; } device.scriptNode.disconnect(); _free(device.inputPtr); window.removeEventListener('click', device.resume); window.removeEventListener('keydown', device.resume); delete window.audiereDevices[devicePtr]; }
 function wasm_nextFrame(){ return Asyncify.handleSleep(requestAnimationFrame); }
 function wasm_initFileSystem(c){ let sgr = UTF8ToString(c); if (sgr.endsWith('/')) sgr = sgr.substr(0, sgr.length - 1); FS.mkdir("/persist"); FS.mkdir(sgr); FS.mount(IDBFS, {}, sgr); FS.syncfs(true, function (err) { if (err) console.error('wasm_initFileSystem failed!', err); }); }
 function fetchSync(pathPtr,size,data){ return Asyncify.handleSleep(resume => { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; resume(); return; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); HEAP32[size >> 2] = bytes.length; const dataPtr = _malloc(bytes.length); HEAP32[data >> 2] = dataPtr; HEAP8.set(bytes, dataPtr); resume(); }); }); }
 function wasm_vgadump(frameBuffer,frameBufferSize,palette){ const pal = HEAPU8.subarray(palette, palette + 768); const fb = HEAPU8.subarray(frameBuffer, frameBuffer + frameBufferSize); const stride = 0; let srcIndex = 0; let destIndex = 0; const ia = window.vergeImageArray; for (let y = 0; y < 200; ++y) { for (let x = 0; x < 320; ++x) { let c = fb[srcIndex++]; ia[destIndex++] = pal[c * 3]; ia[destIndex++] = pal[c * 3 + 1]; ia[destIndex++] = pal[c * 3 + 2]; ia[destIndex++] = 0xFF; } srcIndex += stride; } window.vergeContext.putImageData(window.vergeImageData, 0, 0); }
 function wasm_playSound(filename){ const name = UTF8ToString(filename); const sound = window.verge.sounds[name]; if (!sound) { console.error("Unknown sound ", name); return; } console.log("Playing ", name); const source = window.verge.audioContext.createBufferSource(); source.connect(window.verge.audioContext.destination); source.buffer = sound; source.start(0); }
 function wasm_loadSound(filename,soundData,soundDataSize){ const name = UTF8ToString(filename); const audioData = HEAPU8.buffer.slice(soundData, soundData + soundDataSize); window.verge = window.verge || {}; window.verge.audioContext.decodeAudioData( audioData, decoded => { window.verge.sounds[name] = decoded; }, () => { console.log("Unable to load sound data for ", name); } ); }
-function audiere_createDevice(devicePtr,process){ const device = {}; window.audiereDevices = window.audiereDevices || {}; window.audiereDevices[devicePtr] = device; device.maxFramesPerChunk = 4096; device.audioContext = new AudioContext(); device.scriptNode = device.audioContext.createScriptProcessor(device.maxFramesPerChunk); device.inputPtr = Module._malloc(4 * 4); device.scriptNode.onaudioprocess = ev => { const outputBuffer = ev.outputBuffer; const framesToRender = outputBuffer.length; Module.dynCall_viii(process, devicePtr, device.inputPtr, framesToRender); const leftInPtr = HEAPU32[(device.inputPtr >> 2) + 0]; const leftInSize = HEAPU32[(device.inputPtr >> 2) + 1]; const rightInPtr = HEAPU32[(device.inputPtr >> 2) + 2]; const rightInSize = HEAPU32[(device.inputPtr >> 2) + 3]; const leftSourceData = HEAPF32.subarray(leftInPtr >> 2, (leftInPtr >> 2) + leftInSize); const rightSourceData = HEAPF32.subarray(rightInPtr >> 2, (rightInPtr >> 2) + rightInSize); outputBuffer.copyToChannel(leftSourceData, 0, 0); outputBuffer.copyToChannel(rightSourceData, 1, 0); }; device.scriptNode.connect(device.audioContext.destination); }
+function audiere_createDevice(devicePtr,process){ const device = {}; window.audiereDevices = window.audiereDevices || {}; window.audiereDevices[devicePtr] = device; device.maxFramesPerChunk = 4096; device.audioContext = new AudioContext(); device.scriptNode = device.audioContext.createScriptProcessor(device.maxFramesPerChunk); device.inputPtr = Module._malloc(4 * 4); device.scriptNode.onaudioprocess = ev => { const outputBuffer = ev.outputBuffer; const framesToRender = outputBuffer.length; Module.dynCall_viii(process, devicePtr, device.inputPtr, framesToRender); const leftInPtr = HEAPU32[(device.inputPtr >> 2) + 0]; const leftInSize = HEAPU32[(device.inputPtr >> 2) + 1]; const rightInPtr = HEAPU32[(device.inputPtr >> 2) + 2]; const rightInSize = HEAPU32[(device.inputPtr >> 2) + 3]; const leftSourceData = HEAPF32.subarray(leftInPtr >> 2, (leftInPtr >> 2) + leftInSize); const rightSourceData = HEAPF32.subarray(rightInPtr >> 2, (rightInPtr >> 2) + rightInSize); outputBuffer.copyToChannel(leftSourceData, 0, 0); outputBuffer.copyToChannel(rightSourceData, 1, 0); }; device.scriptNode.connect(device.audioContext.destination); device.resume = () => device.audioContext.resume(); window.addEventListener('click', device.resume); window.addEventListener('keydown', device.resume); }
 function downloadAll(manifest,putFile){ return Asyncify.handleSleep(resume => { let promises = []; let count = 0; function download(pathPtr) { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; throw 'fetchSync failed'; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); const dataPtr = _malloc(bytes.length); HEAP8.set(bytes, dataPtr); Module.dynCall_viii(putFile, pathPtr, bytes.length, dataPtr); ++count; verge.setLoadingProgress((100 * count / promises.length) | 0) }); } while (true) { let pathPtr = HEAPU32[manifest >> 2]; if (pathPtr == 0) { break; } manifest += 4; promises.push(download(pathPtr)); } Promise.all(promises).then(() => { resume(); }); }); }
 function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanvas'); window.vergeContext = window.vergeCanvas.getContext('2d'); window.vergeImageData = new ImageData(320, 200); window.vergeImageArray = window.vergeImageData.data; }
 
 
 
-// STATICTOP = STATIC_BASE + 516384;
+// STATICTOP = STATIC_BASE + 521072;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -4757,7 +4757,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 517232;
+      return 521920;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {

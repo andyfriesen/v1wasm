@@ -47,16 +47,32 @@ EM_JS(void, audiere_createDevice, (void* devicePtr, CB process), {
 });
 
 EM_JS(void, audiere_deleteDevice, (void* devicePtr), {
-  // FIXME!!!
+  if (!window.audiereDevices) {
+    console.error('audiere_deleteDevice before audiere_createDevice?', devicePtr);
+    return;
+  }
+
+  const device = window.audiereDevices[devicePtr];
+  if (!device) {
+    console.error('audiere_deleteDevice got a bad pointer', devicePtr);
+    return;
+  }
+
+  device.scriptNode.disconnect();
+  _free(device.inputPtr);
+  window.removeEventListener('click', device.resume);
+  window.removeEventListener('keydown', device.resume);
+
+  delete window.audiereDevices[devicePtr];
 });
 
 namespace audiere {
   WasmAudioDevice::WasmAudioDevice()
     : MixerDevice(44100)
   {
-    sampleBuffer.reserve(4096);
-    leftOut.reserve(4096);
-    rightOut.reserve(4096);
+    sampleBuffer.reserve(8192);
+    leftOut.reserve(8192);
+    rightOut.reserve(8192);
     audiere_createDevice((void*)this, &WasmAudioDevice::_audioCallback);
   }
 
