@@ -121,8 +121,13 @@ namespace verge {
 
         std::vector<std::string> files;
         auto append = [&](std::string_view name) {
-            if (!name.empty())
-                files.push_back(gameRoot + std::string{ name });
+            if (name.empty())
+                return;
+
+            if (name[name.size() - 1] == '\r')
+                name.remove_suffix(1);
+
+            files.push_back(gameRoot + std::string{ name });
         };
 
         while (!manifest.empty()) {
