@@ -16,30 +16,45 @@ if not emcc:
     sys.exit(1)
 
 def EmscriptenEnvironment():
-    env = Environment()
+    if sys.platform == 'windows':
+        env_dict = {
+            'path': os.environ['PATH']
+        }
+
+        for key in ['HOME', 'USERPROFILE', 'EM_CONFIG']:
+            value = os.environ.get(key)
+            if value is not None:
+                env_dict[key] = value
+
+        env = Environment(ENV=env_dict, TOOLS=['mingw'])
+    else:
+        env = Environment()
 
     env['CC'] = emcc
     env['CXX'] = emcc
 
-    env.Append(CXXFLAGS=[
-            '-fcolor-diagnostics'
-        ]
-    )
-
     emscriptenOpts = [
         '-s', 'ASYNCIFY',
         '-s', 'ASYNCIFY_STACK_SIZE=32768',
-        '-s', 'ASYNCIFY_IMPORTS=\'["fetchSync","downloadAll","wasm_nextFrame","emscripten_sleep"]\'',
+        '-s', 'ASYNCIFY_IMPORTS=["fetchSync","downloadAll","wasm_nextFrame","emscripten_sleep"]',
         '-s', 'FETCH=1',
         '-s', 'FORCE_FILESYSTEM=1',
         '-s', 'ALLOW_MEMORY_GROWTH=1',
     ]
 
-    cflags = []
+    cflags = ['-fcolor-diagnostics']
 
-    if ARGUMENTS.get('debug', 0):
+    debug = ARGUMENTS.get('debug', 0)
+    asan = ARGUMENTS.get('asan', 0)
+    ubsan = ARGUMENTS.get('ubsan', 0)
+
+    if debug:
+        if not asan:
+            emscriptenOpts += [
+                '-s', 'SAFE_HEAP=1',
+            ]
+
         emscriptenOpts += [
-            '-s', 'SAFE_HEAP=1',
             '-s', 'ASSERTIONS=1',
             '-s', 'STACK_OVERFLOW_CHECK=1',
             '-s', 'DEMANGLE_SUPPORT=1',
@@ -54,6 +69,13 @@ def EmscriptenEnvironment():
 
     else:
         cflags.append('-O3')
+
+    if asan:
+        cflags.append('-fsanitize=address')
+        env.Append(LINKFLAGS=['-fsanitize=address'])
+    if ubsan:
+        cflags.append('-fsanitize=undefined')
+        env.Append(LINKFLAGS=['-fsanitize=undefined'])
 
     cflags.extend([
         '-MMD',
@@ -182,4 +204,4 @@ audiereEnv.Append(
 
 audiere = audiereEnv.Object(audiereSource + dumbSource)
 
-verge = env.Program('verge.out.js', sources + audiere)
+verge = env.Program('verge.out.js', sources + audiere, PROGSUFFIX='.js')
