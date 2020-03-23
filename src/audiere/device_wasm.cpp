@@ -39,6 +39,11 @@ EM_JS(void, audiere_createDevice, (void* devicePtr, CB process), {
     outputBuffer.copyToChannel(rightSourceData, 1, 0);
   };
   device.scriptNode.connect(device.audioContext.destination);
+
+  device.resume = () => device.audioContext.resume();
+
+  window.addEventListener('click', device.resume);
+  window.addEventListener('keydown', device.resume);
 });
 
 EM_JS(void, audiere_deleteDevice, (void* devicePtr), {

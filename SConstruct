@@ -35,6 +35,8 @@ def EmscriptenEnvironment():
         '-s', 'ALLOW_MEMORY_GROWTH=1',
     ]
 
+    cflags = []
+
     if ARGUMENTS.get('debug', 0):
         emscriptenOpts += [
             '-s', 'SAFE_HEAP=1',
@@ -43,9 +45,7 @@ def EmscriptenEnvironment():
             '-s', 'DEMANGLE_SUPPORT=1',
         ]
 
-        env.Append(CXXFLAGS=[
-            '-g',
-        ])
+        cflags.append('-g')
 
         env.Append(LINKFLAGS=[
             '-g4',
@@ -53,18 +53,20 @@ def EmscriptenEnvironment():
         ])
 
     else:
-        env.Append(CXXFLAGS=[
-            '-O3'
-        ])
+        cflags.append('-O3')
 
-    env.Append(CXXFLAGS=[
-            '-MMD',
-            '-Wno-parentheses',
-            '-Wno-long-long',
-            '-Wno-dangling-else',
-            '-Wno-writable-strings',
-        ] + emscriptenOpts
-    )
+    cflags.extend([
+        '-MMD',
+        '-Wno-parentheses',
+        '-Wno-long-long',
+        '-Wno-dangling-else',
+        '-Wno-writable-strings',
+    ])
+
+    cflags.extend(emscriptenOpts)
+
+    env.Append(CFLAGS=cflags)
+    env.Append(CXXFLAGS=cflags)
 
     env.Append(LINKFLAGS=[
         '-lidbfs.js',
