@@ -2331,7 +2331,7 @@ void WriteVar0(int var, int value) {
         pdivy = value;
         return;
     case 56:
-        mp_volume = value;
+        setVolume(value);
         return;
     case 57:
         layerc = value;
