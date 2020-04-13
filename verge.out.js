@@ -1292,11 +1292,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5751744,
+    STACK_BASE = 5751936,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 508864,
-    DYNAMIC_BASE = 5751744,
-    DYNAMICTOP_PTR = 508688;
+    STACK_MAX = 509056,
+    DYNAMIC_BASE = 5751936,
+    DYNAMICTOP_PTR = 508880;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1820,18 +1820,18 @@ var tempI64;
 
 var ASM_CONSTS = {
   1439: function() {FS.syncfs(false, err => { if (err) { console.error("SaveGame failed!!", err); } });},  
- 6117: function() {window.verge.setLoadingProgress(100);}
+ 6318: function() {window.verge.setLoadingProgress(100);}
 };
 
 function _emscripten_asm_const_iii(code, sigPtr, argbuf) {
   var args = readAsmConstArgs(sigPtr, argbuf);
   return ASM_CONSTS[code].apply(null, args);
-}function wasm_initSound(){ const ctx = new AudioContext(); const gainNode = ctx.createGain(); gainNode.connect(ctx.destination); window.verge.audioContext = ctx; window.verge.gainNode = gainNode; window.verge.sounds = {}; window.verge.mptInited = ctx.audioWorklet.addModule('worklet-main.js').then(() => { window.verge.mptNode = new AudioWorkletNode(ctx, 'libopenmpt-processor', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], }); window.verge.mptNode.connect(gainNode); }); }
+}function wasm_initSound(){ const ctx = new AudioContext(); const gainNode = ctx.createGain(); gainNode.connect(ctx.destination); window.verge.audioContext = ctx; window.verge.gainNode = gainNode; window.verge.sounds = {}; if (ctx.audioWorklet) { window.verge.mptInited = ctx.audioWorklet.addModule('worklet-main.js').then(() => { window.verge.mptNode = new AudioWorkletNode(ctx, 'libopenmpt-processor', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], }); window.verge.mptNode.connect(gainNode); }); } else { console.warn("AudioWorklet is not supported in this browser.  No music.  Sorry!"); window.verge.mptInited = Promise.resolve(); } }
 function wasm_nextFrame(){ return Asyncify.handleSleep(requestAnimationFrame); }
 function wasm_initFileSystem(c){ let sgr = UTF8ToString(c); if (sgr.endsWith('/')) sgr = sgr.substr(0, sgr.length - 1); FS.mkdir("/persist"); FS.mkdir(sgr); FS.mount(IDBFS, {}, sgr); FS.syncfs(true, function (err) { if (err) console.error('wasm_initFileSystem failed!', err); }); }
 function fetchSync(pathPtr,size,data){ return Asyncify.handleSleep(resume => { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; resume(); return; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); HEAP32[size >> 2] = bytes.length; const dataPtr = _malloc(bytes.length); HEAP32[data >> 2] = dataPtr; HEAP8.set(bytes, dataPtr); resume(); }); }); }
 function wasm_setVolume(volume){ console.log('setvolume', volume); window.verge.gainNode.gain.setValueAtTime(volume / 100, window.verge.audioContext.currentTime); }
-function wasm_playSong(data,length){ window.verge.mptInited.then(() => { const buffer = Module.HEAP8.buffer.slice(data, data + length); const v = new Uint8Array(buffer); window.verge.mptNode.port.postMessage({ songData: buffer, setRepeatCount: -1 }); }); }
+function wasm_playSong(data,length){ window.verge.mptInited.then(() => { if (!window.verge.mptNode) { return; } const buffer = Module.HEAP8.buffer.slice(data, data + length); const v = new Uint8Array(buffer); window.verge.mptNode.port.postMessage({ songData: buffer, setRepeatCount: -1 }); }); }
 function wasm_vgadump(frameBuffer,frameBufferSize,palette){ const pal = HEAPU8.subarray(palette, palette + 768); const fb = HEAPU8.subarray(frameBuffer, frameBuffer + frameBufferSize); const stride = 0; let srcIndex = 0; let destIndex = 0; const ia = window.vergeImageArray; for (let y = 0; y < 200; ++y) { for (let x = 0; x < 320; ++x) { let c = fb[srcIndex++]; ia[destIndex++] = pal[c * 3]; ia[destIndex++] = pal[c * 3 + 1]; ia[destIndex++] = pal[c * 3 + 2]; ia[destIndex++] = 0xFF; } srcIndex += stride; } window.vergeContext.putImageData(window.vergeImageData, 0, 0); }
 function wasm_playSound(filename){ const name = UTF8ToString(filename); const sound = window.verge.sounds[name]; if (!sound) { console.error("Unknown sound ", name); return; } const source = window.verge.audioContext.createBufferSource(); source.connect(window.verge.gainNode); source.buffer = sound; source.start(0); }
 function wasm_loadSound(filename,soundData,soundDataSize){ const name = UTF8ToString(filename); const audioData = HEAPU8.buffer.slice(soundData, soundData + soundDataSize); window.verge = window.verge || {}; window.verge.audioContext.decodeAudioData( audioData, decoded => { window.verge.sounds[name] = decoded; }, () => { console.log("Unable to load sound data for ", name); } ); }
@@ -1840,7 +1840,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
 
 
 
-// STATICTOP = STATIC_BASE + 507840;
+// STATICTOP = STATIC_BASE + 508032;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -4756,7 +4756,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 508688;
+      return 508880;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {

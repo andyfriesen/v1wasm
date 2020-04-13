@@ -42,15 +42,20 @@ EM_JS(void, wasm_initSound, (), {
     window.verge.gainNode = gainNode;
     window.verge.sounds = {};
 
-    window.verge.mptInited = ctx.audioWorklet.addModule('worklet-main.js').then(() => {
-        window.verge.mptNode = new AudioWorkletNode(ctx, 'libopenmpt-processor', {
-            numberOfInputs: 0,
-            numberOfOutputs: 1,
-            outputChannelCount: [2],
-        });
+    if (ctx.audioWorklet) {
+        window.verge.mptInited = ctx.audioWorklet.addModule('worklet-main.js').then(() => {
+            window.verge.mptNode = new AudioWorkletNode(ctx, 'libopenmpt-processor', {
+                numberOfInputs: 0,
+                numberOfOutputs: 1,
+                outputChannelCount: [2],
+            });
 
-        window.verge.mptNode.connect(gainNode);
-    });
+            window.verge.mptNode.connect(gainNode);
+        });
+    } else {
+        console.warn("AudioWorklet is not supported in this browser.  No music.  Sorry!");
+        window.verge.mptInited = Promise.resolve();
+    }
 });
 
 EM_JS(void, wasm_loadSound, (const char* filename, const char* soundData, int soundDataSize), {
@@ -89,6 +94,10 @@ EM_JS(void, wasm_playSound, (const char* filename), {
 
 EM_JS(void, wasm_playSong, (const void* data, int length), {
     window.verge.mptInited.then(() => {
+        if (!window.verge.mptNode) {
+            return;
+        }
+
         const buffer = Module.HEAP8.buffer.slice(data, data + length);
         const v = new Uint8Array(buffer);
         window.verge.mptNode.port.postMessage({

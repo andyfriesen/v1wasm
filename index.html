@@ -78,6 +78,10 @@
             padding: 0.5em;
         }
 
+        #no-audio-worklet {
+            display: none;
+        }
+
         header {
             font-size: 32px;
             grid-area: header;
@@ -110,8 +114,12 @@
                 <dt>Space</dt><dd>Main menu (items, equipment, etc)</dd>
                 <dt>ESC</dt><dd>System menu (save, load, etc)</dd>
             </dl>
+            <div id='no-audio-worklet'>
+                Your browser does not support AudioWorklet.  We cannot play any music.  Sorry!<br />
+                Try Chrome or Brave!
+            </div>
         </div>
-        <footer>Last Updated 22 March 2020</footer>
+        <footer>Last Updated 12 April 2020</footer>
     </div>
 
     <script>
@@ -137,6 +145,10 @@
 
             window.addEventListener('resize', resizeCallback);
             resizeCallback();
+
+            if (!('audioWorklet' in AudioContext.prototype)) {
+                document.getElementById('no-audio-worklet').style.display = 'block';
+            }
         })();
 
         (function() {
