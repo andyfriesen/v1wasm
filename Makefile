@@ -8,7 +8,7 @@ EMSCRIPTEN_OPTS=\
 	-s FORCE_FILESYSTEM=1
 
 CFLAGS=\
-	-O1                                                                     \
+	-O3                                                                     \
 	-g                                                                      \
 	-MMD                                                                    \
 	-Wno-parentheses                                                        \
@@ -22,8 +22,9 @@ LDFLAGS=\
 	--source-map-base http://localhost:8000 \
 	-lidbfs.js
 
+	# src/andyvc.h     \
+
 HEADERS=\
-	src/andyvc.h     \
 	src/base64.h     \
 	src/battle.h     \
 	src/control.h    \
@@ -49,31 +50,33 @@ HEADERS=\
 	src/vclib.h      \
 	src/vga.h        \
 	src/wasm.h       \
+	src/wyrdvc.h     \
 	src/xbigdvc.h
 
+	# andyvc.o  \
 
 OBJS=\
-	andyvc.o  \
-	engine.o  \
-	menu.o    \
-	nichgvc.o \
-	ricvc.o   \
-	vc.o      \
-	xbigdvc.o \
+	base64.o  \
 	battle.o  \
-	entity.o  \
-	menu2.o   \
-	pcx.o     \
-	sound.o   \
-	vclib.o   \
 	control.o \
-	main.o    \
-	render.o  \
-	timer.o   \
-	vga.o     \
+	engine.o  \
+	entity.o  \
 	fs.o      \
+	main.o    \
+	menu.o    \
+	menu2.o   \
+	nichgvc.o \
+	pcx.o     \
+	render.o  \
+	ricvc.o   \
+	sound.o   \
 	stack.o   \
-	base64.o
+	timer.o   \
+	vc.o      \
+	vclib.o   \
+	vga.o     \
+	wyrdvc.o  \
+	xbigdvc.o
 
 %.o: src/%.cpp
 	$(CC) -c -o $@ $< $(CFLAGS) $(EMSCRIPTEN_OPTS)

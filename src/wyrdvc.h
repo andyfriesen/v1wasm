@@ -1,0 +1,35 @@
+#pragma once
+
+void StringMenu();
+void BStringMenu();
+void StrText();
+void StrPrompt();
+void StrSText();
+void VCStringPCX();
+void VCLoadStrPCX();
+void PlayMusStr();
+void VCString();
+void VCCenterString();
+void AssignString();
+void CloseInfile();
+void CloseOutfile();
+void CloseFiles ();
+void OpenInfile ();
+void OpenOutfile ();
+void OpenOutfAppend ();
+void OpenInstring ();
+void OpenOutstring ();
+void OpenOutsAppend ();
+void IntIn ();
+void IntOut ();
+void StrIn ();
+void WordIn ();
+// void FilenameIn ();
+void WordOut ();
+void StrOut ();
+void FileTextOut ();
+void StringBanner();
+void CopyString();
+void CompareString();
+void Concatenate();
+void StrChangeCHR();

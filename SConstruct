@@ -171,9 +171,9 @@ audiereSource = ['src/audiere/' + s for s in Split("""
 """)]
 
 sources = Split("""
-    andyvc.cpp  engine.cpp  menu.cpp    nichgvc.cpp ricvc.cpp   vc.cpp      xbigdvc.cpp
+    engine.cpp  menu.cpp    nichgvc.cpp ricvc.cpp   vc.cpp      xbigdvc.cpp
     battle.cpp  entity.cpp  menu2.cpp   pcx.cpp     sound.cpp   vclib.cpp
-    control.cpp main.cpp    render.cpp  timer.cpp   vga.cpp
+    control.cpp main.cpp    render.cpp  timer.cpp   vga.cpp     wyrdvc.cpp
 
     fs.cpp      stack.cpp   base64.cpp
 """)

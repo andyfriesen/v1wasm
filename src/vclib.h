@@ -10,4 +10,6 @@ void VCClearRegion();
 
 void VChline(int x, int y, int x2, char c);
 
+int CharPos(char p1);
+
 void ExecLibFunc(unsigned char func);

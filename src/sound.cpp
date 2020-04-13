@@ -286,9 +286,11 @@ void playsong(const std::string& songName) {
     currentMusic = audiere::OpenSound(audioDevice, ss, false);
     if (currentMusic) {
         currentMusic->setRepeat(true);
+        setVolume(mp_volume);
         currentMusic->play();
     }
     verge::vclose(f);
+    playingSong = songName;
 }
 
 void stopsound() {
@@ -302,6 +304,13 @@ void playeffect(int efc) {
         return;
     }
     wasm_playSound(soundNames[efc].c_str());
+}
+
+void setVolume(unsigned char v) {
+    mp_volume = v;
+    if (currentMusic) {
+        currentMusic->setVolume(v * 0.01f);
+    }
 }
 
 /*playsound(char *fname,int rate)

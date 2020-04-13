@@ -61,7 +61,7 @@ namespace verge {
     };
 
     // API
-    typedef File VFILE;
+    using VFILE = File;
 
     void vset(const std::string& filename, DataVec data);
 

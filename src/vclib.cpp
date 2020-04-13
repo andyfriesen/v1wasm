@@ -21,6 +21,7 @@
 #include "xbigdvc.h"
 #include "render.h"
 #include "vga.h"
+#include "wyrdvc.h"
 #include "fs.h"
 
 using namespace verge;
@@ -1070,10 +1071,13 @@ void PaletteMorph() {
 int CharPos(char p1) {
     char i;
 
-    for (i = 0; i < numchars; i++)
+    for (i = 0; i < numchars; i++) {
         if (partyidx[i] == p1) {
             return i;
         }
+    }
+
+    return 0;
 }
 
 void ChangeCHR() {
@@ -1867,12 +1871,114 @@ void ExecLibFunc(unsigned char func) {
     case 103:
         PlayVAS();
         break;
+
+#if 0
     case 104:
         SmallText();
         break;       // ANDY 03/Mar/99
     case 105:
         VCEllipse();
         break;       // ANDY 30/Jul/99
+#endif
+
+    case 104:
+        StringMenu();     /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 105:
+        VCStringPCX();    /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 106:
+        VCLoadStrPCX();   /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 107:
+        PlayMusStr();     /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 108:
+        VCString();       /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 109:
+        VCCenterString(); /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 110:
+        AssignString();   /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 111:
+        CloseInfile();    /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 112:
+        CloseOutfile();   /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 113:
+        CloseFiles();     /* -- Wyrdwad: 07/26/98 -- */
+        break;
+    case 114:
+        OpenInfile();     /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 115:
+        OpenOutfile();    /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 116:
+        OpenOutfAppend(); /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 117:
+        OpenInstring();   /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 118:
+        OpenOutstring();  /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 119:
+        OpenOutsAppend(); /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 120:
+        IntIn();          /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 121:
+        IntOut();         /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 122:
+        StrIn();          /* -- Wyrdwad: 07/30/98 -- */
+        break;
+    case 123:
+        StrOut();         /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 124:
+        FileTextOut();    /* -- Wyrdwad: 07/27/98 -- */
+        break;
+    case 125:
+        StringBanner();   /* -- Wyrdwad: 07/30/98 -- */
+        break;
+    case 126:
+        CopyString();     /* -- Wyrdwad: 07/30/98 -- */
+        break;
+    case 127:
+        CompareString();  /* -- Wyrdwad: 07/30/98 -- */
+        break;
+    case 128:
+        Concatenate();    /* -- Wyrdwad: 07/30/98 -- */
+        break;
+    case 129:
+        StrText();        /* -- Wyrdwad: 07/30/98 -- */
+        break;
+    case 130:
+        StrSText();       /* -- Wyrdwad: 07/30/98 -- */
+        break;
+    case 131:
+        StrPrompt();      /* -- Wyrdwad: 07/30/98 -- */
+        break;
+    case 132:
+        BStringMenu();    /* -- Wyrdwad: 07/30/98 -- */
+        break;
+    case 133:
+        WordIn();         /* -- Wyrdwad: 07/31/98 -- */
+        break;
+    case 134:
+        WordOut();        /* -- Wyrdwad: 07/31/98 -- */
+        break;
+    case 135:
+        StrChangeCHR();   /* -- Wyrdwad: 08/02/98 -- */
+        break;
+
+
         //    case 104: VCMagicImage(); break;/* -- ric: 04/May/98 -- */
         //    case 105: vcwritelayer(); break; /* -- xBig_D: 05/May/98 */
 
