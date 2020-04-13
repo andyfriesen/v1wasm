@@ -299,9 +299,8 @@ namespace {
 }
 
 void playsong(const std::string& songName) {
-    if (songName != playingSong) {
-        playingSong = songName;
-        // verge::plugin->playSong(songName);
+    if (songName == playingSong) {
+        return;
     }
 
     auto f = verge::vopen(songName.c_str(), "r");
