@@ -664,8 +664,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 207,
-  'maximum': 207 + 0,
+  'initial': 60,
+  'maximum': 60 + 0,
   'element': 'anyfunc'
 });
 
@@ -1292,11 +1292,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5766720,
+    STACK_BASE = 5751744,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 523840,
-    DYNAMIC_BASE = 5766720,
-    DYNAMICTOP_PTR = 523664;
+    STACK_MAX = 508864,
+    DYNAMIC_BASE = 5751744,
+    DYNAMICTOP_PTR = 508688;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1820,27 +1820,27 @@ var tempI64;
 
 var ASM_CONSTS = {
   1439: function() {FS.syncfs(false, err => { if (err) { console.error("SaveGame failed!!", err); } });},  
- 5366: function() {window.verge.setLoadingProgress(100);}
+ 6117: function() {window.verge.setLoadingProgress(100);}
 };
 
 function _emscripten_asm_const_iii(code, sigPtr, argbuf) {
   var args = readAsmConstArgs(sigPtr, argbuf);
   return ASM_CONSTS[code].apply(null, args);
-}function wasm_initSound(){ window.verge.audioContext = new AudioContext(); window.verge.sounds = {}; }
-function audiere_deleteDevice(devicePtr){ if (!window.audiereDevices) { console.error('audiere_deleteDevice before audiere_createDevice?', devicePtr); return; } const device = window.audiereDevices[devicePtr]; if (!device) { console.error('audiere_deleteDevice got a bad pointer', devicePtr); return; } device.scriptNode.disconnect(); _free(device.inputPtr); window.removeEventListener('click', device.resume); window.removeEventListener('keydown', device.resume); delete window.audiereDevices[devicePtr]; }
+}function wasm_initSound(){ const ctx = new AudioContext(); const gainNode = ctx.createGain(); gainNode.connect(ctx.destination); window.verge.audioContext = ctx; window.verge.gainNode = gainNode; window.verge.sounds = {}; window.verge.mptInited = ctx.audioWorklet.addModule('worklet-main.js').then(() => { window.verge.mptNode = new AudioWorkletNode(ctx, 'libopenmpt-processor', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], }); window.verge.mptNode.connect(gainNode); }); }
 function wasm_nextFrame(){ return Asyncify.handleSleep(requestAnimationFrame); }
 function wasm_initFileSystem(c){ let sgr = UTF8ToString(c); if (sgr.endsWith('/')) sgr = sgr.substr(0, sgr.length - 1); FS.mkdir("/persist"); FS.mkdir(sgr); FS.mount(IDBFS, {}, sgr); FS.syncfs(true, function (err) { if (err) console.error('wasm_initFileSystem failed!', err); }); }
 function fetchSync(pathPtr,size,data){ return Asyncify.handleSleep(resume => { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; resume(); return; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); HEAP32[size >> 2] = bytes.length; const dataPtr = _malloc(bytes.length); HEAP32[data >> 2] = dataPtr; HEAP8.set(bytes, dataPtr); resume(); }); }); }
+function wasm_setVolume(volume){ console.log('setvolume', volume); window.verge.gainNode.gain.setValueAtTime(volume / 100, window.verge.audioContext.currentTime); }
+function wasm_playSong(data,length){ window.verge.mptInited.then(() => { const buffer = Module.HEAP8.buffer.slice(data, data + length); const v = new Uint8Array(buffer); window.verge.mptNode.port.postMessage({ songData: buffer, setRepeatCount: -1 }); }); }
 function wasm_vgadump(frameBuffer,frameBufferSize,palette){ const pal = HEAPU8.subarray(palette, palette + 768); const fb = HEAPU8.subarray(frameBuffer, frameBuffer + frameBufferSize); const stride = 0; let srcIndex = 0; let destIndex = 0; const ia = window.vergeImageArray; for (let y = 0; y < 200; ++y) { for (let x = 0; x < 320; ++x) { let c = fb[srcIndex++]; ia[destIndex++] = pal[c * 3]; ia[destIndex++] = pal[c * 3 + 1]; ia[destIndex++] = pal[c * 3 + 2]; ia[destIndex++] = 0xFF; } srcIndex += stride; } window.vergeContext.putImageData(window.vergeImageData, 0, 0); }
-function wasm_playSound(filename){ const name = UTF8ToString(filename); const sound = window.verge.sounds[name]; if (!sound) { console.error("Unknown sound ", name); return; } console.log("Playing ", name); const source = window.verge.audioContext.createBufferSource(); source.connect(window.verge.audioContext.destination); source.buffer = sound; source.start(0); }
+function wasm_playSound(filename){ const name = UTF8ToString(filename); const sound = window.verge.sounds[name]; if (!sound) { console.error("Unknown sound ", name); return; } const source = window.verge.audioContext.createBufferSource(); source.connect(window.verge.gainNode); source.buffer = sound; source.start(0); }
 function wasm_loadSound(filename,soundData,soundDataSize){ const name = UTF8ToString(filename); const audioData = HEAPU8.buffer.slice(soundData, soundData + soundDataSize); window.verge = window.verge || {}; window.verge.audioContext.decodeAudioData( audioData, decoded => { window.verge.sounds[name] = decoded; }, () => { console.log("Unable to load sound data for ", name); } ); }
-function audiere_createDevice(devicePtr,process){ const device = {}; window.audiereDevices = window.audiereDevices || {}; window.audiereDevices[devicePtr] = device; device.maxFramesPerChunk = 4096; device.audioContext = new AudioContext(); device.scriptNode = device.audioContext.createScriptProcessor(device.maxFramesPerChunk); device.inputPtr = Module._malloc(4 * 4); device.scriptNode.onaudioprocess = ev => { const outputBuffer = ev.outputBuffer; const framesToRender = outputBuffer.length; Module.dynCall_viii(process, devicePtr, device.inputPtr, framesToRender); const leftInPtr = HEAPU32[(device.inputPtr >> 2) + 0]; const leftInSize = HEAPU32[(device.inputPtr >> 2) + 1]; const rightInPtr = HEAPU32[(device.inputPtr >> 2) + 2]; const rightInSize = HEAPU32[(device.inputPtr >> 2) + 3]; const leftSourceData = HEAPF32.subarray(leftInPtr >> 2, (leftInPtr >> 2) + leftInSize); const rightSourceData = HEAPF32.subarray(rightInPtr >> 2, (rightInPtr >> 2) + rightInSize); outputBuffer.copyToChannel(leftSourceData, 0, 0); outputBuffer.copyToChannel(rightSourceData, 1, 0); }; device.scriptNode.connect(device.audioContext.destination); device.resume = () => device.audioContext.resume(); window.addEventListener('click', device.resume); window.addEventListener('keydown', device.resume); }
 function downloadAll(manifest,putFile){ return Asyncify.handleSleep(resume => { let promises = []; let count = 0; function download(pathPtr) { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; throw 'fetchSync failed'; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); const dataPtr = _malloc(bytes.length); HEAP8.set(bytes, dataPtr); Module.dynCall_viii(putFile, pathPtr, bytes.length, dataPtr); ++count; verge.setLoadingProgress((100 * count / promises.length) | 0) }); } while (true) { let pathPtr = HEAPU32[manifest >> 2]; if (pathPtr == 0) { break; } manifest += 4; promises.push(download(pathPtr)); } Promise.all(promises).then(() => { resume(); }); }); }
 function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanvas'); window.vergeContext = window.vergeCanvas.getContext('2d'); window.vergeImageData = new ImageData(320, 200); window.vergeImageArray = window.vergeImageData.data; }
 
 
 
-// STATICTOP = STATIC_BASE + 522816;
+// STATICTOP = STATIC_BASE + 507840;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -4747,7 +4747,6 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       abort();
     }
 
-
   function _emscripten_clear_interval(id) {
       clearInterval(id);
     }
@@ -4757,7 +4756,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 523664;
+      return 508688;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
@@ -4989,59 +4988,6 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       Asyncify.handleSleep(function(wakeUp) {
         Browser.safeSetTimeout(wakeUp, ms);
       });
-    }
-
-  
-  
-  var ENV={};
-  
-  function __getExecutableName() {
-      return thisProgram || './this.program';
-    }function _emscripten_get_environ() {
-      if (!_emscripten_get_environ.strings) {
-        // Default values.
-        var env = {
-          'USER': 'web_user',
-          'LOGNAME': 'web_user',
-          'PATH': '/',
-          'PWD': '/',
-          'HOME': '/home/web_user',
-          // Browser language detection #8751
-          'LANG': ((typeof navigator === 'object' && navigator.languages && navigator.languages[0]) || 'C').replace('-', '_') + '.UTF-8',
-          '_': __getExecutableName()
-        };
-        // Apply the user-provided values, if any.
-        for (var x in ENV) {
-          env[x] = ENV[x];
-        }
-        var strings = [];
-        for (var x in env) {
-          strings.push(x + '=' + env[x]);
-        }
-        _emscripten_get_environ.strings = strings;
-      }
-      return _emscripten_get_environ.strings;
-    }function _environ_get(__environ, environ_buf) {
-      var strings = _emscripten_get_environ();
-      var bufSize = 0;
-      strings.forEach(function(string, i) {
-        var ptr = environ_buf + bufSize;
-        HEAP32[(((__environ)+(i * 4))>>2)]=ptr;
-        writeAsciiToMemory(string, ptr);
-        bufSize += string.length + 1;
-      });
-      return 0;
-    }
-
-  function _environ_sizes_get(penviron_count, penviron_buf_size) {
-      var strings = _emscripten_get_environ();
-      HEAP32[((penviron_count)>>2)]=strings.length;
-      var bufSize = 0;
-      strings.forEach(function(string) {
-        bufSize += string.length + 1;
-      });
-      HEAP32[((penviron_buf_size)>>2)]=bufSize;
-      return 0;
     }
 
   function _exit(status) {
@@ -6256,7 +6202,7 @@ function intArrayToString(array) {
 // ASM_LIBRARY EXTERN PRIMITIVES: Int8Array,Int32Array
 
 var asmGlobalArg = {};
-var asmLibraryArg = { "__assert_fail": ___assert_fail, "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "__syscall221": ___syscall221, "__syscall5": ___syscall5, "__syscall54": ___syscall54, "abort": _abort, "atexit": _atexit, "audiere_createDevice": audiere_createDevice, "audiere_deleteDevice": audiere_deleteDevice, "downloadAll": downloadAll, "emscripten_asm_const_iii": _emscripten_asm_const_iii, "emscripten_clear_interval": _emscripten_clear_interval, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "emscripten_set_interval": _emscripten_set_interval, "emscripten_set_keydown_callback_on_thread": _emscripten_set_keydown_callback_on_thread, "emscripten_set_keyup_callback_on_thread": _emscripten_set_keyup_callback_on_thread, "emscripten_sleep": _emscripten_sleep, "environ_get": _environ_get, "environ_sizes_get": _environ_sizes_get, "exit": _exit, "fd_close": _fd_close, "fd_read": _fd_read, "fd_seek": _fd_seek, "fd_write": _fd_write, "fetchSync": fetchSync, "memory": wasmMemory, "setTempRet0": _setTempRet0, "table": wasmTable, "wasm_initFileSystem": wasm_initFileSystem, "wasm_initSound": wasm_initSound, "wasm_initvga": wasm_initvga, "wasm_loadSound": wasm_loadSound, "wasm_nextFrame": wasm_nextFrame, "wasm_playSound": wasm_playSound, "wasm_vgadump": wasm_vgadump };
+var asmLibraryArg = { "__assert_fail": ___assert_fail, "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "__syscall221": ___syscall221, "__syscall5": ___syscall5, "__syscall54": ___syscall54, "abort": _abort, "downloadAll": downloadAll, "emscripten_asm_const_iii": _emscripten_asm_const_iii, "emscripten_clear_interval": _emscripten_clear_interval, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "emscripten_set_interval": _emscripten_set_interval, "emscripten_set_keydown_callback_on_thread": _emscripten_set_keydown_callback_on_thread, "emscripten_set_keyup_callback_on_thread": _emscripten_set_keyup_callback_on_thread, "emscripten_sleep": _emscripten_sleep, "exit": _exit, "fd_close": _fd_close, "fd_read": _fd_read, "fd_seek": _fd_seek, "fd_write": _fd_write, "fetchSync": fetchSync, "memory": wasmMemory, "setTempRet0": _setTempRet0, "table": wasmTable, "wasm_initFileSystem": wasm_initFileSystem, "wasm_initSound": wasm_initSound, "wasm_initvga": wasm_initvga, "wasm_loadSound": wasm_loadSound, "wasm_nextFrame": wasm_nextFrame, "wasm_playSong": wasm_playSong, "wasm_playSound": wasm_playSound, "wasm_setVolume": wasm_setVolume, "wasm_vgadump": wasm_vgadump };
 Asyncify.instrumentWasmImports(asmLibraryArg);
 var asm = createWasm();
 Module["asm"] = asm;
@@ -6289,17 +6235,17 @@ var _main = Module["_main"] = function() {
 };
 
 /** @type {function(...*):?} */
-var _fflush = Module["_fflush"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["fflush"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
 var ___errno_location = Module["___errno_location"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["__errno_location"].apply(null, arguments)
+};
+
+/** @type {function(...*):?} */
+var _fflush = Module["_fflush"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["fflush"].apply(null, arguments)
 };
 
 /** @type {function(...*):?} */
@@ -6387,62 +6333,6 @@ var dynCall_iii = Module["dynCall_iii"] = function() {
 };
 
 /** @type {function(...*):?} */
-var dynCall_v = Module["dynCall_v"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_v"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
-var dynCall_iiiiiii = Module["dynCall_iiiiiii"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_iiiiiii"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
-var dynCall_vif = Module["dynCall_vif"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_vif"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
-var dynCall_fi = Module["dynCall_fi"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_fi"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
-var dynCall_viiii = Module["dynCall_viiii"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_viiii"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
-var dynCall_iiiii = Module["dynCall_iiiii"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_iiiii"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
-var dynCall_iiffii = Module["dynCall_iiffii"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_iiffii"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
-var dynCall_vifi = Module["dynCall_vifi"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_vifi"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
 var dynCall_jiji = Module["dynCall_jiji"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -6468,6 +6358,13 @@ var dynCall_viiiii = Module["dynCall_viiiii"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["dynCall_viiiii"].apply(null, arguments)
+};
+
+/** @type {function(...*):?} */
+var dynCall_viiii = Module["dynCall_viiii"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["dynCall_viiii"].apply(null, arguments)
 };
 
 /** @type {function(...*):?} */

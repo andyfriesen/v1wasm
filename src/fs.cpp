@@ -107,27 +107,6 @@ namespace verge {
         return result;
     }
 
-    // audiere::File implementation
-
-    void File::ref() {
-    }
-
-    void File::unref() {
-    }
-
-    int File::read(void* dest, int length) {
-        return read(dest, size_t(length));
-    }
-
-    bool File::seek(int position, audiere::File::SeekMode seekMode) {
-        int origin = seekMode == audiere::File::BEGIN ? SEEK_SET
-            : seekMode == audiere::File::END ? SEEK_END
-            : SEEK_CUR
-            ;
-        long int offset = position;
-        return 0 == seek(offset, origin);
-    }
-
     //
 
     FilePtr FS::open(const std::string& filename, FileMode mode) {

@@ -14,8 +14,6 @@
 #include "timer.h"
 #include "render.h"
 #include "fs.h"
-#include "audiere/audiere.h"
-#include "audiere/device_wasm.h"
 
 using namespace verge;
 
@@ -33,14 +31,26 @@ signed short mp_sngpos = 0;
 
 namespace {
     std::vector<std::string> soundNames;
-
-    audiere::AudioDevicePtr audioDevice;
-    audiere::OutputStreamPtr currentMusic;
 }
 
 EM_JS(void, wasm_initSound, (), {
-    window.verge.audioContext = new AudioContext();
+    const ctx = new AudioContext();
+    const gainNode = ctx.createGain();
+    gainNode.connect(ctx.destination);
+
+    window.verge.audioContext = ctx;
+    window.verge.gainNode = gainNode;
     window.verge.sounds = {};
+
+    window.verge.mptInited = ctx.audioWorklet.addModule('worklet-main.js').then(() => {
+        window.verge.mptNode = new AudioWorkletNode(ctx, 'libopenmpt-processor', {
+            numberOfInputs: 0,
+            numberOfOutputs: 1,
+            outputChannelCount: [2],
+        });
+
+        window.verge.mptNode.connect(gainNode);
+    });
 });
 
 EM_JS(void, wasm_loadSound, (const char* filename, const char* soundData, int soundDataSize), {
@@ -71,11 +81,26 @@ EM_JS(void, wasm_playSound, (const char* filename), {
         return;
     }
 
-    console.log("Playing ", name);
     const source = window.verge.audioContext.createBufferSource();
-    source.connect(window.verge.audioContext.destination);
+    source.connect(window.verge.gainNode);
     source.buffer = sound;
     source.start(0);
+});
+
+EM_JS(void, wasm_playSong, (const void* data, int length), {
+    window.verge.mptInited.then(() => {
+        const buffer = Module.HEAP8.buffer.slice(data, data + length);
+        const v = new Uint8Array(buffer);
+        window.verge.mptNode.port.postMessage({
+            songData: buffer,
+            setRepeatCount: -1
+        });
+    });
+});
+
+EM_JS(void, wasm_setVolume, (int volume), {
+    console.log('setvolume', volume);
+    window.verge.gainNode.gain.setValueAtTime(volume / 100, window.verge.audioContext.currentTime);
 });
 
 void ParseSetup() {
@@ -251,8 +276,6 @@ void sound_init() {
     allocbuffers();
     initcontrols(jf);
 
-    audioDevice = new audiere::WasmAudioDevice();
-
     wasm_initSound();
     sound_loadsfx("MAIN.SFX");
 }
@@ -266,14 +289,6 @@ namespace {
     std::string playingSong;
 }
 
-namespace audiere {
-    SampleSource* OpenSource(
-        const FilePtr& file,
-        const char* filename,
-        FileFormat file_format
-    );
-}
-
 void playsong(const std::string& songName) {
     if (songName != playingSong) {
         playingSong = songName;
@@ -281,15 +296,8 @@ void playsong(const std::string& songName) {
     }
 
     auto f = verge::vopen(songName.c_str(), "r");
-    auto file_format = audiere::FF_MOD;
-    auto ss = audiere::OpenSource(audiere::FilePtr(f), songName.c_str(), file_format);
-    currentMusic = audiere::OpenSound(audioDevice, ss, false);
-    if (currentMusic) {
-        currentMusic->setRepeat(true);
-        setVolume(mp_volume);
-        currentMusic->play();
-    }
-    verge::vclose(f);
+    wasm_playSong(f->getRawData().data(), f->getRawData().size());
+
     playingSong = songName;
 }
 
@@ -308,9 +316,7 @@ void playeffect(int efc) {
 
 void setVolume(unsigned char v) {
     mp_volume = v;
-    if (currentMusic) {
-        currentMusic->setVolume(v * 0.01f);
-    }
+    wasm_setVolume(v);
 }
 
 /*playsound(char *fname,int rate)

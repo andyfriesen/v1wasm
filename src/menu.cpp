@@ -530,13 +530,15 @@ drawloop:
 
     readcontrols();
 
-    if (first == 2) if (b2) { goto drawloop; }
+    if (first == 2) {
+        if (b2) { goto drawloop; }
         else { an = 0; return; }
+    }
     if (first && !b1 && !b2 && !down && !up) { first = 0; }
     else if (first) { goto drawloop; }
 
-    if (right && mp_volume < 101) { mp_volume++; }
-    if (left && mp_volume) { mp_volume--; }
+    if (right && mp_volume < 101) { setVolume(mp_volume + 1); }
+    if (left && mp_volume) { setVolume(mp_volume - 1); }
 
     if (!b2) { goto drawloop; }
     if (b2) { first = 2; goto drawloop; }
