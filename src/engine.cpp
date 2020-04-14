@@ -625,6 +625,10 @@ void ProcessControls() {
 }
 
 void process_controls() {
+    if (!party[0].movcnt) {
+        party[0].moving = 0;
+        process_stepzone();
+    }
     party[0].speedct = 0;
     if (!party[0].moving) {
         xtc = party[0].x / 16;
@@ -750,10 +754,6 @@ void process_controls() {
             if (party[i].framectr == 80) {
                 party[i].framectr = 0;
             }
-        }
-        if (!party[0].movcnt) {
-            party[0].moving = 0;
-            process_stepzone();
         }
     }
 }
