@@ -108,9 +108,6 @@ sources = ['src/' + s for s in sources]
 env = EmscriptenEnvironment()
 
 env.Append(
-    CPPPATH=[
-        'src/dumb/include'
-    ],
     CXXFLAGS=[
         '-std=c++17',
         #'-Werror', # Hahaha no way.  This code dates back to like 1997.

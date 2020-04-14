@@ -581,7 +581,7 @@ void process_entities() {
 void process_controls();
 
 void ProcessControls() {
-    const auto effectiveSpeed = keyboard_map[SCAN_TILDE] ? 6 : party[0].speed;
+    const auto effectiveSpeed = goFastButton ? 6 : party[0].speed;
 
     if (effectiveSpeed < 4) {
         switch (effectiveSpeed) {

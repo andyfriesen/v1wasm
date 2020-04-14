@@ -24,6 +24,7 @@ char j = 1;                           // use joystick or not
 char b1, b2, b3, b4;                  // four button flags for GamePad
 char up, down, left, right;           // stick position flags
 int jx, jy;                           // joystick x / y values
+bool goFastButton = false;
 
 char foundx, foundy;                  // found-flags for joystick read.
 int cenx, ceny;                       // stick-center values
@@ -125,39 +126,6 @@ void initcontrols(char joystk) {
     verge::scanMap[DOMScanCode::VK_TILDE] = SCAN_TILDE;
 }
 
-void readb() {
-    if (j) {
-        readbuttons();
-    } else {
-        b1 = 0;
-        b2 = 0;
-        b3 = 0;
-        b4 = 0;
-    }
-    if (keyboard_map[kb1]) {
-        b1 = 1;
-    }
-    if (keyboard_map[kb2]) {
-        b2 = 1;
-    }
-    if (keyboard_map[kb3]) {
-        b3 = 1;
-    }
-    if (keyboard_map[kb4]) {
-        b4 = 1;
-    }
-
-    // if ((keyboard_map[SCAN_ALT]) &&
-    //         (keyboard_map[SCAN_X])) {
-    //     err("Exiting: ALT-X pressed.");
-    // }
-
-    // if (keyboard_map[SCAN_F10]) {
-    //     keyboard_map[SCAN_F10] = 0;
-    //     ScreenShot();
-    // }
-}
-
 void readcontrols() {
     emscripten_sleep(0);
     readcontrols_noSleep();
@@ -174,6 +142,7 @@ void readcontrols_noSleep() {
     down = 0;
     left = 0;
     right = 0;
+    goFastButton = false;
 
     int i;
     readjoystick();
@@ -202,6 +171,9 @@ void readcontrols_noSleep() {
     if (keyboard_map[kb4]) {
         b4 = 1;
     }
+    if (keyboard_map[SCAN_TILDE]) {
+        goFastButton = true;
+    }
 
     for (i = 0; i < 128; i++) {                    /* -- ric: 03/May/98 -- */
         key_map[i].pressed = 0;
@@ -227,17 +199,37 @@ void readbuttons() {
 
     EmscriptenGamepadEvent state;
 
+    const double THRESHHOLD = 0.8;
+
     for (int i : verge::connectedGamepads) {
         emscripten_get_gamepad_status(i, &state);
         b1 |= state.digitalButton[0];
         b2 |= state.digitalButton[1];
-        b3 |= state.digitalButton[2];
+        b3 |= state.digitalButton[9];
         b4 |= state.digitalButton[3];
 
         up |= state.digitalButton[12];
         down |= state.digitalButton[13];
         left |= state.digitalButton[14];
         right |= state.digitalButton[15];
+
+        if (state.axis[0] < -THRESHHOLD) {
+            left = 1;
+        }
+        if (state.axis[0] > THRESHHOLD) {
+            right = 1;
+        }
+        if (state.axis[1] < -THRESHHOLD) {
+            up = 1;
+        }
+        if (state.axis[1] > THRESHHOLD) {
+            down = 1;
+        }
+
+        // speed hax
+        if (state.digitalButton[6] && state.digitalButton[7]) {
+            goFastButton = true;
+        }
     }
 }
 
@@ -267,24 +259,6 @@ int calibrate() {
 
 void readjoystick() {
     readbuttons();
-    // getcoordinates();
-    // up = 0;
-    // down = 0;
-    // left = 0;
-    // right = 0;
-
-    // if (jx < leftb) {
-    //     left = 1;
-    // }
-    // if (jx > rightb) {
-    //     right = 1;
-    // }
-    // if (jy < upb) {
-    //     up = 1;
-    // }
-    // if (jy > downb) {
-    //     down = 1;
-    // }
 }
 
 int keyboard_init() {
