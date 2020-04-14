@@ -264,12 +264,18 @@ void LoadCHRList() {
     int i;
     VFILE* f;
 
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < 20; i++) {
         if (strlen(chrlist[i].fname)) {
             f = vopen(chrlist[i].fname, "rb");
+            if (!f) {
+                printf("Unable to load CHR %s\n", chrlist[i].fname);
+                memset(chrs + (i + 5) * 15360, 0, 30 * 512);
+                continue;
+            }
             vread(chrs + ((i + 5) * 15360), 30, 512, f);
             vclose(f);
         }
+    }
 }
 
 void load_map(char* fname) {

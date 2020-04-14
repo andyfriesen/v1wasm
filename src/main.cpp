@@ -476,8 +476,10 @@ eqloop:
 
     f = vopen("MAGICEQ.DAT", "r");
     if (!f) {
-        err("Could not open MAGICEQ.DAT.");
+        printf("Could not open MAGICEQ.DAT.\n");
+        return;
     }
+
     vscanf(f, "%d", &a);
     for (i = 1; i <= a; i++) {
 mpl1:
@@ -556,55 +558,58 @@ void InitItems() {
 
     f = vopen("MAGICON.DAT", "rb");
     if (!f) {
-        err("Could not open MAGICON.DAT.");
+        printf("Could not open MAGICON.DAT.\n");
+    } else {
+        vread(&b, 1, 1, f);
+        vread(magicicons + 256, 256, b, f);
+        vclose(f);
     }
-    vread(&b, 1, 1, f);
-    vread(magicicons + 256, 256, b, f);
-    vclose(f);
 
     f = vopen("MAGIC.DAT", "r");
     if (!f) {
-        err("Could not open MAGIC.DAT.");
+        printf("Could not open MAGIC.DAT.\n");
+    } else {
+        vscanf(f, "%s", strbuf);
+        b = atoi(strbuf);
+        for (i = 1; i < b + 1; i++) {
+            vscanf(f, "%s", magic[i].name);
+            vscanf(f, "%s", strbuf);
+            magic[i].icon = atoi(strbuf) + 1;
+            vscanf(f, "%s", magic[i].desc);
+            vscanf(f, "%s", strbuf);
+            magic[i].useflag = atoi(strbuf);
+            vscanf(f, "%s", strbuf);
+            magic[i].useeffect = atoi(strbuf);
+            vscanf(f, "%s", strbuf);
+            magic[i].itemtype = atoi(strbuf);
+            vscanf(f, "%s", strbuf);
+            magic[i].equipflag = atoi(strbuf);
+            vscanf(f, "%s", strbuf);
+            magic[i].equipidx = atoi(strbuf);
+            vscanf(f, "%s", strbuf);
+            magic[i].itmprv = atoi(strbuf);
+            vscanf(f, "%s", strbuf);
+            magic[i].price = atoi(strbuf);
+            vscanf(f, "%s", strbuf);
+            magic[i].cost = atoi(strbuf);
+        }
+        vclose(f);
+        printf("magic.dat read ok\n");
     }
-    vscanf(f, "%s", strbuf);
-    b = atoi(strbuf);
-    for (i = 1; i < b + 1; i++) {
-        vscanf(f, "%s", magic[i].name);
-        vscanf(f, "%s", strbuf);
-        magic[i].icon = atoi(strbuf) + 1;
-        vscanf(f, "%s", magic[i].desc);
-        vscanf(f, "%s", strbuf);
-        magic[i].useflag = atoi(strbuf);
-        vscanf(f, "%s", strbuf);
-        magic[i].useeffect = atoi(strbuf);
-        vscanf(f, "%s", strbuf);
-        magic[i].itemtype = atoi(strbuf);
-        vscanf(f, "%s", strbuf);
-        magic[i].equipflag = atoi(strbuf);
-        vscanf(f, "%s", strbuf);
-        magic[i].equipidx = atoi(strbuf);
-        vscanf(f, "%s", strbuf);
-        magic[i].itmprv = atoi(strbuf);
-        vscanf(f, "%s", strbuf);
-        magic[i].price = atoi(strbuf);
-        vscanf(f, "%s", strbuf);
-        magic[i].cost = atoi(strbuf);
-    }
-    vclose(f);
-    printf("magic.dat read ok\n");
 
     f = vopen("MAGIC.VCS", "rb");
     if (!f) {
-        err("Could not open MAGIC.VCS");
+        printf("Could not open MAGIC.VCS\n");
+    } else {
+        vread(&j, 1, 4, f);
+        printf("j = %i\n", j);
+        vread(&magicofstbl, 4, j, f);
+        printf("magicofstbl\n");
+        vread(magicvc, 1, 50000, f);
+        printf("magicvc\n");
+        vclose(f);
+        printf("magic.vcs read ok\n");
     }
-    vread(&j, 1, 4, f);
-    printf("j = %i\n", j);
-    vread(&magicofstbl, 4, j, f);
-    printf("magicofstbl\n");
-    vread(magicvc, 1, 50000, f);
-    printf("magicvc\n");
-    vclose(f);
-    printf("magic.vcs read ok\n");
 
     // END NEW
 
