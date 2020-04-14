@@ -3,6 +3,7 @@
 // Copyright (C)1997 BJ Eirich
 
 #include <map>
+#include <set>
 #include <vector>
 #include <stdio.h>
 #include <emscripten.h>
@@ -18,7 +19,7 @@ keyb_map key_map[128];         // for recording bound keys
 char keyboard_map[128];
 char last_pressed;
 
-char j;                               // use joystick or not
+char j = 1;                           // use joystick or not
 
 char b1, b2, b3, b4;                  // four button flags for GamePad
 char up, down, left, right;           // stick position flags
@@ -57,6 +58,20 @@ namespace verge {
         return true;
     }
 
+    std::set<int> connectedGamepads;
+
+    EM_BOOL onGamepadConnected(int eventType, const EmscriptenGamepadEvent* gamepadEvent, void* userData) {
+        printf("Gamepad connected idx='%s' mapping='%s' index=%ld\n", gamepadEvent->id, gamepadEvent->mapping, gamepadEvent->index);
+        connectedGamepads.insert(gamepadEvent->index);
+        return true;
+    }
+
+    EM_BOOL onGamepadDisonnected(int eventType, const EmscriptenGamepadEvent* gamepadEvent, void* userData) {
+        printf("Gamepad disconnected\n");
+        connectedGamepads.erase(gamepadEvent->index);
+        return true;
+    }
+
     void registerInputEventHandlers() {
         EMSCRIPTEN_RESULT result;
         result = emscripten_set_keydown_callback(
@@ -74,6 +89,15 @@ namespace verge {
             &onKeyUp
         );
         // TEST_RESULT(result);
+
+        auto res = emscripten_sample_gamepad_data();
+        if (res == EMSCRIPTEN_RESULT_NOT_SUPPORTED) {
+            printf("no gamepad support?\n");
+        }
+        // EMSCRIPTEN_RESULT_NOT_SUPPORTED means that the browser does not support gamepads at all
+
+        emscripten_set_gamepadconnected_callback(0, true, &onGamepadConnected);
+        emscripten_set_gamepaddisconnected_callback(0, true, &onGamepadDisonnected);
     }
 }
 
@@ -123,15 +147,15 @@ void readb() {
         b4 = 1;
     }
 
-    if ((keyboard_map[SCAN_ALT]) &&
-            (keyboard_map[SCAN_X])) {
-        err("Exiting: ALT-X pressed.");
-    }
+    // if ((keyboard_map[SCAN_ALT]) &&
+    //         (keyboard_map[SCAN_X])) {
+    //     err("Exiting: ALT-X pressed.");
+    // }
 
-    if (keyboard_map[SCAN_F10]) {
-        keyboard_map[SCAN_F10] = 0;
-        ScreenShot();
-    }
+    // if (keyboard_map[SCAN_F10]) {
+    //     keyboard_map[SCAN_F10] = 0;
+    //     ScreenShot();
+    // }
 }
 
 void readcontrols() {
@@ -142,19 +166,17 @@ void readcontrols() {
 void readcontrols_noSleep() {
     readKeyboard();
 
+    b1 = 0;
+    b2 = 0;
+    b3 = 0;
+    b4 = 0;
+    up = 0;
+    down = 0;
+    left = 0;
+    right = 0;
+
     int i;
-    if (j) {
-        readjoystick();
-    } else {
-        b1 = 0;
-        b2 = 0;
-        b3 = 0;
-        b4 = 0;
-        up = 0;
-        down = 0;
-        left = 0;
-        right = 0;
-    }
+    readjoystick();
 
     if (keyboard_map[SCAN_UP]) {
         up = 1;
@@ -200,6 +222,23 @@ void readcontrols_noSleep() {
 }
 
 void readbuttons() {
+    emscripten_sample_gamepad_data();
+    int count = emscripten_get_num_gamepads();
+
+    EmscriptenGamepadEvent state;
+
+    for (int i : verge::connectedGamepads) {
+        emscripten_get_gamepad_status(i, &state);
+        b1 |= state.digitalButton[0];
+        b2 |= state.digitalButton[1];
+        b3 |= state.digitalButton[2];
+        b4 |= state.digitalButton[3];
+
+        up |= state.digitalButton[12];
+        down |= state.digitalButton[13];
+        left |= state.digitalButton[14];
+        right |= state.digitalButton[15];
+    }
 }
 
 void getcoordinates() {
@@ -228,24 +267,24 @@ int calibrate() {
 
 void readjoystick() {
     readbuttons();
-    getcoordinates();
-    up = 0;
-    down = 0;
-    left = 0;
-    right = 0;
+    // getcoordinates();
+    // up = 0;
+    // down = 0;
+    // left = 0;
+    // right = 0;
 
-    if (jx < leftb) {
-        left = 1;
-    }
-    if (jx > rightb) {
-        right = 1;
-    }
-    if (jy < upb) {
-        up = 1;
-    }
-    if (jy > downb) {
-        down = 1;
-    }
+    // if (jx < leftb) {
+    //     left = 1;
+    // }
+    // if (jx > rightb) {
+    //     right = 1;
+    // }
+    // if (jy < upb) {
+    //     up = 1;
+    // }
+    // if (jy > downb) {
+    //     down = 1;
+    // }
 }
 
 int keyboard_init() {
