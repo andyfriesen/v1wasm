@@ -1820,13 +1820,13 @@ var tempI64;
 
 var ASM_CONSTS = {
   1439: function() {FS.syncfs(false, err => { if (err) { console.error("SaveGame failed!!", err); } });},  
- 6318: function() {window.verge.setLoadingProgress(100);}
+ 6317: function() {window.verge.setLoadingProgress(100);}
 };
 
 function _emscripten_asm_const_iii(code, sigPtr, argbuf) {
   var args = readAsmConstArgs(sigPtr, argbuf);
   return ASM_CONSTS[code].apply(null, args);
-}function wasm_initSound(){ const ctx = new AudioContext(); const gainNode = ctx.createGain(); gainNode.connect(ctx.destination); window.verge.audioContext = ctx; window.verge.gainNode = gainNode; window.verge.sounds = {}; if (ctx.audioWorklet) { window.verge.mptInited = ctx.audioWorklet.addModule('worklet-main.js').then(() => { window.verge.mptNode = new AudioWorkletNode(ctx, 'libopenmpt-processor', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], }); window.verge.mptNode.connect(gainNode); }); } else { console.warn("AudioWorklet is not supported in this browser.  No music.  Sorry!"); window.verge.mptInited = Promise.resolve(); } }
+}function wasm_initSound(){ const ctx = new AudioContext(); const gainNode = ctx.createGain(); gainNode.connect(ctx.destination); window.verge.audioContext = ctx; window.verge.gainNode = gainNode; window.verge.sounds = {}; if (ctx.audioWorklet) { window.verge.mptInited = ctx.audioWorklet.addModule('mpt-worklet.js').then(() => { window.verge.mptNode = new AudioWorkletNode(ctx, 'libopenmpt-processor', { numberOfInputs: 0, numberOfOutputs: 1, outputChannelCount: [2], }); window.verge.mptNode.connect(gainNode); }); } else { console.warn("AudioWorklet is not supported in this browser.  No music.  Sorry!"); window.verge.mptInited = Promise.resolve(); } }
 function wasm_nextFrame(){ return Asyncify.handleSleep(requestAnimationFrame); }
 function wasm_initFileSystem(c){ let sgr = UTF8ToString(c); if (sgr.endsWith('/')) sgr = sgr.substr(0, sgr.length - 1); FS.mkdir("/persist"); FS.mkdir(sgr); FS.mount(IDBFS, {}, sgr); FS.syncfs(true, function (err) { if (err) console.error('wasm_initFileSystem failed!', err); }); }
 function fetchSync(pathPtr,size,data){ return Asyncify.handleSleep(resume => { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; resume(); return; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); HEAP32[size >> 2] = bytes.length; const dataPtr = _malloc(bytes.length); HEAP32[data >> 2] = dataPtr; HEAP8.set(bytes, dataPtr); resume(); }); }); }

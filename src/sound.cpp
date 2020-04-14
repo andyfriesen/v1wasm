@@ -43,7 +43,7 @@ EM_JS(void, wasm_initSound, (), {
     window.verge.sounds = {};
 
     if (ctx.audioWorklet) {
-        window.verge.mptInited = ctx.audioWorklet.addModule('worklet-main.js').then(() => {
+        window.verge.mptInited = ctx.audioWorklet.addModule('mpt-worklet.js').then(() => {
             window.verge.mptNode = new AudioWorkletNode(ctx, 'libopenmpt-processor', {
                 numberOfInputs: 0,
                 numberOfOutputs: 1,
