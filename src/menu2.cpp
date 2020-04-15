@@ -178,8 +178,8 @@ redraw:
                 printstring("0");
             }
             printstring(strbuf);
-            fread(&b, 1, 2, f);
-            fread(&j, 1, 1, f);
+            int s = 0;
+            fread(&s, 1, 3, f);
             if (!i) {
                 img = buf1;
             }
