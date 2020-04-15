@@ -100,7 +100,7 @@ void drawchar(int i, int xw, int yw) {
         fr = 15;
         break;
     }
-    if (party[i].moving && !party[i].specframe) {
+    if (!party[i].specframe) {
         const int incrTable[] = { 0, 1, 2, 1, 0, 3, 4, 3 };
         fr += incrTable[party[i].framectr / 10];
     }
