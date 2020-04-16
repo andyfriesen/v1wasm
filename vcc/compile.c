@@ -91,11 +91,11 @@ void err(char *str)
 
          if (!quiet) printf("%s (%d) \n",str,lines);
          if (quiet)
-         {    f=fopen("ERROR.TXT","w");
+         {    f=fopen("error.txt","w");
               fprintf(f,"%s (%d)\n",str,lines);
               fclose(f);
          }
-         remove("$$TMEP$$.MA_");
+         remove("$$tmep$$.ma_");
          exit(-1);
 }
 
@@ -399,7 +399,7 @@ void Expect(char *str)
          if (!strcmp(str,token)) return;
          if (!quiet) printf ("error: %s expected, %s got (%d)", str, &token, lines);
          if (quiet)
-         {    f=fopen("ERROR.TXT","w");
+         {    f=fopen("error.txt","w");
               fprintf(f,"error: %s expected, %s got (%d) \n", str, &token, lines);
               fclose(f);
          }
