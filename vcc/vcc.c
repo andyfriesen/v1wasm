@@ -84,14 +84,14 @@ PreStartupFiles ()
 WriteMagicOutput ()
 { FILE *f;
 
-         f=fopen("MAGIC.VCS","wb");
+         f=fopen("magic.vcs","wb");
          fwrite (&numscripts, 1, 4, f);
          fwrite (&scriptofstbl, 4, numscripts, f);
          fwrite (code, 1, (cpos-code), f);
          fclose (f);
 
-         remove("ERROR.TXT");
-         remove("$$TMEP$$.MA_");
+         remove("error.txt");
+         remove("$$tmep$$.ma_");
 }
 
 // END NEW CODE
@@ -99,27 +99,27 @@ WriteMagicOutput ()
 WriteEffectOutput ()
 { FILE *f;
 
-         f=fopen("EFFECTS.VCS","wb");
+         f=fopen("effects.vcs","wb");
          fwrite (&numscripts, 1, 4, f);
          fwrite (&scriptofstbl, 4, numscripts, f);
          fwrite (code, 1, (cpos-code), f);
          fclose (f);
 
-         remove("ERROR.TXT");
-         remove("$$TMEP$$.MA_");
+         remove("error.txt");
+         remove("$$tmep$$.ma_");
 }
 
 WriteScriptOutput ()
 { FILE *f;
 
-         f=fopen("STARTUP.VCS","wb");
+         f=fopen("startup.vcs","wb");
          fwrite (&numscripts, 1, 4, f);
          fwrite (&scriptofstbl, 4, numscripts, f);
          fwrite (code, 1, (cpos-code), f);
          fclose (f);
 
-         remove("ERROR.TXT");
-         remove("$$TMEP$$.MA_");
+         remove("error.txt");
+         remove("$$tmep$$.ma_");
 }
 
 void WriteOutput ()
@@ -130,7 +130,7 @@ void WriteOutput ()
 
          i = strlen (fname);
          memcpy (strbuf, &fname, i);
-         strcpy(strbuf + i, ".MAP");
+         strcpy(strbuf + i, ".map");
 
          f = fopen (strbuf, "rb+");
          if (f == 0) {
@@ -153,8 +153,8 @@ void WriteOutput ()
          fwrite (code, 1, (cpos-code), f);
          fclose (f);
 
-         remove("ERROR.TXT");
-         remove("$$TMEP$$.MA_");
+         remove("error.txt");
+         remove("$$tmep$$.ma_");
 }
 
 main (int argc, char *argv[])
@@ -181,11 +181,11 @@ main (int argc, char *argv[])
                      for ( i=0; i<100; i++ )
                          fname[i] = strbuf[i];
                     //  strupr (fname);
-                     if (!strcmp(fname,"EFFECTS")) effect=1;
+                     if (!strcmp(fname,"effects")) effect=1;
 // NEW CODE
-                     if (!strcmp(fname,"MAGIC")) magic=1;
+                     if (!strcmp(fname,"magic")) magic=1;
 // END NEW CODE
-                     if (!strcmp(fname,"STARTUP")) scrpt=1;
+                     if (!strcmp(fname,"startup")) scrpt=1;
                      break;
                    }
            default: { printf ("vcc: Too many parameters. \n");
