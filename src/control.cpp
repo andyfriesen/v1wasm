@@ -49,14 +49,18 @@ void readjoystick();
 namespace verge {
     std::map<DOMScanCode, VScanCode> scanMap;
 
+    bool shouldStopPropagation(int keyCode) {
+        return 9 == keyCode;
+    }
+
     EM_BOOL onKeyDown(int eventType, const EmscriptenKeyboardEvent *e, void *userData) {
         inputEvents.push_back(verge::InputEvent{ verge::EventType::KeyDown, int(e->keyCode) });
-        return true;
+        return shouldStopPropagation(e->keyCode);
     }
 
     EM_BOOL onKeyUp(int eventType, const EmscriptenKeyboardEvent *e, void *userData) {
         inputEvents.push_back(verge::InputEvent{ verge::EventType::KeyUp, int(e->keyCode) });
-        return true;
+        return shouldStopPropagation(e->keyCode);
     }
 
     std::set<int> connectedGamepads;
