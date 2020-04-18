@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <map>
 #include <cstdint>
 #include <stdexcept>
 
@@ -9,11 +10,58 @@
 // FIXME: indentation style? (brace on next line like, tab count)
 // FIXME: spacing style? (space betwen operators, after commas, etc)
 
-using Bytecode = std::vector<std::uint8_t>;
+using std::uint8_t;
+using std::int32_t;
+using std::uint32_t;
+
+using Bytecode = std::vector<uint8_t>;
 
 struct Code {
-    std::vector<std::uint32_t> offsets;
+    std::vector<uint32_t> offsets;
     Bytecode code;
+};
+
+struct Ctx {
+    Bytecode& bytecode;
+    uint32_t offset;
+
+    std::map<uint32_t, std::string> code;
+
+    uint8_t getC() {
+        return bytecode[offset++];
+    }
+
+    int32_t getD() {
+        const auto a = getC();
+        const auto b = getC();
+        const auto c = getC();
+        const auto d = getC();
+        return static_cast<int32_t>(
+            (static_cast<uint32_t>(d) << 24U)
+            | (static_cast<uint32_t>(c) << 16U)
+            | (static_cast<uint32_t>(b) << 8U)
+            | static_cast<uint32_t>(a));
+    }
+
+    std::string getString() {
+        const auto startOffset = offset;
+        while (bytecode[offset]) {
+            ++offset;
+        }
+        ++offset;
+
+        return std::string(bytecode.begin() + startOffset, bytecode.begin() + offset);
+    }
+
+    void emit(uint32_t offset, std::string s) {
+        code[offset] = std::move(s);
+    }
+
+    void dump() {
+        for (const auto& pair: code) {
+            printf("%s\n", pair.second.c_str());
+        }
+    }
 };
 
 Code loadCode(const std::string& fileName) {
@@ -31,8 +79,8 @@ Code loadCode(const std::string& fileName) {
 
         fseek(f, 100+(mx*my*5)+7956, SEEK_SET);
 
-        std::uint32_t a;
-        std::uint8_t i;
+        uint32_t a;
+        uint8_t i;
         fread(&a, 1, 4, f);
         fseek(f, 88*a, 1);
         fread(&i, 1, 1, f);
@@ -42,14 +90,14 @@ Code loadCode(const std::string& fileName) {
         fseek(f, 0, SEEK_SET);
     }
 
-    std::uint32_t numscripts;
+    uint32_t numscripts;
     fread(&numscripts, 1, 4, f);
 
-    std::vector<std::uint32_t> scriptofstbl;
+    std::vector<uint32_t> scriptofstbl;
     scriptofstbl.resize(numscripts);
     fread(scriptofstbl.data(), 4, numscripts, f);
 
-    std::vector<std::uint8_t> code;
+    std::vector<uint8_t> code;
     code.resize(size - static_cast<unsigned>(ftell(f)));
     fread(code.data(), 1, code.size(), f);
 
@@ -58,60 +106,36 @@ Code loadCode(const std::string& fileName) {
     return Code{ std::move(scriptofstbl), std::move(code) };
 }
 
-
-std::uint8_t getC(const Bytecode& code, int& i) {
-    return code[i++];
-}
-
-std::int32_t getD(const Bytecode& code, int& i) {
-    const auto a = getC(code, i);
-    const auto b = getC(code, i);
-    const auto c = getC(code, i);
-    const auto d = getC(code, i);
-    return static_cast<std::int32_t>(
-        (static_cast<std::uint32_t>(d) << 24U)
-        | (static_cast<std::uint32_t>(c) << 16U)
-        | (static_cast<std::uint32_t>(b) << 8U)
-        | static_cast<std::uint32_t>(a));
-}
-
-std::string getString(const Bytecode& code, int& i) {
-    int startI = i;
-    while (code[i]) {
-        ++i;
-    }
-    ++i;
-
-    return std::string(code.begin() + startI, code.begin() + i);
-}
-
 void decode(const Code& code, int index);
-void decodeBlock(const Bytecode& code, int& i);
-void decodeExec(const Bytecode& code, int& i);
-void decodeAssignOp(const Bytecode& code, int& i);
-void decodeVar0Assign(const Bytecode& code, int& i);
-void decodeVar1Assign(const Bytecode& code, int& i);
-void decodeVar2Assign(const Bytecode& code, int& i);
-void decodeIf(const Bytecode& code, int& i);
-void decodeForLoop0(const Bytecode& code, int& i);
-void decodeForLoop1(const Bytecode& code, int& i);
-void decodeGoto(const Bytecode& code, int& i);
-void decodeSwitch(const Bytecode& code, int& i);
-void skipOperand(const Bytecode& code, int& i);
-void skipOperandTerm(const Bytecode& code, int& i);
-void decodeOperand(const Bytecode& code, int& i);
-void decodeOperandTerm(const Bytecode& code, int& i);
-void decodeVar0(const Bytecode& code, int& i);
-void decodeVar1(const Bytecode& code, int& i);
-void decodeVar2(const Bytecode& code, int& i);
+void decodeBlock(Ctx& ctx);
+void decodeExec(Ctx& ctx);
+void decodeAssignOp(Ctx& ctx);
+void decodeVar0Assign(Ctx& ctx);
+void decodeVar1Assign(Ctx& ctx);
+void decodeVar2Assign(Ctx& ctx);
+void decodeIf(Ctx& ctx);
+void decodeForLoop0(Ctx& ctx);
+void decodeForLoop1(Ctx& ctx);
+void decodeGoto(Ctx& ctx);
+void decodeSwitch(Ctx& ctx);
+void skipOperand(Ctx& ctx);
+void skipOperandTerm(Ctx& ctx);
+void decodeOperand(Ctx& ctx);
+void decodeOperandTerm(Ctx& ctx);
+void decodeVar0(Ctx& ctx);
+void decodeVar1(Ctx& ctx);
+void decodeVar2(Ctx& ctx);
 
 void decode(const Code& code, int index) {
     const auto startOffset = code.offsets[index];
     const auto endOffset = (index == static_cast<int>(code.offsets.size()) - 1) ? code.offsets.size() : code.offsets[index + 1];
 
     Bytecode bc{ code.code.begin() + startOffset, code.code.begin() + endOffset };
+    Ctx ctx{ bc, 0 };
     int i = 0;
-    decodeBlock(bc, i);
+    decodeBlock(ctx);
+
+    ctx.dump();
 }
 
 enum class Op {
@@ -128,20 +152,20 @@ enum class Op {
     EndScript = 255
 };
 
-void decodeBlock(const Bytecode& code, int& i) {
-    while (i < static_cast<int>(code.size())) {
-        const auto op = static_cast<Op>(getC(code, i));
+void decodeBlock(Ctx& ctx) {
+    while (ctx.offset < static_cast<int>(ctx.bytecode.size())) {
+        const auto op = static_cast<Op>(ctx.getC());
 
         switch (op) {
-            case Op::Exec: decodeExec(code, i); break;
-            case Op::Var0Assign: decodeVar0Assign(code, i); break;
-            case Op::Var1Assign: decodeVar1Assign(code, i); break;
-            case Op::Var2Assign: decodeVar2Assign(code, i); break;
-            case Op::If: decodeIf(code, i); break;
-            case Op::ForLoop0: decodeForLoop0(code, i); break;
-            case Op::ForLoop1: decodeForLoop1(code, i); break;
-            case Op::Goto: decodeGoto(code, i); break;
-            case Op::Switch: decodeSwitch(code, i); break;
+            case Op::Exec: decodeExec(ctx); break;
+            case Op::Var0Assign: decodeVar0Assign(ctx); break;
+            case Op::Var1Assign: decodeVar1Assign(ctx); break;
+            case Op::Var2Assign: decodeVar2Assign(ctx); break;
+            case Op::If: decodeIf(ctx); break;
+            case Op::ForLoop0: decodeForLoop0(ctx); break;
+            case Op::ForLoop1: decodeForLoop1(ctx); break;
+            case Op::Goto: decodeGoto(ctx); break;
+            case Op::Switch: decodeSwitch(ctx); break;
             case Op::EndScript: return;
             default: throw std::runtime_error(std::string{"*error* decodeBlock: Illegal opcode in VC code "} + std::to_string(static_cast<int>(op)));
         }
@@ -290,10 +314,10 @@ enum class FuncId {
     WyrdStrChangeCHR = 135,
 };
 
-void decodeGenericFunc(const Bytecode& code, int& i, const std::string& funcName, int argumentCount) {
+void decodeGenericFunc(Ctx& ctx, const std::string& funcName, int argumentCount) {
     printf("%s(", funcName.c_str());
     for (int argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
-        decodeOperand(code, i);
+        decodeOperand(ctx);
 
         if (argumentIndex < argumentCount - 1) {
             printf(", ");
@@ -302,264 +326,264 @@ void decodeGenericFunc(const Bytecode& code, int& i, const std::string& funcName
     printf(");\n");
 }
 
-void decodeExec(const Bytecode& code, int& i) {
-    const auto funcId = static_cast<FuncId>(getC(code, i));
+void decodeExec(Ctx& ctx) {
+    const auto funcId = static_cast<FuncId>(ctx.getC());
 
     switch (funcId) {
         case FuncId::MapSwitch: {
             printf("MapSwitch(");
-            printf("\"%s\", ", getString(code, i).c_str());
-            decodeOperand(code, i);
+            printf("\"%s\", ", ctx.getString().c_str());
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(");\n");
             break;
         }
-        case FuncId::Warp: decodeGenericFunc(code, i, "Warp", 3); break;
-        case FuncId::AddCharacter: decodeGenericFunc(code, i, "AddCharacter", 1); break;
-        case FuncId::SoundEffect: decodeGenericFunc(code, i, "SoundEffect", 1); break;
-        case FuncId::GiveItem: decodeGenericFunc(code, i, "GiveItem", 1); break;
+        case FuncId::Warp: decodeGenericFunc(ctx, "Warp", 3); break;
+        case FuncId::AddCharacter: decodeGenericFunc(ctx, "AddCharacter", 1); break;
+        case FuncId::SoundEffect: decodeGenericFunc(ctx, "SoundEffect", 1); break;
+        case FuncId::GiveItem: decodeGenericFunc(ctx, "GiveItem", 1); break;
         case FuncId::Text: {
             printf("Text(");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            printf("\"%s\", ", getString(code, i).c_str());
-            printf("\"%s\", ", getString(code, i).c_str());
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\", ", ctx.getString().c_str());
+            printf("\"%s\", ", ctx.getString().c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }
-        case FuncId::AlterFTile: decodeGenericFunc(code, i, "AlterFTile", 4); break;
-        case FuncId::AlterBTile: decodeGenericFunc(code, i, "AlterBTile", 4); break;
-        case FuncId::FakeBattle: decodeGenericFunc(code, i, "FakeBattle", 0); break;
+        case FuncId::AlterFTile: decodeGenericFunc(ctx, "AlterFTile", 4); break;
+        case FuncId::AlterBTile: decodeGenericFunc(ctx, "AlterBTile", 4); break;
+        case FuncId::FakeBattle: decodeGenericFunc(ctx, "FakeBattle", 0); break;
         case FuncId::Return: printf("return;\n"); break;
         case FuncId::PlayMusic: {
             printf("PlayMusic(");
-            printf("\"%s\", ", getString(code, i).c_str());
+            printf("\"%s\", ", ctx.getString().c_str());
             printf(");\n");
             break;
         }
         case FuncId::StopMusic: printf("StopMusic();\n"); break;
         case FuncId::HealAll: printf("HealAll();\n"); break;
-        case FuncId::AlterParallax: decodeGenericFunc(code, i, "AlterParallax", 3); break;
-        case FuncId::FadeIn: decodeGenericFunc(code, i, "FadeIn", 1); break;
-        case FuncId::FadeOut: decodeGenericFunc(code, i, "FadeOut", 2); break;
-        case FuncId::RemoveCharacter: decodeGenericFunc(code, i, "RemoveCharacter", 1); break;
+        case FuncId::AlterParallax: decodeGenericFunc(ctx, "AlterParallax", 3); break;
+        case FuncId::FadeIn: decodeGenericFunc(ctx, "FadeIn", 1); break;
+        case FuncId::FadeOut: decodeGenericFunc(ctx, "FadeOut", 2); break;
+        case FuncId::RemoveCharacter: decodeGenericFunc(ctx, "RemoveCharacter", 1); break;
         case FuncId::Banner: {
             printf("Banner(\n");
-            printf("\"%s\", ", getString(code, i).c_str());
+            printf("\"%s\", ", ctx.getString().c_str());
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(");\n");     
             break;
         }
-        case FuncId::EnforceAnimation: decodeGenericFunc(code, i, "EnforceAnimation", 0); break;
-        case FuncId::WaitKeyUp: decodeGenericFunc(code, i, "WaitKeyUp", 0); break;
-        case FuncId::DestroyItem: decodeGenericFunc(code, i, "DestroyItem", 2); break;
+        case FuncId::EnforceAnimation: decodeGenericFunc(ctx, "EnforceAnimation", 0); break;
+        case FuncId::WaitKeyUp: decodeGenericFunc(ctx, "WaitKeyUp", 0); break;
+        case FuncId::DestroyItem: decodeGenericFunc(ctx, "DestroyItem", 2); break;
         case FuncId::Prompt: {
             printf("Text(");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            printf("\"%s\", ", getString(code, i).c_str());
-            printf("\"%s\", ", getString(code, i).c_str());
-            printf("\"%s\", ", getString(code, i).c_str());
-            decodeOperand(code, i);
+            printf("\"%s\", ", ctx.getString().c_str());
+            printf("\"%s\", ", ctx.getString().c_str());
+            printf("\"%s\", ", ctx.getString().c_str());
+            decodeOperand(ctx);
             printf(", ");
-            printf("\"%s\", ", getString(code, i).c_str());
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\", ", ctx.getString().c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }        
         case FuncId::ChainEvent: {
-            const auto argumentCount = getC(code, i) + 1;
-            decodeGenericFunc(code, i, "ChainEvent", argumentCount);
+            const auto argumentCount = ctx.getC() + 1;
+            decodeGenericFunc(ctx, "ChainEvent", argumentCount);
             break;
         }
         case FuncId::CallEvent: {
-            const auto argumentCount = getC(code, i) + 1;
-            decodeGenericFunc(code, i, "CallEvent", argumentCount);
+            const auto argumentCount = ctx.getC() + 1;
+            decodeGenericFunc(ctx, "CallEvent", argumentCount);
             break;
         }
-        case FuncId::Heal: decodeGenericFunc(code, i, "Heal", 2); break;
-        case FuncId::EarthQuake: decodeGenericFunc(code, i, "EarthQuake", 3); break;
-        case FuncId::SaveMenu: decodeGenericFunc(code, i, "SaveMenu", 0); break;
-        case FuncId::EnableSave: decodeGenericFunc(code, i, "EnableSave", 0); break;
-        case FuncId::DisableSave: decodeGenericFunc(code, i, "DisableSave", 0); break;
-        case FuncId::ReviveChar: decodeGenericFunc(code, i, "ReviveChar", 1); break;
-        case FuncId::RestoreMP: decodeGenericFunc(code, i, "RestoreMP", 2); break;
-        case FuncId::Redraw: decodeGenericFunc(code, i, "Redraw", 0); break;
+        case FuncId::Heal: decodeGenericFunc(ctx, "Heal", 2); break;
+        case FuncId::EarthQuake: decodeGenericFunc(ctx, "EarthQuake", 3); break;
+        case FuncId::SaveMenu: decodeGenericFunc(ctx, "SaveMenu", 0); break;
+        case FuncId::EnableSave: decodeGenericFunc(ctx, "EnableSave", 0); break;
+        case FuncId::DisableSave: decodeGenericFunc(ctx, "DisableSave", 0); break;
+        case FuncId::ReviveChar: decodeGenericFunc(ctx, "ReviveChar", 1); break;
+        case FuncId::RestoreMP: decodeGenericFunc(ctx, "RestoreMP", 2); break;
+        case FuncId::Redraw: decodeGenericFunc(ctx, "Redraw", 0); break;
         case FuncId::SText: {
             printf("SText(");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            printf("\"%s\", ", getString(code, i).c_str());
-            printf("\"%s\", ", getString(code, i).c_str());
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\", ", ctx.getString().c_str());
+            printf("\"%s\", ", ctx.getString().c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }
-        case FuncId::DisableMenu: decodeGenericFunc(code, i, "DisableMenu", 0); break;
-        case FuncId::EnableMenu: decodeGenericFunc(code, i, "EnableMenu", 0); break;
-        case FuncId::Wait: decodeGenericFunc(code, i, "Wait", 1); break;
-        case FuncId::SetFace: decodeGenericFunc(code, i, "SetFace", 2); break;
-        case FuncId::MapPaletteGradient: decodeGenericFunc(code, i, "MapPaletteGradient", 4); break;
-        case FuncId::BoxFadeOut: decodeGenericFunc(code, i, "BoxFadeOut", 1); break;
-        case FuncId::BoxFadeIn: decodeGenericFunc(code, i, "BoxFadeIn", 1); break;
-        case FuncId::GiveGP: decodeGenericFunc(code, i, "GiveGP", 1); break;
-        case FuncId::TakeGP: decodeGenericFunc(code, i, "TakeGP", 1); break;
-        case FuncId::ChangeZone: decodeGenericFunc(code, i, "ChangeZone", 3); break;
-        case FuncId::GetItem: decodeGenericFunc(code, i, "ChangeZone", 2); break;
-        case FuncId::ForceEquip: decodeGenericFunc(code, i, "ForceEquip", 2); break;
-        case FuncId::GiveXP: decodeGenericFunc(code, i, "GiveXP", 2); break;
+        case FuncId::DisableMenu: decodeGenericFunc(ctx, "DisableMenu", 0); break;
+        case FuncId::EnableMenu: decodeGenericFunc(ctx, "EnableMenu", 0); break;
+        case FuncId::Wait: decodeGenericFunc(ctx, "Wait", 1); break;
+        case FuncId::SetFace: decodeGenericFunc(ctx, "SetFace", 2); break;
+        case FuncId::MapPaletteGradient: decodeGenericFunc(ctx, "MapPaletteGradient", 4); break;
+        case FuncId::BoxFadeOut: decodeGenericFunc(ctx, "BoxFadeOut", 1); break;
+        case FuncId::BoxFadeIn: decodeGenericFunc(ctx, "BoxFadeIn", 1); break;
+        case FuncId::GiveGP: decodeGenericFunc(ctx, "GiveGP", 1); break;
+        case FuncId::TakeGP: decodeGenericFunc(ctx, "TakeGP", 1); break;
+        case FuncId::ChangeZone: decodeGenericFunc(ctx, "ChangeZone", 3); break;
+        case FuncId::GetItem: decodeGenericFunc(ctx, "ChangeZone", 2); break;
+        case FuncId::ForceEquip: decodeGenericFunc(ctx, "ForceEquip", 2); break;
+        case FuncId::GiveXP: decodeGenericFunc(ctx, "GiveXP", 2); break;
         case FuncId::Shop: {
-            const auto argumentCount = getC(code, i);
-            decodeGenericFunc(code, i, "Shop", argumentCount);
+            const auto argumentCount = ctx.getC();
+            decodeGenericFunc(ctx, "Shop", argumentCount);
             break;
         }
-        case FuncId::PaletteMorph: decodeGenericFunc(code, i, "PaletteMorph", 5); break;
+        case FuncId::PaletteMorph: decodeGenericFunc(ctx, "PaletteMorph", 5); break;
         case FuncId::ChangeCHR: {
             printf("ChangeCHR(");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }
-        case FuncId::ReadControls: decodeGenericFunc(code, i, "ReadControls", 0); break;
+        case FuncId::ReadControls: decodeGenericFunc(ctx, "ReadControls", 0); break;
         case FuncId::VCPutPCX: {
             printf("VCPutPCX(");
-            printf("\"%s\", ", getString(code, i).c_str());
-            decodeOperand(code, i);
+            printf("\"%s\", ", ctx.getString().c_str());
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);            
+            decodeOperand(ctx);            
             printf(");\n");
             break;
         }
-        case FuncId::HookTimer: decodeGenericFunc(code, i, "HookTimer", 1); break;
-        case FuncId::HookRetrace: decodeGenericFunc(code, i, "HookRetrace", 1); break;
+        case FuncId::HookTimer: decodeGenericFunc(ctx, "HookTimer", 1); break;
+        case FuncId::HookRetrace: decodeGenericFunc(ctx, "HookRetrace", 1); break;
         case FuncId::VCLoadPCX: {
             printf("VCLoadPCX(");
-            printf("\"%s\", ", getString(code, i).c_str());
-            decodeOperand(code, i);
+            printf("\"%s\", ", ctx.getString().c_str());
+            decodeOperand(ctx);
             printf(");\n");
             break;
         }
-        case FuncId::VCBlitImage: decodeGenericFunc(code, i, "VCBlitImage", 5); break;
+        case FuncId::VCBlitImage: decodeGenericFunc(ctx, "VCBlitImage", 5); break;
         case FuncId::PlayFLI: throw std::runtime_error(std::string{"*error* TODO: PlayFLI"});
-        case FuncId::VCClear: decodeGenericFunc(code, i, "VCClear", 0); break;
-        case FuncId::VCClearRegion: decodeGenericFunc(code, i, "VCClear", 4); break;
+        case FuncId::VCClear: decodeGenericFunc(ctx, "VCClear", 0); break;
+        case FuncId::VCClearRegion: decodeGenericFunc(ctx, "VCClear", 4); break;
         case FuncId::VCText: {
             printf("VCText(");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");            
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }
-        case FuncId::VCTBlitImage: decodeGenericFunc(code, i, "VCTBlitImage", 5); break;
-        case FuncId::Exit: decodeGenericFunc(code, i, "Exit", 0); break;
+        case FuncId::VCTBlitImage: decodeGenericFunc(ctx, "VCTBlitImage", 5); break;
+        case FuncId::Exit: decodeGenericFunc(ctx, "Exit", 0); break;
         case FuncId::Quit: {
             printf("Quit(");
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }
         case FuncId::VCCenterText: {
             printf("VCCenterText(");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");            
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }
-        case FuncId::ResetTimer: decodeGenericFunc(code, i, "ResetTimer", 0); break;
-        case FuncId::VCBlitTile: decodeGenericFunc(code, i, "VCBlitTile", 3); break;
-        case FuncId::Sys_ClearScreen: decodeGenericFunc(code, i, "Sys_ClearScreen", 0); break;
+        case FuncId::ResetTimer: decodeGenericFunc(ctx, "ResetTimer", 0); break;
+        case FuncId::VCBlitTile: decodeGenericFunc(ctx, "VCBlitTile", 3); break;
+        case FuncId::Sys_ClearScreen: decodeGenericFunc(ctx, "Sys_ClearScreen", 0); break;
         case FuncId::Sys_DisplayPCX: {
             printf("Sys_DisplayPCX(");
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }        
-        case FuncId::OldStartupMenu: decodeGenericFunc(code, i, "OldStartupMenu", 0); break;
-        case FuncId::VGADump: decodeGenericFunc(code, i, "VGADump", 0); break;
+        case FuncId::OldStartupMenu: decodeGenericFunc(ctx, "OldStartupMenu", 0); break;
+        case FuncId::VGADump: decodeGenericFunc(ctx, "VGADump", 0); break;
         case FuncId::NewGame: {
             printf("NewGame(");
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }
-        case FuncId::LoadSaveErase: decodeGenericFunc(code, i, "LoadSaveErase", 0); break;
-        case FuncId::Delay: decodeGenericFunc(code, i, "Delay", 1); break;
+        case FuncId::LoadSaveErase: decodeGenericFunc(ctx, "LoadSaveErase", 0); break;
+        case FuncId::Delay: decodeGenericFunc(ctx, "Delay", 1); break;
         case FuncId::PartyMove: {
             printf("PartyMove(");
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }
         case FuncId::EntityMove: {
             printf("EntityMove(");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");            
-            printf("\"%s\"", getString(code, i).c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         } 
-        case FuncId::AutoOn: decodeGenericFunc(code, i, "AutoOn", 0); break;
-        case FuncId::AutoOff: decodeGenericFunc(code, i, "AutoOff", 0); break;
-        case FuncId::EntityMoveScript: decodeGenericFunc(code, i, "EntityMoveScript", 2); break;
-        case FuncId::VCTextNum: decodeGenericFunc(code, i, "VCTextNum", 3); break;
+        case FuncId::AutoOn: decodeGenericFunc(ctx, "AutoOn", 0); break;
+        case FuncId::AutoOff: decodeGenericFunc(ctx, "AutoOff", 0); break;
+        case FuncId::EntityMoveScript: decodeGenericFunc(ctx, "EntityMoveScript", 2); break;
+        case FuncId::VCTextNum: decodeGenericFunc(ctx, "VCTextNum", 3); break;
         case FuncId::VCLoadRaw: {
             printf("VCLoadRaw(");
-            printf("\"%s\", ", getString(code, i).c_str());
-            decodeOperand(code, i);
+            printf("\"%s\", ", ctx.getString().c_str());
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(");\n");
             break;
         }
-        case FuncId::VCBox: decodeGenericFunc(code, i, "VCBox", 4); break;
-        case FuncId::VCCharName: decodeGenericFunc(code, i, "VCCharName", 4); break;
-        case FuncId::VCItemName: decodeGenericFunc(code, i, "VCItemName", 4); break;
-        case FuncId::VCItemDesc: decodeGenericFunc(code, i, "VCItemDesc", 4); break;
-        case FuncId::VCItemImage: decodeGenericFunc(code, i, "VCItemImage", 4); break;
-        case FuncId::VCATextNum: decodeGenericFunc(code, i, "VCATextNum", 4); break;
-        case FuncId::VCSpc: decodeGenericFunc(code, i, "VCSpc", 4); break;
+        case FuncId::VCBox: decodeGenericFunc(ctx, "VCBox", 4); break;
+        case FuncId::VCCharName: decodeGenericFunc(ctx, "VCCharName", 4); break;
+        case FuncId::VCItemName: decodeGenericFunc(ctx, "VCItemName", 4); break;
+        case FuncId::VCItemDesc: decodeGenericFunc(ctx, "VCItemDesc", 4); break;
+        case FuncId::VCItemImage: decodeGenericFunc(ctx, "VCItemImage", 4); break;
+        case FuncId::VCATextNum: decodeGenericFunc(ctx, "VCATextNum", 4); break;
+        case FuncId::VCSpc: decodeGenericFunc(ctx, "VCSpc", 4); break;
         case FuncId::CallEffect: {
-            const auto argumentCount = getC(code, i) + 1;
-            decodeGenericFunc(code, i, "CallEffect", argumentCount);
+            const auto argumentCount = ctx.getC() + 1;
+            decodeGenericFunc(ctx, "CallEffect", argumentCount);
             break;
         }
         case FuncId::CallScript: {
-            const auto argumentCount = getC(code, i) + 1;
-            decodeGenericFunc(code, i, "CallScript", argumentCount);
+            const auto argumentCount = ctx.getC() + 1;
+            decodeGenericFunc(ctx, "CallScript", argumentCount);
             break;
         }
-        case FuncId::VCLine: decodeGenericFunc(code, i, "VCLine", 5); break;
-        case FuncId::GetMagic: decodeGenericFunc(code, i, "GetMagic", 2); break;
-        case FuncId::BindKey: decodeGenericFunc(code, i, "BindKey", 2); break;
+        case FuncId::VCLine: decodeGenericFunc(ctx, "VCLine", 5); break;
+        case FuncId::GetMagic: decodeGenericFunc(ctx, "GetMagic", 2); break;
+        case FuncId::BindKey: decodeGenericFunc(ctx, "BindKey", 2); break;
         case FuncId::TextMenu: {
             printf("TextMenu(");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
 
-            const auto argumentCount = getC(code, i) + 1;
+            const auto argumentCount = ctx.getC() + 1;
             for (int argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
-                printf("\"%s\"", getString(code, i).c_str());
+                printf("\"%s\"", ctx.getString().c_str());
 
                 if (argumentIndex < argumentCount - 1) {
                     printf(", ");
@@ -569,31 +593,31 @@ void decodeExec(const Bytecode& code, int& i) {
             printf(");\n");
             break;
         }
-        case FuncId::ItemMenu: decodeGenericFunc(code, i, "ItemMenu", 1); break;
-        case FuncId::EquipMenu: decodeGenericFunc(code, i, "EquipMenu", 1); break;
-        case FuncId::MagicMenu: decodeGenericFunc(code, i, "MagicMenu", 1); break;
-        case FuncId::StatusScreen: decodeGenericFunc(code, i, "StatusScreen", 1); break;
-        case FuncId::VCCr2: decodeGenericFunc(code, i, "VCCr2", 4); break;
-        case FuncId::VCSpellName: decodeGenericFunc(code, i, "VCSpellName", 4); break;
-        case FuncId::VCSpellDesc: decodeGenericFunc(code, i, "VCSpellDesc", 4); break;
-        case FuncId::VCSpellImage: decodeGenericFunc(code, i, "VCSpellImage", 4); break;
+        case FuncId::ItemMenu: decodeGenericFunc(ctx, "ItemMenu", 1); break;
+        case FuncId::EquipMenu: decodeGenericFunc(ctx, "EquipMenu", 1); break;
+        case FuncId::MagicMenu: decodeGenericFunc(ctx, "MagicMenu", 1); break;
+        case FuncId::StatusScreen: decodeGenericFunc(ctx, "StatusScreen", 1); break;
+        case FuncId::VCCr2: decodeGenericFunc(ctx, "VCCr2", 4); break;
+        case FuncId::VCSpellName: decodeGenericFunc(ctx, "VCSpellName", 4); break;
+        case FuncId::VCSpellDesc: decodeGenericFunc(ctx, "VCSpellDesc", 4); break;
+        case FuncId::VCSpellImage: decodeGenericFunc(ctx, "VCSpellImage", 4); break;
         case FuncId::MagicShop: {
-            const auto argumentCount = getC(code, i) + 1;
-            decodeGenericFunc(code, i, "MagicShop", argumentCount);
+            const auto argumentCount = ctx.getC() + 1;
+            decodeGenericFunc(ctx, "MagicShop", argumentCount);
             break;
         }
         case FuncId::VCTextBox: {
             printf("VCTextBox(");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
 
-            const auto argumentCount = getC(code, i) + 1;
+            const auto argumentCount = ctx.getC() + 1;
             for (int argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
-                printf("\"%s\"", getString(code, i).c_str());
+                printf("\"%s\"", ctx.getString().c_str());
 
                 if (argumentIndex < argumentCount - 1) {
                     printf(", ");
@@ -605,16 +629,16 @@ void decodeExec(const Bytecode& code, int& i) {
         }
         case FuncId::PlayVAS: {
             printf("PlayVAS(");
-            printf("\"%s\", ", getString(code, i).c_str());
-            decodeOperand(code, i);
+            printf("\"%s\", ", ctx.getString().c_str());
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(", ");
-            decodeOperand(code, i);
+            decodeOperand(ctx);
             printf(");\n");
             break;
         }
@@ -742,8 +766,8 @@ enum class AssignOp {
     DecSet = 5,
 };
 
-void decodeAssignOp(const Bytecode& code, int& i) {
-    const auto assignOp = static_cast<AssignOp>(getC(code, i));
+void decodeAssignOp(Ctx& ctx) {
+    const auto assignOp = static_cast<AssignOp>(ctx.getC());
 
     switch (assignOp) {
         case AssignOp::Set: printf(" = "); break;
@@ -756,24 +780,24 @@ void decodeAssignOp(const Bytecode& code, int& i) {
     } 
 }
 
-void decodeVar0Assign(const Bytecode& code, int& i) {
-    decodeVar0(code, i);
-    decodeAssignOp(code, i);
-    decodeOperand(code, i);
+void decodeVar0Assign(Ctx& ctx) {
+    decodeVar0(ctx);
+    decodeAssignOp(ctx);
+    decodeOperand(ctx);
     printf(";\n");
 }
 
-void decodeVar1Assign(const Bytecode& code, int& i) {
-    decodeVar1(code, i);
-    decodeAssignOp(code, i);
-    decodeOperand(code, i);
+void decodeVar1Assign(Ctx& ctx) {
+    decodeVar1(ctx);
+    decodeAssignOp(ctx);
+    decodeOperand(ctx);
     printf(";\n");
 }
 
-void decodeVar2Assign(const Bytecode& code, int& i) {
-    decodeVar2(code, i);
-    decodeAssignOp(code, i);
-    decodeOperand(code, i);
+void decodeVar2Assign(Ctx& ctx) {
+    decodeVar2(ctx);
+    decodeAssignOp(ctx);
+    decodeOperand(ctx);
     printf(";\n");
 }
 
@@ -788,72 +812,72 @@ enum class BranchOp {
     LessThanOrEqual = 7,
 };
 
-void decodeIf(const Bytecode& code, int& i) {
-    const auto argumentCount = static_cast<int>(getC(code, i));
-    static_cast<void>(getD(code, i));
+void decodeIf(Ctx& ctx) {
+    const auto argumentCount = static_cast<int>(ctx.getC());
+    static_cast<void>(ctx.getD());
 
     printf("if ("); 
     for (int argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
-        const auto previousOffset = i;
-        skipOperand(code, i);
+        const auto previousOffset = ctx.offset;
+        skipOperand(ctx);
 
         // FIXME: remove skipOperand if we can actually modify existing output, we only need to seek back to prepend unary !
 
-        const auto branchOp = static_cast<BranchOp>(getC(code, i));
-        i = previousOffset;
+        const auto branchOp = static_cast<BranchOp>(ctx.getC());
+        ctx.offset = previousOffset;
 
         switch (branchOp) {
             case BranchOp::Zero: {
-                decodeOperand(code, i);
-                i++;
+                decodeOperand(ctx);
+                ctx.offset++;
                 break;
             }
             case BranchOp::NonZero: {
                 printf("!");
-                decodeOperand(code, i);
-                i++;
+                decodeOperand(ctx);
+                ctx.offset++;
                 break;
             }
             case BranchOp::Equal: {
-                decodeOperand(code, i);
-                i++;
+                decodeOperand(ctx);
+                ctx.offset++;
                 printf(" == ");
-                decodeOperand(code, i);
+                decodeOperand(ctx);
                 break;
             }
             case BranchOp::NotEqual: {
-                decodeOperand(code, i);
-                i++;
+                decodeOperand(ctx);
+                ctx.offset++;
                 printf(" != ");
-                decodeOperand(code, i);
+                decodeOperand(ctx);
                 break;
             }
             case BranchOp::GreaterThan: {
-                decodeOperand(code, i);
-                i++;
+                decodeOperand(ctx);
+                ctx.offset++;
                 printf(" >" );
-                decodeOperand(code, i);
+                decodeOperand(ctx);
                 break;
             }
             case BranchOp::GreaterThanOrEqual: {
-                decodeOperand(code, i);
-                i++;
+                decodeOperand(ctx);
+                ctx.offset++;
                 printf(" >= ");
-                decodeOperand(code, i);
+                decodeOperand(ctx);
                 break;
             }
             case BranchOp::LessThan: {
-                decodeOperand(code, i);
-                i++;
+                decodeOperand(ctx);
+                ctx.offset++;
                 printf(" < ");
-                decodeOperand(code, i);
+                decodeOperand(ctx);
                 break;
             }
             case BranchOp::LessThanOrEqual: {
-                decodeOperand(code, i);
-                i++;
+                decodeOperand(ctx);
+                ctx.offset++;
                 printf(" <= ");
-                decodeOperand(code, i);
+                decodeOperand(ctx);
                 break;
             }
             default:
@@ -866,43 +890,43 @@ void decodeIf(const Bytecode& code, int& i) {
     }
     printf(")\n"); 
     printf("{\n"); 
-    decodeBlock(code, i);
+    decodeBlock(ctx);
     printf("}\n"); 
 }
 
-void decodeForLoop0(const Bytecode& code, int& i) {
+void decodeForLoop0(Ctx& ctx) {
     printf("for(");
-    decodeVar0(code, i);
+    decodeVar0(ctx);
     printf(",");
-    decodeOperand(code, i);
+    decodeOperand(ctx);
     printf(",");
-    decodeOperand(code, i);
+    decodeOperand(ctx);
     printf(",");
-    printf(getC(code, i) == 0 ? "-" : "");
-    decodeOperand(code, i);
+    printf(ctx.getC() == 0 ? "-" : "");
+    decodeOperand(ctx);
     printf(")\n");
     printf("{\n"); 
-    decodeBlock(code, i);
+    decodeBlock(ctx);
     printf("}\n"); 
 }
 
-void decodeForLoop1(const Bytecode& code, int& i) {
+void decodeForLoop1(Ctx& ctx) {
     printf("for(");
-    decodeVar1(code, i);
+    decodeVar1(ctx);
     printf(",");
-    decodeOperand(code, i);
+    decodeOperand(ctx);
     printf(",");
-    decodeOperand(code, i);
+    decodeOperand(ctx);
     printf(",");
-    printf(getC(code, i) == 0 ? "-" : "");
-    decodeOperand(code, i);
+    printf(ctx.getC() == 0 ? "-" : "");
+    decodeOperand(ctx);
     printf(")\n");
     printf("{\n"); 
-    decodeBlock(code, i);
+    decodeBlock(ctx);
     printf("}\n");
 }
 
-void decodeGoto(const Bytecode& code, int& i) {
+void decodeGoto(Ctx& ctx) {
     // FIXME: could be a goto, or a while loop! we can't know!
     // both are allowed, and any reverse jump will require a way to insert labels into earlier code, or replace an if with while {}
     //
@@ -915,30 +939,30 @@ void decodeGoto(const Bytecode& code, int& i) {
     // so that we can add things in the middle (statement-level granularity)
     // 
     // instead of printf, have a writeable file buffer we build in memory, and then flush it at the end.    
-    const auto dest = getD(code, i);
+    const auto dest = ctx.getD();
     printf("// FIXME: goto or while to offset %d\n", dest);
 }
 
-void decodeSwitch(const Bytecode& code, int& i) {
+void decodeSwitch(Ctx& ctx) {
     // FIXME: argh, how do we know where a switch ends.
 
     printf("switch (");
-    decodeOperand(code, i);
+    decodeOperand(ctx);
     printf(")");
     printf("{\n");
 
-    while (i < static_cast<int>(code.size())) {
-        const auto op = static_cast<Op>(getC(code, i));
+    while (ctx.offset < static_cast<int>(ctx.bytecode.size())) {
+        const auto op = static_cast<Op>(ctx.getC());
 
         switch (op) {
             // Anything besides ScriptEnd is supposed to be treated as a case.
             // (according to vc interpreter, even if vcc uses a CASE opcode there)
             default: {
                 printf("case ");
-                decodeOperand(code, i);
+                decodeOperand(ctx);
                 printf(":\n");
-                static_cast<void>(getD(code, i));
-                decodeBlock(code, i);
+                static_cast<void>(ctx.getD());
+                decodeBlock(ctx);
             }
             case Op::EndScript: {
                 printf("}\n");
@@ -966,11 +990,11 @@ enum class OpDesc {
     Group = 5
 };
 
-void skipOperand(const Bytecode& code, int& i) {
-    skipOperandTerm(code, i);
+void skipOperand(Ctx& ctx) {
+    skipOperandTerm(ctx);
 
-    while (i < static_cast<int>(code.size())) {
-        const auto arithmeticOp = static_cast<ArithmeticOp>(getC(code, i));
+    while (ctx.offset < static_cast<int>(ctx.bytecode.size())) {
+        const auto arithmeticOp = static_cast<ArithmeticOp>(ctx.getC());
         //printf("skip arith op %d\n", static_cast<int>(arithmeticOp));
 
         switch (arithmeticOp) {
@@ -979,7 +1003,7 @@ void skipOperand(const Bytecode& code, int& i) {
             case ArithmeticOp::Div:
             case ArithmeticOp::Mul:
             case ArithmeticOp::Mod:
-                skipOperandTerm(code, i);
+                skipOperandTerm(ctx);
                 break;
             case ArithmeticOp::End:
                 return;
@@ -989,32 +1013,32 @@ void skipOperand(const Bytecode& code, int& i) {
     }
 }
 
-void skipOperandTerm(const Bytecode& code, int& i) {
-    const auto desc = static_cast<OpDesc>(getC(code, i));
+void skipOperandTerm(Ctx& ctx) {
+    const auto desc = static_cast<OpDesc>(ctx.getC());
     //printf("skip op desc %d\n", static_cast<int>(desc));
 
     switch (desc) {
         case OpDesc::Immediate: {
-            static_cast<void>(getD(code, i));
+            static_cast<void>(ctx.getD());
             break;
         }
         case OpDesc::Var0: {
-            static_cast<void>(getC(code, i));
+            static_cast<void>(ctx.getC());
             break;
         }
         case OpDesc::Var1: {
-            static_cast<void>(getC(code, i));
-            skipOperand(code, i);
+            static_cast<void>(ctx.getC());
+            skipOperand(ctx);
             break;
         }
         case OpDesc::Var2: {
-            static_cast<void>(getC(code, i));
-            skipOperand(code, i);
-            skipOperand(code, i);
+            static_cast<void>(ctx.getC());
+            skipOperand(ctx);
+            skipOperand(ctx);
             break;
         }
         case OpDesc::Group: {
-            skipOperand(code, i);
+            skipOperand(ctx);
             break;
         }
         default:
@@ -1022,19 +1046,19 @@ void skipOperandTerm(const Bytecode& code, int& i) {
     }
 }
 
-void decodeOperand(const Bytecode& code, int& i) {
-    decodeOperandTerm(code, i);
+void decodeOperand(Ctx& ctx) {
+    decodeOperandTerm(ctx);
 
-    while (i < static_cast<int>(code.size())) {
-        const auto arithmeticOp = static_cast<ArithmeticOp>(getC(code, i));
+    while (ctx.offset < static_cast<int>(ctx.bytecode.size())) {
+        const auto arithmeticOp = static_cast<ArithmeticOp>(ctx.getC());
         //printf("decode arith op %d\n", static_cast<int>(arithmeticOp));
 
         switch (arithmeticOp) {            
-            case ArithmeticOp::Add: printf(" + "); decodeOperandTerm(code, i); break;
-            case ArithmeticOp::Sub: printf(" - "); decodeOperandTerm(code, i); break;
-            case ArithmeticOp::Div: printf(" / "); decodeOperandTerm(code, i); break;
-            case ArithmeticOp::Mul: printf(" * "); decodeOperandTerm(code, i); break;
-            case ArithmeticOp::Mod: printf(" %% "); decodeOperandTerm(code, i); break;
+            case ArithmeticOp::Add: printf(" + "); decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Sub: printf(" - "); decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Div: printf(" / "); decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Mul: printf(" * "); decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Mod: printf(" %% "); decodeOperandTerm(ctx); break;
             case ArithmeticOp::End: return;
             default:
                 throw std::runtime_error(std::string{"*error* decodeOperand: Unknown arithmetic opcode in VC code "} + std::to_string(static_cast<int>(arithmeticOp)));            
@@ -1042,16 +1066,16 @@ void decodeOperand(const Bytecode& code, int& i) {
     }
 }
 
-void decodeOperandTerm(const Bytecode& code, int& i) {
-    const auto desc = static_cast<OpDesc>(getC(code, i));
+void decodeOperandTerm(Ctx& ctx) {
+    const auto desc = static_cast<OpDesc>(ctx.getC());
     //printf("decode op desc %d\n", static_cast<int>(desc));
 
     switch (desc) {
-        case OpDesc::Immediate: printf("%d", getD(code, i)); break;
-        case OpDesc::Var0: decodeVar0(code, i); break;
-        case OpDesc::Var1: decodeVar1(code, i); break;
-        case OpDesc::Var2: decodeVar2(code, i); break;
-        case OpDesc::Group: decodeOperand(code, i); break;
+        case OpDesc::Immediate: printf("%d", ctx.getD()); break;
+        case OpDesc::Var0: decodeVar0(ctx); break;
+        case OpDesc::Var1: decodeVar1(ctx); break;
+        case OpDesc::Var2: decodeVar2(ctx); break;
+        case OpDesc::Group: decodeOperand(ctx); break;
         default:
             throw std::runtime_error(std::string{"*error* decodeOperandTerm: Unknown operand descriptor in VC code "} + std::to_string(static_cast<int>(desc)));
     }
@@ -1134,8 +1158,8 @@ enum class Var0 {
     ModPosition = 73,
 };
 
-void decodeVar0(const Bytecode& code, int& i) {
-    const auto var0 = static_cast<Var0>(getC(code, i));
+void decodeVar0(Ctx& ctx) {
+    const auto var0 = static_cast<Var0>(ctx.getC());
 
     switch (var0) {
         case Var0::A: printf("a"); break;
@@ -1278,8 +1302,8 @@ enum class Var1 {
     Spell
 };
 
-void decodeVar1(const Bytecode& code, int& i) {
-    const auto var1 = static_cast<Var1>(getC(code, i));
+void decodeVar1(Ctx& ctx) {
+    const auto var1 = static_cast<Var1>(ctx.getC());
 
     switch (var1) {
         case Var1::Flags: printf("flags"); break;
@@ -1345,7 +1369,7 @@ void decodeVar1(const Bytecode& code, int& i) {
     }
     // '(' and '[' are equivalent in V1, so we use '[' for 1-argument array-like things, eg. flags.
     printf("[");
-    decodeOperand(code, i);
+    decodeOperand(ctx);
     printf("]");
 }
 
@@ -1359,8 +1383,8 @@ enum class Var2 {
     Spells,
 };
 
-void decodeVar2(const Bytecode& code, int& i) {
-    const auto var2 = static_cast<Var2>(getC(code, i));
+void decodeVar2(Ctx& ctx) {
+    const auto var2 = static_cast<Var2>(ctx.getC());
 
     switch (var2) {
         case Var2::Random: printf("random"); break;
@@ -1374,8 +1398,8 @@ void decodeVar2(const Bytecode& code, int& i) {
             throw std::runtime_error(std::string{"*error* decodeVar2: Unknown var2 index in VC code "} + std::to_string(static_cast<int>(var2)));
     }
     printf("(");
-    decodeOperand(code, i);
-    decodeOperand(code, i);
+    decodeOperand(ctx);
+    decodeOperand(ctx);
     printf(")");    
 }
 
@@ -1386,6 +1410,12 @@ int main(int argc, char** argv) {
     }
 
     Code code = loadCode(argv[1]);
-    decode(code, 0);
+    int i = 0;
+    for (int offset: code.offsets) {
+        printf("event /* %d offset=%d */\n{\n", i, offset);
+        decode(code, offset);
+        printf("}\n");
+        ++i;
+    }
     return 0;
 }
