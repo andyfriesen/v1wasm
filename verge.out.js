@@ -1292,11 +1292,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5752048,
+    STACK_BASE = 5752064,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 509168,
-    DYNAMIC_BASE = 5752048,
-    DYNAMICTOP_PTR = 508992;
+    STACK_MAX = 509184,
+    DYNAMIC_BASE = 5752064,
+    DYNAMICTOP_PTR = 509008;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1820,7 +1820,7 @@ var tempI64;
 
 var ASM_CONSTS = {
   1462: function() {FS.syncfs(false, err => { if (err) { console.error("SaveGame failed!!", err); } });},  
- 6432: function() {window.verge.setLoadingProgress(100);}
+ 6448: function() {window.verge.setLoadingProgress(100);}
 };
 
 function _emscripten_asm_const_iii(code, sigPtr, argbuf) {
@@ -1833,14 +1833,14 @@ function fetchSync(pathPtr,size,data){ return Asyncify.handleSleep(resume => { c
 function wasm_setVolume(volume){ console.log('setvolume', volume); window.verge.gainNode.gain.setValueAtTime(volume / 100, window.verge.audioContext.currentTime); }
 function wasm_playSong(data,length){ window.verge.mptInited.then(() => { if (!window.verge.mptNode) { return; } const buffer = Module.HEAP8.buffer.slice(data, data + length); const v = new Uint8Array(buffer); window.verge.mptNode.port.postMessage({ songData: buffer, setRepeatCount: -1 }); }); }
 function wasm_vgadump(frameBuffer,frameBufferSize,palette){ const pal = HEAPU8.subarray(palette, palette + 768); const fb = HEAPU8.subarray(frameBuffer, frameBuffer + frameBufferSize); const stride = 0; let srcIndex = 0; let destIndex = 0; const ia = window.vergeImageArray; for (let y = 0; y < 200; ++y) { for (let x = 0; x < 320; ++x) { let c = fb[srcIndex++]; ia[destIndex++] = pal[c * 3]; ia[destIndex++] = pal[c * 3 + 1]; ia[destIndex++] = pal[c * 3 + 2]; ia[destIndex++] = 0xFF; } srcIndex += stride; } window.vergeContext.putImageData(window.vergeImageData, 0, 0); }
-function wasm_playSound(filename){ const name = UTF8ToString(filename); const sound = window.verge.sounds[name]; if (!sound) { console.error("Unknown sound ", name); return; } const source = window.verge.audioContext.createBufferSource(); source.connect(window.verge.gainNode); source.buffer = sound; source.start(0); }
+function wasm_playSound(filename){ const name = UTF8ToString(filename); const sound = window.verge.sounds[name]; if (!sound) { console.error("Unknown sound ", name); return; } const source = window.verge.audioContext.createBufferSource(); source.connect(window.verge.audioContext.destination); source.buffer = sound; source.start(0); }
 function wasm_loadSound(filename,soundData,soundDataSize){ const name = UTF8ToString(filename); const audioData = HEAPU8.buffer.slice(soundData, soundData + soundDataSize); window.verge = window.verge || {}; window.verge.audioContext.decodeAudioData( audioData, decoded => { window.verge.sounds[name] = decoded; }, () => { console.log("Unable to load sound data for ", name); } ); }
 function downloadAll(manifest,putFile){ return Asyncify.handleSleep(resume => { let promises = []; let count = 0; function download(pathPtr) { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; throw 'fetchSync failed'; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); const dataPtr = _malloc(bytes.length); HEAP8.set(bytes, dataPtr); Module.dynCall_viii(putFile, pathPtr, bytes.length, dataPtr); ++count; verge.setLoadingProgress((100 * count / promises.length) | 0) }); } while (true) { let pathPtr = HEAPU32[manifest >> 2]; if (pathPtr == 0) { break; } manifest += 4; promises.push(download(pathPtr)); } Promise.all(promises).then(() => { resume(); }); }); }
 function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanvas'); window.vergeContext = window.vergeCanvas.getContext('2d'); window.vergeImageData = new ImageData(320, 200); window.vergeImageArray = window.vergeImageData.data; }
 
 
 
-// STATICTOP = STATIC_BASE + 508144;
+// STATICTOP = STATIC_BASE + 508160;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -4912,7 +4912,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 508992;
+      return 509008;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {

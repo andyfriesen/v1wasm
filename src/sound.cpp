@@ -87,7 +87,7 @@ EM_JS(void, wasm_playSound, (const char* filename), {
     }
 
     const source = window.verge.audioContext.createBufferSource();
-    source.connect(window.verge.gainNode);
+    source.connect(window.verge.audioContext.destination);
     source.buffer = sound;
     source.start(0);
 });
