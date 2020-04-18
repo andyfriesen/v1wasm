@@ -18,7 +18,7 @@ using std::uint32_t;
 
 using Bytecode = std::vector<uint8_t>;
 
-enum CodeType {
+enum class CodeType {
     Script,
     Event,
     Effect,
