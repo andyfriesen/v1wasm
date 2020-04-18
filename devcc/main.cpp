@@ -734,8 +734,6 @@ void decodeExec(Ctx& ctx) {
             printf("VCCenterText(");
             decodeOperand(ctx);
             printf(", ");
-            decodeOperand(ctx);
-            printf(", ");            
             printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;

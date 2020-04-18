@@ -4,6 +4,10 @@ devcc bumville.map > bumville.vc
 @if ERRORLEVEL 1 goto error
 devcc startup.vcs > startup.vc
 @if ERRORLEVEL 1 goto error
+devcc magic.vcs > magic.vc
+@if ERRORLEVEL 1 goto error
+devcc effects.vcs > effects.vc
+@if ERRORLEVEL 1 goto error
 @echo * Success!
 @goto done
 :error
