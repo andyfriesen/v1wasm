@@ -1,7 +1,9 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <cctype>
 #include <cstdint>
+#include <algorithm>
 #include <stdexcept>
 
 // FIXME: line buffers for output, allow adding lines in earlier part of output during disassembly (for fixing up labels, etc).
@@ -16,7 +18,14 @@ using std::uint32_t;
 
 using Bytecode = std::vector<uint8_t>;
 
+enum CodeType {
+    Script,
+    Event,
+    Effect,
+};
+
 struct Code {
+    CodeType type;
     std::vector<uint32_t> offsets;
     Bytecode code;
 };
@@ -424,16 +433,35 @@ enum class Var2 {
     Spells,
 };
 
+bool equalsIgnoreCase(const std::string& left, const std::string& right) {
+    return std::equal(left.begin(), left.end(), right.begin(),
+        [](const char& a, const char& b) {
+            return std::tolower(a) == std::tolower(b);
+        });
+}
+
+const char* getCodeTypeName(CodeType type) {
+    switch (type) {
+        case CodeType::Event: return "event";
+        case CodeType::Script: return "script";
+        case CodeType::Effect: return "effect";
+        default: throw std::runtime_error(std::string{"*error* getCodeTypeName: unhandled code type "} + std::to_string(static_cast<int>(type)));
+    }
+}
+
 Code loadCode(const std::string& fileName) {
     FILE* f = fopen(fileName.c_str(), "rb");
 
     fseek(f, 0, SEEK_END);
     const auto size = static_cast<unsigned>(ftell(f));
 
-    // Map files have more stuff.
+    CodeType codeType = CodeType::Script;
+
     if (fileName.rfind(".map") == fileName.size() - 4) {
+        codeType = CodeType::Event;
+
         fseek(f, 68, SEEK_SET);
-        std::uint16_t mx, my;
+        uint16_t mx, my;
         fread(&mx, 1, 2, f);
         fread(&my, 1, 2, f);
 
@@ -448,6 +476,11 @@ Code loadCode(const std::string& fileName) {
         fseek(f, (i*4)+a, SEEK_CUR);
     } else {
         fseek(f, 0, SEEK_SET);
+
+        if (equalsIgnoreCase(fileName, "effects.vcs")
+        || equalsIgnoreCase(fileName, "magic.vcs")) {
+            codeType = CodeType::Effect;
+        }
     }
 
     uint32_t numscripts;
@@ -463,10 +496,10 @@ Code loadCode(const std::string& fileName) {
 
     fclose(f);
 
-    return Code{ std::move(scriptofstbl), std::move(code) };
+    return Code{ codeType, std::move(scriptofstbl), std::move(code) };
 }
 
-void decode(const Code& code, int index);
+void decode(const Code& code, int scriptIndex);
 void decodeBlock(Ctx& ctx);
 void decodeExec(Ctx& ctx);
 void decodeAssignOp(Ctx& ctx);
@@ -486,9 +519,11 @@ void decodeVar0(Ctx& ctx);
 void decodeVar1(Ctx& ctx);
 void decodeVar2(Ctx& ctx);
 
-void decode(const Code& code, int index) {
-    const auto startOffset = code.offsets[index];
-    const auto endOffset = (index == static_cast<int>(code.offsets.size()) - 1) ? code.offsets.size() : code.offsets[index + 1];
+void decode(const Code& code, int scriptIndex) {
+    const auto startOffset = code.offsets[scriptIndex];
+    const auto endOffset = scriptIndex == static_cast<int>(code.offsets.size()) - 1
+        ? code.offsets.size()
+        : code.offsets[scriptIndex + 1];
 
     Bytecode bc{ code.code.begin() + startOffset, code.code.begin() + endOffset };
     Ctx ctx{ bc, 0 };
@@ -1428,12 +1463,12 @@ int main(int argc, char** argv) {
     }
 
     Code code = loadCode(argv[1]);
-    int i = 0;
-    for (int offset: code.offsets) {
-        printf("event /* %d offset=%d */\n{\n", i, offset);
-        decode(code, offset);
+    int scriptIndex = 0;
+    for (uint32_t offset: code.offsets) {
+        printf("%s /* %d offset=%d */\n{\n", getCodeTypeName(code.type), scriptIndex, offset);
+        decode(code, scriptIndex);
         printf("}\n");
-        ++i;
+        ++scriptIndex;
     }
     return 0;
 }
