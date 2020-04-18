@@ -35,7 +35,6 @@ def EmscriptenEnvironment():
 
     emscriptenOpts = [
         '-s', 'ASYNCIFY',
-        '-s', 'ASYNCIFY_STACK_SIZE=32768',
         '-s', 'ASYNCIFY_IMPORTS=["fetchSync","downloadAll","wasm_nextFrame","emscripten_sleep"]',
         '-s', 'FETCH=1',
         '-s', 'FORCE_FILESYSTEM=1',
@@ -44,6 +43,7 @@ def EmscriptenEnvironment():
 
     cflags = ['-fcolor-diagnostics']
 
+    asmjs = ARGUMENTS.get('asmjs', 0)
     debug = ARGUMENTS.get('debug', 0)
     asan = ARGUMENTS.get('asan', 0)
     ubsan = ARGUMENTS.get('ubsan', 0)
@@ -55,6 +55,7 @@ def EmscriptenEnvironment():
             ]
 
         emscriptenOpts += [
+            '-s', 'ASYNCIFY_STACK_SIZE=327680',
             '-s', 'ASSERTIONS=1',
             '-s', 'STACK_OVERFLOW_CHECK=1',
             '-s', 'DEMANGLE_SUPPORT=1',
@@ -63,12 +64,20 @@ def EmscriptenEnvironment():
         cflags.append('-g')
 
         env.Append(LINKFLAGS=[
-            '-g4',
-            '--source-map-base', 'http://localhost:8000/',
+            '-g',
+            '--source-map-base', 'https://localhost/',
         ])
 
     else:
+        emscriptenOpts += [
+            '-s', 'ASYNCIFY_STACK_SIZE=32768',
+        ]
         cflags.append('-O3')
+
+    if asmjs:
+        env.Append(LINKFLAGS=[
+            '-s', 'WASM=0',
+        ])
 
     if asan:
         cflags.append('-fsanitize=address')
