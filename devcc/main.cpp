@@ -83,7 +83,7 @@ struct Ctx {
     }
 };
 
-enum class Op {
+enum class BlockOp {
     Exec = 1,
     Var0Assign = 2,
     Var1Assign = 3,
@@ -94,7 +94,7 @@ enum class Op {
     ForLoop1 = 9,
     Switch = 10,
 
-    EndScript = 255
+    End = 255
 };
 
 enum class AssignOp {
@@ -118,14 +118,15 @@ enum class BranchOp {
 
 enum class ArithmeticOp {
     Add = 1,
-    Sub = 2,
-    Div = 3,
-    Mul = 4,
-    Mod = 5,
+    Subtract = 2,
+    Divide = 3,
+    Multiply = 4,
+    Modulo = 5,
+
     End = 255,
 };
 
-enum class OpDesc {
+enum class OpTermType {
     Immediate = 1,
     Var0 = 2,
     Var1 = 3,
@@ -423,7 +424,6 @@ enum class Var2 {
     Spells,
 };
 
-
 Code loadCode(const std::string& fileName) {
     FILE* f = fopen(fileName.c_str(), "rb");
 
@@ -499,20 +499,20 @@ void decode(const Code& code, int index) {
 
 void decodeBlock(Ctx& ctx) {
     while (!ctx.isEOF()) {
-        const auto op = static_cast<Op>(ctx.getC());
+        const auto op = static_cast<BlockOp>(ctx.getC());
         //printf("decode block %d\n", static_cast<int>(op));
 
         switch (op) {
-            case Op::Exec: decodeExec(ctx); break;
-            case Op::Var0Assign: decodeVar0Assign(ctx); break;
-            case Op::Var1Assign: decodeVar1Assign(ctx); break;
-            case Op::Var2Assign: decodeVar2Assign(ctx); break;
-            case Op::If: decodeIf(ctx); break;
-            case Op::ForLoop0: decodeForLoop0(ctx); break;
-            case Op::ForLoop1: decodeForLoop1(ctx); break;
-            case Op::Goto: decodeGoto(ctx); break;
-            case Op::Switch: decodeSwitch(ctx); break;
-            case Op::EndScript: return;
+            case BlockOp::Exec: decodeExec(ctx); break;
+            case BlockOp::Var0Assign: decodeVar0Assign(ctx); break;
+            case BlockOp::Var1Assign: decodeVar1Assign(ctx); break;
+            case BlockOp::Var2Assign: decodeVar2Assign(ctx); break;
+            case BlockOp::If: decodeIf(ctx); break;
+            case BlockOp::ForLoop0: decodeForLoop0(ctx); break;
+            case BlockOp::ForLoop1: decodeForLoop1(ctx); break;
+            case BlockOp::Goto: decodeGoto(ctx); break;
+            case BlockOp::Switch: decodeSwitch(ctx); break;
+            case BlockOp::End: return;
             default: throw std::runtime_error(std::string{"*error* decodeBlock: Illegal opcode in VC code "} + std::to_string(static_cast<int>(op)));
         }
     }
@@ -1135,7 +1135,7 @@ void decodeSwitch(Ctx& ctx) {
     printf("{\n");
 
     while (!ctx.isEOF()) {
-        const auto op = static_cast<Op>(ctx.getC());
+        const auto op = static_cast<BlockOp>(ctx.getC());
 
         switch (op) {
             // Anything besides ScriptEnd is supposed to be treated as a case.
@@ -1147,7 +1147,7 @@ void decodeSwitch(Ctx& ctx) {
                 static_cast<void>(ctx.getD());
                 decodeBlock(ctx);
             }
-            case Op::EndScript: {
+            case BlockOp::End: {
                 printf("}\n");
                 return;
             }            
@@ -1165,14 +1165,14 @@ void skipOperand(Ctx& ctx) {
 
         switch (arithmeticOp) {
             case ArithmeticOp::Add:
-            case ArithmeticOp::Sub:
-            case ArithmeticOp::Div:
-            case ArithmeticOp::Mul:
-            case ArithmeticOp::Mod:
+            case ArithmeticOp::Subtract:
+            case ArithmeticOp::Divide:
+            case ArithmeticOp::Multiply: {
+            case ArithmeticOp::Modulo:
                 skipOperandTerm(ctx);
                 break;
-            case ArithmeticOp::End:
-                return;
+            }
+            case ArithmeticOp::End: return;
             default:
                 throw std::runtime_error(std::string{"*error* skipOperand: Unknown arithmetic opcode in VC code "} + std::to_string(static_cast<int>(arithmeticOp)));
         }
@@ -1180,35 +1180,35 @@ void skipOperand(Ctx& ctx) {
 }
 
 void skipOperandTerm(Ctx& ctx) {
-    const auto desc = static_cast<OpDesc>(ctx.getC());
-    //printf("skip op desc %d\n", static_cast<int>(desc));
+    const auto termType = static_cast<OpTermType>(ctx.getC());
+    //printf("skip op term %d\n", static_cast<int>(termType));
 
-    switch (desc) {
-        case OpDesc::Immediate: {
+    switch (termType) {
+        case OpTermType::Immediate: {
             ctx.skipD();
             break;
         }
-        case OpDesc::Var0: {
+        case OpTermType::Var0: {
             ctx.skipC();
             break;
         }
-        case OpDesc::Var1: {
+        case OpTermType::Var1: {
             ctx.skipC();
             skipOperand(ctx);
             break;
         }
-        case OpDesc::Var2: {
+        case OpTermType::Var2: {
             ctx.skipC();
             skipOperand(ctx);
             skipOperand(ctx);
             break;
         }
-        case OpDesc::Group: {
+        case OpTermType::Group: {
             skipOperand(ctx);
             break;
         }
         default:
-            throw std::runtime_error(std::string{"*error* skipOperandTerm: Unknown operand descriptor in VC code "} + std::to_string(static_cast<int>(desc)));        
+            throw std::runtime_error(std::string{"*error* skipOperandTerm: Unknown operand term type in VC code "} + std::to_string(static_cast<int>(termType)));        
     }
 }
 
@@ -1221,10 +1221,10 @@ void decodeOperand(Ctx& ctx) {
 
         switch (arithmeticOp) {            
             case ArithmeticOp::Add: printf(" + "); decodeOperandTerm(ctx); break;
-            case ArithmeticOp::Sub: printf(" - "); decodeOperandTerm(ctx); break;
-            case ArithmeticOp::Div: printf(" / "); decodeOperandTerm(ctx); break;
-            case ArithmeticOp::Mul: printf(" * "); decodeOperandTerm(ctx); break;
-            case ArithmeticOp::Mod: printf(" %% "); decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Subtract: printf(" - "); decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Divide: printf(" / "); decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Multiply: printf(" * "); decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Modulo: printf(" %% "); decodeOperandTerm(ctx); break;
             case ArithmeticOp::End: return;
             default:
                 throw std::runtime_error(std::string{"*error* decodeOperand: Unknown arithmetic opcode in VC code "} + std::to_string(static_cast<int>(arithmeticOp)));            
@@ -1233,17 +1233,17 @@ void decodeOperand(Ctx& ctx) {
 }
 
 void decodeOperandTerm(Ctx& ctx) {
-    const auto desc = static_cast<OpDesc>(ctx.getC());
-    //printf("decode op desc %d\n", static_cast<int>(desc));
+    const auto termType = static_cast<OpTermType>(ctx.getC());
+    //printf("decode op term %d\n", static_cast<int>(termType));
 
-    switch (desc) {
-        case OpDesc::Immediate: printf("%d", ctx.getD()); break;
-        case OpDesc::Var0: decodeVar0(ctx); break;
-        case OpDesc::Var1: decodeVar1(ctx); break;
-        case OpDesc::Var2: decodeVar2(ctx); break;
-        case OpDesc::Group: decodeOperand(ctx); break;
+    switch (termType) {
+        case OpTermType::Immediate: printf("%d", ctx.getD()); break;
+        case OpTermType::Var0: decodeVar0(ctx); break;
+        case OpTermType::Var1: decodeVar1(ctx); break;
+        case OpTermType::Var2: decodeVar2(ctx); break;
+        case OpTermType::Group: decodeOperand(ctx); break;
         default:
-            throw std::runtime_error(std::string{"*error* decodeOperandTerm: Unknown operand descriptor in VC code "} + std::to_string(static_cast<int>(desc)));
+            throw std::runtime_error(std::string{"*error* decodeOperandTerm: Unknown operand term type in VC code "} + std::to_string(static_cast<int>(termType)));
     }
 }
 
