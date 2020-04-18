@@ -611,7 +611,7 @@ void decodeExec(Ctx& ctx) {
         case FuncId::FadeOut: decodeGenericFunc(ctx, "FadeOut", 1); break;
         case FuncId::RemoveCharacter: decodeGenericFunc(ctx, "RemoveCharacter", 1); break;
         case FuncId::Banner: {
-            printf("Banner(\n");
+            printf("Banner(");
             printf("\"%s\", ", ctx.getString().c_str());
             decodeOperand(ctx);
             printf(");\n");     
