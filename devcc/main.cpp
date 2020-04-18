@@ -600,7 +600,7 @@ void decodeExec(Ctx& ctx) {
         case FuncId::Return: printf("return;\n"); break;
         case FuncId::PlayMusic: {
             printf("PlayMusic(");
-            printf("\"%s\", ", ctx.getString().c_str());
+            printf("\"%s\"", ctx.getString().c_str());
             printf(");\n");
             break;
         }
@@ -613,7 +613,6 @@ void decodeExec(Ctx& ctx) {
         case FuncId::Banner: {
             printf("Banner(\n");
             printf("\"%s\", ", ctx.getString().c_str());
-            printf(", ");
             decodeOperand(ctx);
             printf(");\n");     
             break;

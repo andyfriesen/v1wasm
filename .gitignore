@@ -10,4 +10,6 @@ opt_x86_64
 $$tmep$$.ma_
 error.txt
 devcc/*.map
+devcc/*.vcs
+devcc/*.vc
 devcc/*.exe
