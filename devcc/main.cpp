@@ -27,9 +27,32 @@ struct Ctx {
 
     std::map<uint32_t, std::string> code;
 
+    bool isEOF() const {
+        return offset >= bytecode.size();
+    }
+
+    void skip(uint32_t amount) {
+        offset += amount;
+    }
+
+    void skipC() {
+        skip(1);
+    }
+
+    void skipD() {
+        skip(4);
+    }
+
+    void skipString() {
+        while (bytecode[offset]) {
+            ++offset;
+        }
+        ++offset;
+    }    
+
     uint8_t getC() {
         return bytecode[offset++];
-    }
+    }    
 
     int32_t getD() {
         const auto a = getC();
@@ -45,11 +68,7 @@ struct Ctx {
 
     std::string getString() {
         const auto startOffset = offset;
-        while (bytecode[offset]) {
-            ++offset;
-        }
-        ++offset;
-
+        skipString();
         return std::string(bytecode.begin() + startOffset, bytecode.begin() + offset);
     }
 
@@ -63,80 +82,6 @@ struct Ctx {
         }
     }
 };
-
-Code loadCode(const std::string& fileName) {
-    FILE* f = fopen(fileName.c_str(), "rb");
-
-    fseek(f, 0, SEEK_END);
-    const auto size = static_cast<unsigned>(ftell(f));
-
-    // Map files have more stuff.
-    if (fileName.rfind(".map") == fileName.size() - 4) {
-        fseek(f, 68, SEEK_SET);
-        std::uint16_t mx, my;
-        fread(&mx, 1, 2, f);
-        fread(&my, 1, 2, f);
-
-        fseek(f, 100+(mx*my*5)+7956, SEEK_SET);
-
-        uint32_t a;
-        uint8_t i;
-        fread(&a, 1, 4, f);
-        fseek(f, 88*a, 1);
-        fread(&i, 1, 1, f);
-        fread(&a, 1, 4, f);
-        fseek(f, (i*4)+a, SEEK_CUR);
-    } else {
-        fseek(f, 0, SEEK_SET);
-    }
-
-    uint32_t numscripts;
-    fread(&numscripts, 1, 4, f);
-
-    std::vector<uint32_t> scriptofstbl;
-    scriptofstbl.resize(numscripts);
-    fread(scriptofstbl.data(), 4, numscripts, f);
-
-    std::vector<uint8_t> code;
-    code.resize(size - static_cast<unsigned>(ftell(f)));
-    fread(code.data(), 1, code.size(), f);
-
-    fclose(f);
-
-    return Code{ std::move(scriptofstbl), std::move(code) };
-}
-
-void decode(const Code& code, int index);
-void decodeBlock(Ctx& ctx);
-void decodeExec(Ctx& ctx);
-void decodeAssignOp(Ctx& ctx);
-void decodeVar0Assign(Ctx& ctx);
-void decodeVar1Assign(Ctx& ctx);
-void decodeVar2Assign(Ctx& ctx);
-void decodeIf(Ctx& ctx);
-void decodeForLoop0(Ctx& ctx);
-void decodeForLoop1(Ctx& ctx);
-void decodeGoto(Ctx& ctx);
-void decodeSwitch(Ctx& ctx);
-void skipOperand(Ctx& ctx);
-void skipOperandTerm(Ctx& ctx);
-void decodeOperand(Ctx& ctx);
-void decodeOperandTerm(Ctx& ctx);
-void decodeVar0(Ctx& ctx);
-void decodeVar1(Ctx& ctx);
-void decodeVar2(Ctx& ctx);
-
-void decode(const Code& code, int index) {
-    const auto startOffset = code.offsets[index];
-    const auto endOffset = (index == static_cast<int>(code.offsets.size()) - 1) ? code.offsets.size() : code.offsets[index + 1];
-
-    Bytecode bc{ code.code.begin() + startOffset, code.code.begin() + endOffset };
-    Ctx ctx{ bc, 0 };
-    int i = 0;
-    decodeBlock(ctx);
-
-    ctx.dump();
-}
 
 enum class Op {
     Exec = 1,
@@ -152,25 +97,41 @@ enum class Op {
     EndScript = 255
 };
 
-void decodeBlock(Ctx& ctx) {
-    while (ctx.offset < static_cast<int>(ctx.bytecode.size())) {
-        const auto op = static_cast<Op>(ctx.getC());
+enum class AssignOp {
+    Set = 1,
+    Increment = 2,
+    Decrement = 3,
+    IncSet = 4,
+    DecSet = 5,
+};
 
-        switch (op) {
-            case Op::Exec: decodeExec(ctx); break;
-            case Op::Var0Assign: decodeVar0Assign(ctx); break;
-            case Op::Var1Assign: decodeVar1Assign(ctx); break;
-            case Op::Var2Assign: decodeVar2Assign(ctx); break;
-            case Op::If: decodeIf(ctx); break;
-            case Op::ForLoop0: decodeForLoop0(ctx); break;
-            case Op::ForLoop1: decodeForLoop1(ctx); break;
-            case Op::Goto: decodeGoto(ctx); break;
-            case Op::Switch: decodeSwitch(ctx); break;
-            case Op::EndScript: return;
-            default: throw std::runtime_error(std::string{"*error* decodeBlock: Illegal opcode in VC code "} + std::to_string(static_cast<int>(op)));
-        }
-    }
-}
+enum class BranchOp {
+    Zero = 0,
+    NonZero = 1,
+    Equal = 2,
+    NotEqual = 3,
+    GreaterThan = 4,
+    GreaterThanOrEqual = 5,
+    LessThan = 6,
+    LessThanOrEqual = 7,
+};
+
+enum class ArithmeticOp {
+    Add = 1,
+    Sub = 2,
+    Div = 3,
+    Mul = 4,
+    Mod = 5,
+    End = 255,
+};
+
+enum class OpDesc {
+    Immediate = 1,
+    Var0 = 2,
+    Var1 = 3,
+    Var2 = 4,
+    Group = 5
+};
 
 enum class FuncId {
     MapSwitch = 1,
@@ -313,6 +274,249 @@ enum class FuncId {
     WyrdWordOut = 134,
     WyrdStrChangeCHR = 135,
 };
+
+enum class Var0 {
+    A = 0,
+    B = 1,
+    C = 2,
+    D = 3,
+    E = 4,
+    F = 5,
+    G = 6,
+    H = 7,
+    I = 8,
+    J = 9,
+    K = 10,
+    L = 11,
+    M = 12,
+    N = 13,
+    O = 14,
+    P = 15,
+    Q = 16,
+    R = 17,
+    S = 18,
+    T = 19,
+    U = 20,
+    V = 21,
+    W = 22,
+    X = 23,
+    Y = 24,
+    Z = 25,
+    NumChars = 26,
+    GP = 27,
+    LocX = 28,
+    LocY = 29,
+    Timer = 30,
+    DrawParty = 31,
+    Cameratracking = 32,
+    XWin = 33,
+    YWin = 34,
+    B1 = 35,
+    B2 = 36,
+    B3 = 37,
+    B4 = 38,
+    Up = 39,
+    Down = 40,
+    Left = 41,
+    Right = 42,
+    TimerAnimate = 43,
+    Fade = 44,
+    Layer0 = 45,
+    Layer1 = 46,
+    LayerVC = 47,
+    QuakeX = 48,
+    QuakeY = 49,
+    Quake = 50,
+    ScreenGradient = 51,
+    PMultX = 52,
+    PMultY = 53,
+    PDivX = 54,
+    PDivY = 55,
+    Volume = 56,
+    ParallaxC = 57,
+    CancelFade = 58,
+    DrawEntities = 59,
+    CurZone = 60,
+    TileB = 61,
+    TileF = 62,
+    ForegroundLock = 63,
+    XWin1 = 64,
+    YWin1 = 65,
+    Layer1Trans = 66,
+    LayerVCTrans = 67,
+    FontColor = 68,
+    KeepAZ = 69,
+    LayerVC2 = 70,
+    LayerVC2Trans = 71,
+    VCWriteLayer = 72,
+    ModPosition = 73,
+};
+
+enum class Var1 {
+    Flags,
+    Facing,
+    Char,
+    Item,
+    Var,
+    PartyIndex,
+    XP,
+    CurHP,
+    MaxHP,
+    CurMP,
+    MaxMP,
+    Key,
+    VCDataBuf,
+    SpecialFrame,
+    Face,
+    Speed,
+    EntityMoving,
+    EntityCHRIndex,
+    MoveCode,
+    ActiveMode,
+    ObsMode,
+    EntityStep,
+    EntityDelay,
+    EntityLocX,
+    EntityLocY,
+    EntityX1,
+    EntityX2,
+    EntityY1,
+    EntityY2,
+    EntityFace,
+    EntityChasing,
+    EntityChaseDist,
+    EntityChaseSpeed,
+    EntityScriptOfs,
+    ATK,
+    DEF,
+    HIT,
+    DOD,
+    MAG,
+    MGR,
+    REA,
+    MBL,
+    FER,
+    ItemUse,
+    ItemEffect,
+    ItemType,
+    ItemEquipType,
+    ItemEquipIndex,
+    ItemPrice,
+    SpellUse,
+    SpellEffect,
+    SpellType,
+    SpellPrice,
+    SpellCost,
+    Lvl,
+    Nxt,
+    Charstatus,
+    Spell
+};
+
+enum class Var2 {
+    Random,
+    Screen,
+    Items,
+    CanEquip,
+    ChooseChar,
+    Obs,
+    Spells,
+};
+
+
+Code loadCode(const std::string& fileName) {
+    FILE* f = fopen(fileName.c_str(), "rb");
+
+    fseek(f, 0, SEEK_END);
+    const auto size = static_cast<unsigned>(ftell(f));
+
+    // Map files have more stuff.
+    if (fileName.rfind(".map") == fileName.size() - 4) {
+        fseek(f, 68, SEEK_SET);
+        std::uint16_t mx, my;
+        fread(&mx, 1, 2, f);
+        fread(&my, 1, 2, f);
+
+        fseek(f, 100+(mx*my*5)+7956, SEEK_SET);
+
+        uint32_t a;
+        uint8_t i;
+        fread(&a, 1, 4, f);
+        fseek(f, 88*a, 1);
+        fread(&i, 1, 1, f);
+        fread(&a, 1, 4, f);
+        fseek(f, (i*4)+a, SEEK_CUR);
+    } else {
+        fseek(f, 0, SEEK_SET);
+    }
+
+    uint32_t numscripts;
+    fread(&numscripts, 1, 4, f);
+
+    std::vector<uint32_t> scriptofstbl;
+    scriptofstbl.resize(numscripts);
+    fread(scriptofstbl.data(), 4, numscripts, f);
+
+    std::vector<uint8_t> code;
+    code.resize(size - static_cast<unsigned>(ftell(f)));
+    fread(code.data(), 1, code.size(), f);
+
+    fclose(f);
+
+    return Code{ std::move(scriptofstbl), std::move(code) };
+}
+
+void decode(const Code& code, int index);
+void decodeBlock(Ctx& ctx);
+void decodeExec(Ctx& ctx);
+void decodeAssignOp(Ctx& ctx);
+void decodeVar0Assign(Ctx& ctx);
+void decodeVar1Assign(Ctx& ctx);
+void decodeVar2Assign(Ctx& ctx);
+void decodeIf(Ctx& ctx);
+void decodeForLoop0(Ctx& ctx);
+void decodeForLoop1(Ctx& ctx);
+void decodeGoto(Ctx& ctx);
+void decodeSwitch(Ctx& ctx);
+void skipOperand(Ctx& ctx);
+void skipOperandTerm(Ctx& ctx);
+void decodeOperand(Ctx& ctx);
+void decodeOperandTerm(Ctx& ctx);
+void decodeVar0(Ctx& ctx);
+void decodeVar1(Ctx& ctx);
+void decodeVar2(Ctx& ctx);
+
+void decode(const Code& code, int index) {
+    const auto startOffset = code.offsets[index];
+    const auto endOffset = (index == static_cast<int>(code.offsets.size()) - 1) ? code.offsets.size() : code.offsets[index + 1];
+
+    Bytecode bc{ code.code.begin() + startOffset, code.code.begin() + endOffset };
+    Ctx ctx{ bc, 0 };
+    decodeBlock(ctx);
+
+    ctx.dump();
+}
+
+void decodeBlock(Ctx& ctx) {
+    while (!ctx.isEOF()) {
+        const auto op = static_cast<Op>(ctx.getC());
+        //printf("decode block %d\n", static_cast<int>(op));
+
+        switch (op) {
+            case Op::Exec: decodeExec(ctx); break;
+            case Op::Var0Assign: decodeVar0Assign(ctx); break;
+            case Op::Var1Assign: decodeVar1Assign(ctx); break;
+            case Op::Var2Assign: decodeVar2Assign(ctx); break;
+            case Op::If: decodeIf(ctx); break;
+            case Op::ForLoop0: decodeForLoop0(ctx); break;
+            case Op::ForLoop1: decodeForLoop1(ctx); break;
+            case Op::Goto: decodeGoto(ctx); break;
+            case Op::Switch: decodeSwitch(ctx); break;
+            case Op::EndScript: return;
+            default: throw std::runtime_error(std::string{"*error* decodeBlock: Illegal opcode in VC code "} + std::to_string(static_cast<int>(op)));
+        }
+    }
+}
 
 void decodeGenericFunc(Ctx& ctx, const std::string& funcName, int argumentCount) {
     printf("%s(", funcName.c_str());
@@ -758,14 +962,6 @@ void decodeExec(Ctx& ctx) {
     }
 }
 
-enum class AssignOp {
-    Set = 1,
-    Increment = 2,
-    Decrement = 3,
-    IncSet = 4,
-    DecSet = 5,
-};
-
 void decodeAssignOp(Ctx& ctx) {
     const auto assignOp = static_cast<AssignOp>(ctx.getC());
 
@@ -801,20 +997,9 @@ void decodeVar2Assign(Ctx& ctx) {
     printf(";\n");
 }
 
-enum class BranchOp {
-    Zero = 0,
-    NonZero = 1,
-    Equal = 2,
-    NotEqual = 3,
-    GreaterThan = 4,
-    GreaterThanOrEqual = 5,
-    LessThan = 6,
-    LessThanOrEqual = 7,
-};
-
 void decodeIf(Ctx& ctx) {
     const auto argumentCount = static_cast<int>(ctx.getC());
-    static_cast<void>(ctx.getD());
+    ctx.skipD();
 
     printf("if ("); 
     for (int argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
@@ -829,53 +1014,53 @@ void decodeIf(Ctx& ctx) {
         switch (branchOp) {
             case BranchOp::Zero: {
                 decodeOperand(ctx);
-                ctx.offset++;
+                ctx.skipC();
                 break;
             }
             case BranchOp::NonZero: {
                 printf("!");
                 decodeOperand(ctx);
-                ctx.offset++;
+                ctx.skipC();
                 break;
             }
             case BranchOp::Equal: {
                 decodeOperand(ctx);
-                ctx.offset++;
+                ctx.skipC();
                 printf(" == ");
                 decodeOperand(ctx);
                 break;
             }
             case BranchOp::NotEqual: {
                 decodeOperand(ctx);
-                ctx.offset++;
+                ctx.skipC();
                 printf(" != ");
                 decodeOperand(ctx);
                 break;
             }
             case BranchOp::GreaterThan: {
                 decodeOperand(ctx);
-                ctx.offset++;
+                ctx.skipC();
                 printf(" >" );
                 decodeOperand(ctx);
                 break;
             }
             case BranchOp::GreaterThanOrEqual: {
                 decodeOperand(ctx);
-                ctx.offset++;
+                ctx.skipC();
                 printf(" >= ");
                 decodeOperand(ctx);
                 break;
             }
             case BranchOp::LessThan: {
                 decodeOperand(ctx);
-                ctx.offset++;
+                ctx.skipC();
                 printf(" < ");
                 decodeOperand(ctx);
                 break;
             }
             case BranchOp::LessThanOrEqual: {
                 decodeOperand(ctx);
-                ctx.offset++;
+                ctx.skipC();
                 printf(" <= ");
                 decodeOperand(ctx);
                 break;
@@ -944,14 +1129,12 @@ void decodeGoto(Ctx& ctx) {
 }
 
 void decodeSwitch(Ctx& ctx) {
-    // FIXME: argh, how do we know where a switch ends.
-
     printf("switch (");
     decodeOperand(ctx);
     printf(")");
     printf("{\n");
 
-    while (ctx.offset < static_cast<int>(ctx.bytecode.size())) {
+    while (!ctx.isEOF()) {
         const auto op = static_cast<Op>(ctx.getC());
 
         switch (op) {
@@ -973,27 +1156,10 @@ void decodeSwitch(Ctx& ctx) {
     }
 }
 
-enum class ArithmeticOp {
-    Add = 1,
-    Sub = 2,
-    Div = 3,
-    Mul = 4,
-    Mod = 5,
-    End = 255,
-};
-
-enum class OpDesc {
-    Immediate = 1,
-    Var0 = 2,
-    Var1 = 3,
-    Var2 = 4,
-    Group = 5
-};
-
 void skipOperand(Ctx& ctx) {
     skipOperandTerm(ctx);
 
-    while (ctx.offset < static_cast<int>(ctx.bytecode.size())) {
+    while (!ctx.isEOF()) {
         const auto arithmeticOp = static_cast<ArithmeticOp>(ctx.getC());
         //printf("skip arith op %d\n", static_cast<int>(arithmeticOp));
 
@@ -1019,20 +1185,20 @@ void skipOperandTerm(Ctx& ctx) {
 
     switch (desc) {
         case OpDesc::Immediate: {
-            static_cast<void>(ctx.getD());
+            ctx.skipD();
             break;
         }
         case OpDesc::Var0: {
-            static_cast<void>(ctx.getC());
+            ctx.skipC();
             break;
         }
         case OpDesc::Var1: {
-            static_cast<void>(ctx.getC());
+            ctx.skipC();
             skipOperand(ctx);
             break;
         }
         case OpDesc::Var2: {
-            static_cast<void>(ctx.getC());
+            ctx.skipC();
             skipOperand(ctx);
             skipOperand(ctx);
             break;
@@ -1049,7 +1215,7 @@ void skipOperandTerm(Ctx& ctx) {
 void decodeOperand(Ctx& ctx) {
     decodeOperandTerm(ctx);
 
-    while (ctx.offset < static_cast<int>(ctx.bytecode.size())) {
+    while (!ctx.isEOF()) {
         const auto arithmeticOp = static_cast<ArithmeticOp>(ctx.getC());
         //printf("decode arith op %d\n", static_cast<int>(arithmeticOp));
 
@@ -1080,83 +1246,6 @@ void decodeOperandTerm(Ctx& ctx) {
             throw std::runtime_error(std::string{"*error* decodeOperandTerm: Unknown operand descriptor in VC code "} + std::to_string(static_cast<int>(desc)));
     }
 }
-
-enum class Var0 {
-    A = 0,
-    B = 1,
-    C = 2,
-    D = 3,
-    E = 4,
-    F = 5,
-    G = 6,
-    H = 7,
-    I = 8,
-    J = 9,
-    K = 10,
-    L = 11,
-    M = 12,
-    N = 13,
-    O = 14,
-    P = 15,
-    Q = 16,
-    R = 17,
-    S = 18,
-    T = 19,
-    U = 20,
-    V = 21,
-    W = 22,
-    X = 23,
-    Y = 24,
-    Z = 25,
-    NumChars = 26,
-    GP = 27,
-    LocX = 28,
-    LocY = 29,
-    Timer = 30,
-    DrawParty = 31,
-    Cameratracking = 32,
-    XWin = 33,
-    YWin = 34,
-    B1 = 35,
-    B2 = 36,
-    B3 = 37,
-    B4 = 38,
-    Up = 39,
-    Down = 40,
-    Left = 41,
-    Right = 42,
-    TimerAnimate = 43,
-    Fade = 44,
-    Layer0 = 45,
-    Layer1 = 46,
-    LayerVC = 47,
-    QuakeX = 48,
-    QuakeY = 49,
-    Quake = 50,
-    ScreenGradient = 51,
-    PMultX = 52,
-    PMultY = 53,
-    PDivX = 54,
-    PDivY = 55,
-    Volume = 56,
-    ParallaxC = 57,
-    CancelFade = 58,
-    DrawEntities = 59,
-    CurZone = 60,
-    TileB = 61,
-    TileF = 62,
-    ForegroundLock = 63,
-    XWin1 = 64,
-    YWin1 = 65,
-    Layer1Trans = 66,
-    LayerVCTrans = 67,
-    FontColor = 68,
-    KeepAZ = 69,
-    LayerVC2 = 70,
-    LayerVC2Trans = 71,
-    VCWriteLayer = 72,
-    ModPosition = 73,
-};
 
 void decodeVar0(Ctx& ctx) {
     const auto var0 = static_cast<Var0>(ctx.getC());
@@ -1241,67 +1330,6 @@ void decodeVar0(Ctx& ctx) {
     }
 }
 
-enum class Var1 {
-    Flags,
-    Facing,
-    Char,
-    Item,
-    Var,
-    PartyIndex,
-    XP,
-    CurHP,
-    MaxHP,
-    CurMP,
-    MaxMP,
-    Key,
-    VCDataBuf,
-    SpecialFrame,
-    Face,
-    Speed,
-    EntityMoving,
-    EntityCHRIndex,
-    MoveCode,
-    ActiveMode,
-    ObsMode,
-    EntityStep,
-    EntityDelay,
-    EntityLocX,
-    EntityLocY,
-    EntityX1,
-    EntityX2,
-    EntityY1,
-    EntityY2,
-    EntityFace,
-    EntityChasing,
-    EntityChaseDist,
-    EntityChaseSpeed,
-    EntityScriptOfs,
-    ATK,
-    DEF,
-    HIT,
-    DOD,
-    MAG,
-    MGR,
-    REA,
-    MBL,
-    FER,
-    ItemUse,
-    ItemEffect,
-    ItemType,
-    ItemEquipType,
-    ItemEquipIndex,
-    ItemPrice,
-    SpellUse,
-    SpellEffect,
-    SpellType,
-    SpellPrice,
-    SpellCost,
-    Lvl,
-    Nxt,
-    Charstatus,
-    Spell
-};
-
 void decodeVar1(Ctx& ctx) {
     const auto var1 = static_cast<Var1>(ctx.getC());
 
@@ -1372,16 +1400,6 @@ void decodeVar1(Ctx& ctx) {
     decodeOperand(ctx);
     printf("]");
 }
-
-enum class Var2 {
-    Random,
-    Screen,
-    Items,
-    CanEquip,
-    ChooseChar,
-    Obs,
-    Spells,
-};
 
 void decodeVar2(Ctx& ctx) {
     const auto var2 = static_cast<Var2>(ctx.getC());
