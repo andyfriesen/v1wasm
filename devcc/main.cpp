@@ -522,7 +522,7 @@ void decodeVar2(Ctx& ctx);
 void decode(const Code& code, int scriptIndex) {
     const auto startOffset = code.offsets[scriptIndex];
     const auto endOffset = scriptIndex == static_cast<int>(code.offsets.size()) - 1
-        ? code.offsets.size()
+        ? code.code.size()
         : code.offsets[scriptIndex + 1];
 
     Bytecode bc{ code.code.begin() + startOffset, code.code.begin() + endOffset };
@@ -608,7 +608,7 @@ void decodeExec(Ctx& ctx) {
         case FuncId::HealAll: printf("HealAll();\n"); break;
         case FuncId::AlterParallax: decodeGenericFunc(ctx, "AlterParallax", 3); break;
         case FuncId::FadeIn: decodeGenericFunc(ctx, "FadeIn", 1); break;
-        case FuncId::FadeOut: decodeGenericFunc(ctx, "FadeOut", 2); break;
+        case FuncId::FadeOut: decodeGenericFunc(ctx, "FadeOut", 1); break;
         case FuncId::RemoveCharacter: decodeGenericFunc(ctx, "RemoveCharacter", 1); break;
         case FuncId::Banner: {
             printf("Banner(\n");
