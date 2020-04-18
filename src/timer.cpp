@@ -8,6 +8,7 @@
 #include <emscripten/html5.h>
 
 #include "engine.h" // for valloc()
+#include "vc.h"
 
 #define PIT0 0x40
 #define PIT1 0x41
@@ -23,6 +24,10 @@
 
 unsigned hooktimer = 0;
 unsigned char an = 0, tickctr = 0, sec = 0, min = 0, hr = 0;
+
+namespace {
+    unsigned lastTick = 0;
+}
 
 void sethz(unsigned int hz) {
 }
@@ -63,6 +68,7 @@ void setTimerCount(int offset) {
 void incTimerCount(void*) {
     timer_count++;
     vc_timer++;
+    lastTick++;
 
     tickctr++;
     if (tickctr == 100) {
@@ -80,6 +86,20 @@ void incTimerCount(void*) {
     }
 
     // FIXME: HookTimer.  Can't run it here.
+}
+
+// The original engine ran this in a DOS interrupt.
+// We can't do that, so we instead play catch up.  We must call this function after each "asyncify"d call.
+void runTimerHooks() {
+    while (lastTick > 0) {
+        --lastTick;
+        if (an) {
+            check_tileanimation();
+        }
+        if (hooktimer) {
+            ExecuteHookedScript(hooktimer);
+        }
+    }
 }
 
 void decTimerCount() {

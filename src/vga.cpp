@@ -79,6 +79,7 @@ EM_JS(void, wasm_nextFrame, (), {
 
 void wait() {
     wasm_nextFrame();
+    runTimerHooks();
 }
 
 void dump_palette(unsigned char* palette) {
@@ -166,7 +167,7 @@ void vgadump() {
     }
 
     wasm_vgadump(bb, BACKBUFFER_SIZE, realPalette);
-    wasm_nextFrame();
+    wait();
 }
 
 void setpixel(int x, int y, char c) {

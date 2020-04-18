@@ -1,3 +1,5 @@
+#pragma once
+
 int time();
 void delay(int ms);
 int timer_init();
@@ -12,3 +14,5 @@ int getTimerCount();
 
 int getVcTimer();
 void setVcTimer(int value);
+
+void runTimerHooks();

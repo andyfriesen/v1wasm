@@ -4,11 +4,12 @@
 
 #include <stdio.h>
 #include <emscripten.h>
-#include "stack.h"
 #include "engine.h"
-#include "main.h"
 #include "fs.h"
 #include "keyboard.h"
+#include "main.h"
+#include "stack.h"
+#include "timer.h"
 #include "vc.h"
 #include "vclib.h"
 
@@ -43,6 +44,7 @@ namespace {
         if (sleepCount < 0) {
             sleepCount = SLEEP_COUNT;
             emscripten_sleep(0);
+            runTimerHooks();
         }
     }
 }

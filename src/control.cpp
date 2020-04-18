@@ -9,9 +9,10 @@
 #include <emscripten.h>
 #include <emscripten/html5.h>
 #include "control.h"
-#include "wasm.h"
-#include "main.h"
 #include "keyboard.h"
+#include "main.h"
+#include "timer.h"
+#include "wasm.h"
 
 
 keyb_map key_map[128];         // for recording bound keys
@@ -132,6 +133,7 @@ void initcontrols(char joystk) {
 
 void readcontrols() {
     emscripten_sleep(0);
+    runTimerHooks();
     readcontrols_noSleep();
 }
 

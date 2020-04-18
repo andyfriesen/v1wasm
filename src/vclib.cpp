@@ -2,27 +2,29 @@
 // The VergeC standard function library
 // Copyright (C)1997 BJ Eirich
 
+#include <algorithm>
 #include <cassert>
 #include <stdlib.h>
 #include <string.h>
 #include <emscripten.h>
-#include "entity.h"
+
+#include "battle.h"
 #include "engine.h"
-#include "vc.h"
+#include "entity.h"
+#include "fs.h"
+#include "main.h"
 #include "menu.h"
 #include "menu2.h"
-#include "stack.h"
-#include "main.h"
-#include "battle.h"
-#include "ricvc.h"
-#include "andyvc.h"
-#include "ricvc.h"
-#include "nichgvc.h"
-#include "xbigdvc.h"
 #include "render.h"
+#include "stack.h"
+#include "vc.h"
 #include "vga.h"
+
+#include "andyvc.h"
+#include "nichgvc.h"
+#include "ricvc.h"
+#include "xbigdvc.h"
 #include "wyrdvc.h"
-#include "fs.h"
 
 using namespace verge;
 
@@ -1265,8 +1267,16 @@ void NewGame() {
 }
 
 void Delay() {
-    auto s = ResolveOperand();
-    emscripten_sleep(s * 10);
+    unsigned s = ResolveOperand();
+    s *= 10;
+
+    // Sleep for short increments so that we can run timer hooks frequently-ish.
+    while (s > 0) {
+        unsigned a = std::max(s, 100u);
+        s -= a;
+        emscripten_sleep(a);
+        runTimerHooks();
+    }
 }
 
 void GetNextMove() {
