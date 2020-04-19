@@ -1,4 +1,5 @@
 #include <string>
+#include <cassert>
 #include <vector>
 #include <map>
 #include <cctype>
@@ -34,7 +35,7 @@ struct Ctx {
     Bytecode& bytecode;
     uint32_t offset;
 
-    std::map<uint32_t, std::string> code;
+    std::vector<std::pair<uint32_t, std::string>> code;
 
     bool isEOF() const {
         return offset >= bytecode.size();
@@ -78,14 +79,15 @@ struct Ctx {
     std::string getString() {
         const auto startOffset = offset;
         skipString();
-        return std::string(bytecode.begin() + startOffset, bytecode.begin() + offset);
+        return "\"" + std::string(bytecode.begin() + startOffset, bytecode.begin() + offset - 1) + "\"";
     }
 
     void emit(uint32_t offset, std::string s) {
-        code[offset] = std::move(s);
+        code.push_back(std::make_pair(offset, std::move(s)));
     }
 
     void dump() {
+        std::sort(code.begin(), code.end(), [](auto a, auto b) { return a.first < b.first; });
         for (const auto& pair: code) {
             printf("%s\n", pair.second.c_str());
         }
@@ -513,11 +515,11 @@ void decodeGoto(Ctx& ctx);
 void decodeSwitch(Ctx& ctx);
 void skipOperand(Ctx& ctx);
 void skipOperandTerm(Ctx& ctx);
-void decodeOperand(Ctx& ctx);
-void decodeOperandTerm(Ctx& ctx);
-void decodeVar0(Ctx& ctx);
-void decodeVar1(Ctx& ctx);
-void decodeVar2(Ctx& ctx);
+std::string decodeOperand(Ctx& ctx);
+std::string decodeOperandTerm(Ctx& ctx);
+std::string decodeVar0(Ctx& ctx);
+std::string decodeVar1(Ctx& ctx);
+std::string decodeVar2(Ctx& ctx);
 
 void decode(const Code& code, int scriptIndex) {
     const auto startOffset = code.offsets[scriptIndex];
@@ -554,84 +556,96 @@ void decodeBlock(Ctx& ctx) {
 }
 
 void decodeGenericFunc(Ctx& ctx, const std::string& funcName, int argumentCount) {
-    printf("%s(", funcName.c_str());
+    auto o = ctx.offset - 1; // ctx.offset has already gobbled up the function ID once this function is called.
+    std::string res;
+    res = funcName + "(";
     for (int argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
-        decodeOperand(ctx);
+        res += decodeOperand(ctx);
 
         if (argumentIndex < argumentCount - 1) {
-            printf(", ");
+            res += ", ";
         }
     }
-    printf(");\n");
+    res += ");";
+    ctx.emit(o, std::move(res));
+}
+
+void emitFunctionCall(Ctx& ctx, int offset, const std::string& name, const std::string& desc) {
+    std::string res = name + "(";
+
+    bool first = true;
+    for (char c: desc) {
+        if (first) {
+            first = false;
+        } else {
+            res += ", ";
+        }
+
+        if (c == 'i') {
+            res += decodeOperand(ctx);
+        } else if (c == 's') {
+            res += ctx.getString();
+        } else {
+            throw std::runtime_error("what");
+        }
+    }
+
+    res += ");";
+    ctx.emit(offset, res);
+}
+
+void emitFunctionCall(Ctx& ctx, int offset, const std::string& name, std::initializer_list<std::string> args) {
+    std::string res = name + "(";
+    bool first = true;
+
+    for (const auto& s: args) {
+        if (first) {
+            first = false;
+        } else {
+            res += ", ";
+        }
+
+        res += s;
+    }
+
+    res += ");";
+    ctx.emit(offset, res);
 }
 
 void decodeExec(Ctx& ctx) {
     const auto funcId = static_cast<FuncId>(ctx.getC());
+    auto offset = ctx.offset;
 
     switch (funcId) {
-        case FuncId::MapSwitch: {
-            printf("MapSwitch(");
-            printf("\"%s\", ", ctx.getString().c_str());
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(");\n");
-            break;
-        }
+        case FuncId::MapSwitch: emitFunctionCall(ctx, offset, "MapSwitch", "siii"); break;
         case FuncId::Warp: decodeGenericFunc(ctx, "Warp", 3); break;
         case FuncId::AddCharacter: decodeGenericFunc(ctx, "AddCharacter", 1); break;
         case FuncId::SoundEffect: decodeGenericFunc(ctx, "SoundEffect", 1); break;
         case FuncId::GiveItem: decodeGenericFunc(ctx, "GiveItem", 1); break;
-        case FuncId::Text: {
-            printf("Text(");
-            decodeOperand(ctx);
-            printf(", ");
-            printf("\"%s\", ", ctx.getString().c_str());
-            printf("\"%s\", ", ctx.getString().c_str());
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
-            break;
-        }
+        case FuncId::Text: emitFunctionCall(ctx, offset, "Text", "siii"); break;
         case FuncId::AlterFTile: decodeGenericFunc(ctx, "AlterFTile", 4); break;
         case FuncId::AlterBTile: decodeGenericFunc(ctx, "AlterBTile", 4); break;
         case FuncId::FakeBattle: decodeGenericFunc(ctx, "FakeBattle", 0); break;
-        case FuncId::Return: printf("return;\n"); break;
+        case FuncId::Return: ctx.emit(offset, "return;"); break;
         case FuncId::PlayMusic: {
-            printf("PlayMusic(");
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "PlayMusic", "s");
             break;
         }
-        case FuncId::StopMusic: printf("StopMusic();\n"); break;
-        case FuncId::HealAll: printf("HealAll();\n"); break;
+        case FuncId::StopMusic: ctx.emit(offset, "StopMusic();"); break;
+        case FuncId::HealAll: ctx.emit(offset, "HealAll();"); break;
         case FuncId::AlterParallax: decodeGenericFunc(ctx, "AlterParallax", 3); break;
         case FuncId::FadeIn: decodeGenericFunc(ctx, "FadeIn", 1); break;
         case FuncId::FadeOut: decodeGenericFunc(ctx, "FadeOut", 1); break;
         case FuncId::RemoveCharacter: decodeGenericFunc(ctx, "RemoveCharacter", 1); break;
         case FuncId::Banner: {
-            printf("Banner(");
-            printf("\"%s\", ", ctx.getString().c_str());
-            decodeOperand(ctx);
-            printf(");\n");     
+            emitFunctionCall(ctx, offset, "Banner", "si");
             break;
         }
         case FuncId::EnforceAnimation: decodeGenericFunc(ctx, "EnforceAnimation", 0); break;
         case FuncId::WaitKeyUp: decodeGenericFunc(ctx, "WaitKeyUp", 0); break;
         case FuncId::DestroyItem: decodeGenericFunc(ctx, "DestroyItem", 2); break;
         case FuncId::Prompt: {
-            printf("Text(");
-            decodeOperand(ctx);
-            printf(", ");
-            printf("\"%s\", ", ctx.getString().c_str());
-            printf("\"%s\", ", ctx.getString().c_str());
-            printf("\"%s\", ", ctx.getString().c_str());
-            decodeOperand(ctx);
-            printf(", ");
-            printf("\"%s\", ", ctx.getString().c_str());
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "Prompt", "isssiss");
             break;
         }        
         case FuncId::ChainEvent: {
@@ -653,13 +667,7 @@ void decodeExec(Ctx& ctx) {
         case FuncId::RestoreMP: decodeGenericFunc(ctx, "RestoreMP", 2); break;
         case FuncId::Redraw: decodeGenericFunc(ctx, "Redraw", 0); break;
         case FuncId::SText: {
-            printf("SText(");
-            decodeOperand(ctx);
-            printf(", ");
-            printf("\"%s\", ", ctx.getString().c_str());
-            printf("\"%s\", ", ctx.getString().c_str());
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "SText", "isss");
             break;
         }
         case FuncId::DisableMenu: decodeGenericFunc(ctx, "DisableMenu", 0); break;
@@ -682,30 +690,18 @@ void decodeExec(Ctx& ctx) {
         }
         case FuncId::PaletteMorph: decodeGenericFunc(ctx, "PaletteMorph", 5); break;
         case FuncId::ChangeCHR: {
-            printf("ChangeCHR(");
-            decodeOperand(ctx);
-            printf(", ");
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "ChangeCHR", "is");
             break;
         }
         case FuncId::ReadControls: decodeGenericFunc(ctx, "ReadControls", 0); break;
         case FuncId::VCPutPCX: {
-            printf("VCPutPCX(");
-            printf("\"%s\", ", ctx.getString().c_str());
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);            
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "VCPutPCX", "sii");
             break;
         }
         case FuncId::HookTimer: decodeGenericFunc(ctx, "HookTimer", 1); break;
         case FuncId::HookRetrace: decodeGenericFunc(ctx, "HookRetrace", 1); break;
         case FuncId::VCLoadPCX: {
-            printf("VCLoadPCX(");
-            printf("\"%s\", ", ctx.getString().c_str());
-            decodeOperand(ctx);
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "VCLoadPCX", "si");
             break;
         }
         case FuncId::VCBlitImage: decodeGenericFunc(ctx, "VCBlitImage", 5); break;
@@ -713,62 +709,40 @@ void decodeExec(Ctx& ctx) {
         case FuncId::VCClear: decodeGenericFunc(ctx, "VCClear", 0); break;
         case FuncId::VCClearRegion: decodeGenericFunc(ctx, "VCClear", 4); break;
         case FuncId::VCText: {
-            printf("VCText(");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");            
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "VCText", "iis");
             break;
         }
         case FuncId::VCTBlitImage: decodeGenericFunc(ctx, "VCTBlitImage", 5); break;
         case FuncId::Exit: decodeGenericFunc(ctx, "Exit", 0); break;
         case FuncId::Quit: {
-            printf("Quit(");
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "Quit", "s");
             break;
         }
         case FuncId::VCCenterText: {
-            printf("VCCenterText(");
-            decodeOperand(ctx);
-            printf(", ");
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "VCCenterText", "is");
             break;
         }
         case FuncId::ResetTimer: decodeGenericFunc(ctx, "ResetTimer", 0); break;
         case FuncId::VCBlitTile: decodeGenericFunc(ctx, "VCBlitTile", 3); break;
         case FuncId::Sys_ClearScreen: decodeGenericFunc(ctx, "Sys_ClearScreen", 0); break;
         case FuncId::Sys_DisplayPCX: {
-            printf("Sys_DisplayPCX(");
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "Sys_DisplayPCX", "s");
             break;
         }        
         case FuncId::OldStartupMenu: decodeGenericFunc(ctx, "OldStartupMenu", 0); break;
         case FuncId::VGADump: decodeGenericFunc(ctx, "VGADump", 0); break;
         case FuncId::NewGame: {
-            printf("NewGame(");
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "NewGame", "s");
             break;
         }
         case FuncId::LoadSaveErase: decodeGenericFunc(ctx, "LoadSaveErase", 0); break;
         case FuncId::Delay: decodeGenericFunc(ctx, "Delay", 1); break;
         case FuncId::PartyMove: {
-            printf("PartyMove(");
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "PartyMove", "s");
             break;
         }
         case FuncId::EntityMove: {
-            printf("EntityMove(");
-            decodeOperand(ctx);
-            printf(", ");            
-            printf("\"%s\"", ctx.getString().c_str());
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "EntityMove", "is");
             break;
         } 
         case FuncId::AutoOn: decodeGenericFunc(ctx, "AutoOn", 0); break;
@@ -776,14 +750,7 @@ void decodeExec(Ctx& ctx) {
         case FuncId::EntityMoveScript: decodeGenericFunc(ctx, "EntityMoveScript", 2); break;
         case FuncId::VCTextNum: decodeGenericFunc(ctx, "VCTextNum", 3); break;
         case FuncId::VCLoadRaw: {
-            printf("VCLoadRaw(");
-            printf("\"%s\", ", ctx.getString().c_str());
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "VCLoadRaw", "siii");
             break;
         }
         case FuncId::VCBox: decodeGenericFunc(ctx, "VCBox", 4); break;
@@ -807,26 +774,24 @@ void decodeExec(Ctx& ctx) {
         case FuncId::GetMagic: decodeGenericFunc(ctx, "GetMagic", 2); break;
         case FuncId::BindKey: decodeGenericFunc(ctx, "BindKey", 2); break;
         case FuncId::TextMenu: {
-            printf("TextMenu(");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
+            std::string res = "TextMenu(" +
+                decodeOperand(ctx) + ", " + 
+                decodeOperand(ctx) + ", " + 
+                decodeOperand(ctx) + ", " + 
+                decodeOperand(ctx) +
+                ", ";
 
             const auto argumentCount = ctx.getC() + 1;
             for (int argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
-                printf("\"%s\"", ctx.getString().c_str());
+                res += ctx.getString();
 
                 if (argumentIndex < argumentCount - 1) {
-                    printf(", ");
+                    res += ", ";
                 }
             }
 
-            printf(");\n");
+            res += ");";
+            ctx.emit(offset, std::move(res));
             break;
         }
         case FuncId::ItemMenu: decodeGenericFunc(ctx, "ItemMenu", 1); break;
@@ -843,39 +808,26 @@ void decodeExec(Ctx& ctx) {
             break;
         }
         case FuncId::VCTextBox: {
-            printf("VCTextBox(");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
-
+            std::string res = "VCTextBox(" +
+                decodeOperand(ctx) + ", " +
+                decodeOperand(ctx) + ", " +
+                decodeOperand(ctx) + ", "
+            ;
             const auto argumentCount = ctx.getC() + 1;
             for (int argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
-                printf("\"%s\"", ctx.getString().c_str());
+                res += ctx.getString();
 
                 if (argumentIndex < argumentCount - 1) {
-                    printf(", ");
+                    res += ", ";
                 }
             }
 
-            printf(");\n");
+            res += ");";
+            ctx.emit(offset, res);
             break;
         }
         case FuncId::PlayVAS: {
-            printf("PlayVAS(");
-            printf("\"%s\", ", ctx.getString().c_str());
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(", ");
-            decodeOperand(ctx);
-            printf(");\n");
+            emitFunctionCall(ctx, offset, "PlayVAS", "siiiii");
             break;
         }
 
@@ -1030,10 +982,13 @@ void decodeVar2Assign(Ctx& ctx) {
 }
 
 void decodeIf(Ctx& ctx) {
+    auto offset = ctx.offset;
+
     const auto argumentCount = static_cast<int>(ctx.getC());
     ctx.skipD();
 
-    printf("if ("); 
+    std::string res = "if (";
+
     for (int argumentIndex = 0; argumentIndex < argumentCount; argumentIndex++) {
         const auto previousOffset = ctx.offset;
         skipOperand(ctx);
@@ -1045,56 +1000,56 @@ void decodeIf(Ctx& ctx) {
 
         switch (branchOp) {
             case BranchOp::Zero: {
-                decodeOperand(ctx);
+                res += decodeOperand(ctx);
                 ctx.skipC();
                 break;
             }
             case BranchOp::NonZero: {
-                printf("!");
-                decodeOperand(ctx);
+                res += "!";
+                res += decodeOperand(ctx);
                 ctx.skipC();
                 break;
             }
             case BranchOp::Equal: {
-                decodeOperand(ctx);
+                res += decodeOperand(ctx);
                 ctx.skipC();
-                printf(" == ");
-                decodeOperand(ctx);
+                res += " == ";
+                res += decodeOperand(ctx);
                 break;
             }
             case BranchOp::NotEqual: {
-                decodeOperand(ctx);
+                res += decodeOperand(ctx);
                 ctx.skipC();
-                printf(" != ");
-                decodeOperand(ctx);
+                res += " != ";
+                res += decodeOperand(ctx);
                 break;
             }
             case BranchOp::GreaterThan: {
-                decodeOperand(ctx);
+                res += decodeOperand(ctx);
                 ctx.skipC();
-                printf(" >" );
-                decodeOperand(ctx);
+                res += " >" ;
+                res += decodeOperand(ctx);
                 break;
             }
             case BranchOp::GreaterThanOrEqual: {
-                decodeOperand(ctx);
+                res += decodeOperand(ctx);
                 ctx.skipC();
-                printf(" >= ");
-                decodeOperand(ctx);
+                res += " >= ";
+                res += decodeOperand(ctx);
                 break;
             }
             case BranchOp::LessThan: {
-                decodeOperand(ctx);
+                res += decodeOperand(ctx);
                 ctx.skipC();
-                printf(" < ");
-                decodeOperand(ctx);
+                res += " < ";
+                res += decodeOperand(ctx);
                 break;
             }
             case BranchOp::LessThanOrEqual: {
-                decodeOperand(ctx);
+                res += decodeOperand(ctx);
                 ctx.skipC();
-                printf(" <= ");
-                decodeOperand(ctx);
+                res += " <= ";
+                res += decodeOperand(ctx);
                 break;
             }
             default:
@@ -1102,16 +1057,17 @@ void decodeIf(Ctx& ctx) {
         }
 
         if (argumentIndex < argumentCount - 1) {
-            printf(" && ");
+            res += " && ";
         }
     }
-    printf(")\n"); 
-    printf("{\n"); 
+    res += ") {";
+    ctx.emit(offset, res);
     decodeBlock(ctx);
-    printf("}\n"); 
+    ctx.emit(ctx.offset, "}");
 }
 
 void decodeForLoop0(Ctx& ctx) {
+    
     printf("for(");
     decodeVar0(ctx);
     printf(",");
@@ -1161,10 +1117,7 @@ void decodeGoto(Ctx& ctx) {
 }
 
 void decodeSwitch(Ctx& ctx) {
-    printf("switch (");
-    decodeOperand(ctx);
-    printf(")");
-    printf("{\n");
+    ctx.emit(ctx.offset, "switch (" + decodeOperand(ctx) + ") {");
 
     while (!ctx.isEOF()) {
         const auto op = static_cast<BlockOp>(ctx.getC());
@@ -1173,14 +1126,15 @@ void decodeSwitch(Ctx& ctx) {
             // Anything besides ScriptEnd is supposed to be treated as a case.
             // (according to vc interpreter, even if vcc uses a CASE opcode there)
             default: {
-                printf("case ");
-                decodeOperand(ctx);
-                printf(":\n");
+                ctx.emit(ctx.offset, "case " + decodeOperand(ctx) + ":");
+                // printf("case ");
+                // decodeOperand(ctx);
+                // printf(":\n");
                 static_cast<void>(ctx.getD());
                 decodeBlock(ctx);
             }
             case BlockOp::End: {
-                printf("}\n");
+                ctx.emit(ctx.offset, "}");
                 return;
             }            
         }
@@ -1244,213 +1198,220 @@ void skipOperandTerm(Ctx& ctx) {
     }
 }
 
-void decodeOperand(Ctx& ctx) {
-    decodeOperandTerm(ctx);
+std::string decodeOperand(Ctx& ctx) {
+    std::string res = decodeOperandTerm(ctx);
 
     while (!ctx.isEOF()) {
         const auto arithmeticOp = static_cast<ArithmeticOp>(ctx.getC());
         //printf("decode arith op %d\n", static_cast<int>(arithmeticOp));
 
         switch (arithmeticOp) {            
-            case ArithmeticOp::Add: printf(" + "); decodeOperandTerm(ctx); break;
-            case ArithmeticOp::Subtract: printf(" - "); decodeOperandTerm(ctx); break;
-            case ArithmeticOp::Divide: printf(" / "); decodeOperandTerm(ctx); break;
-            case ArithmeticOp::Multiply: printf(" * "); decodeOperandTerm(ctx); break;
-            case ArithmeticOp::Modulo: printf(" %% "); decodeOperandTerm(ctx); break;
-            case ArithmeticOp::End: return;
+            case ArithmeticOp::Add:      res += " + " + decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Subtract: res += " - " + decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Divide:   res += " / " + decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Multiply: res += " * " + decodeOperandTerm(ctx); break;
+            case ArithmeticOp::Modulo:   res += " % " + decodeOperandTerm(ctx); break;
+            case ArithmeticOp::End:      return res;
             default:
                 throw std::runtime_error(std::string{"*error* decodeOperand: Unknown arithmetic opcode in VC code "} + std::to_string(static_cast<int>(arithmeticOp)));            
         }
     }
+
+    return res;
 }
 
-void decodeOperandTerm(Ctx& ctx) {
+std::string decodeOperandTerm(Ctx& ctx) {
     const auto termType = static_cast<OpTermType>(ctx.getC());
     //printf("decode op term %d\n", static_cast<int>(termType));
 
     switch (termType) {
-        case OpTermType::Immediate: printf("%d", ctx.getD()); break;
-        case OpTermType::Var0: decodeVar0(ctx); break;
-        case OpTermType::Var1: decodeVar1(ctx); break;
-        case OpTermType::Var2: decodeVar2(ctx); break;
-        case OpTermType::Group: decodeOperand(ctx); break;
+        case OpTermType::Immediate: return std::to_string(ctx.getD());
+        case OpTermType::Var0:      return decodeVar0(ctx);
+        case OpTermType::Var1:      return decodeVar1(ctx);
+        case OpTermType::Var2:      return decodeVar2(ctx);
+        case OpTermType::Group:     return decodeOperand(ctx);
         default:
             throw std::runtime_error(std::string{"*error* decodeOperandTerm: Unknown operand term type in VC code "} + std::to_string(static_cast<int>(termType)));
     }
+
+    assert(0);
 }
 
-void decodeVar0(Ctx& ctx) {
+std::string decodeVar0(Ctx& ctx) {
     const auto var0 = static_cast<Var0>(ctx.getC());
 
     switch (var0) {
-        case Var0::A: printf("a"); break;
-        case Var0::B: printf("b"); break;
-        case Var0::C: printf("c"); break;
-        case Var0::D: printf("d"); break;
-        case Var0::E: printf("e"); break;
-        case Var0::F: printf("f"); break;
-        case Var0::G: printf("g"); break;
-        case Var0::H: printf("h"); break;
-        case Var0::I: printf("i"); break;
-        case Var0::J: printf("j"); break;
-        case Var0::K: printf("k"); break;
-        case Var0::L: printf("l"); break;
-        case Var0::M: printf("m"); break;
-        case Var0::N: printf("n"); break;
-        case Var0::O: printf("o"); break;
-        case Var0::P: printf("p"); break;
-        case Var0::Q: printf("q"); break;
-        case Var0::R: printf("r"); break;
-        case Var0::S: printf("s"); break;
-        case Var0::T: printf("t"); break;
-        case Var0::U: printf("u"); break;
-        case Var0::V: printf("v"); break;
-        case Var0::W: printf("w"); break;
-        case Var0::X: printf("x"); break;
-        case Var0::Y: printf("y"); break;
-        case Var0::Z: printf("z"); break;
-        case Var0::NumChars: printf("numchars"); break;
-        case Var0::GP: printf("gp"); break;
-        case Var0::LocX: printf("locx"); break;
-        case Var0::LocY: printf("locy"); break;
-        case Var0::Timer: printf("timer"); break;
-        case Var0::DrawParty: printf("drawparty"); break;
-        case Var0::Cameratracking: printf("cameratracking"); break;
-        case Var0::XWin: printf("xwin"); break;
-        case Var0::YWin: printf("ywin"); break;
-        case Var0::B1: printf("b1"); break;
-        case Var0::B2: printf("b2"); break;
-        case Var0::B3: printf("b3"); break;
-        case Var0::B4: printf("b4"); break;
-        case Var0::Up: printf("up"); break;
-        case Var0::Down: printf("down"); break;
-        case Var0::Left: printf("left"); break;
-        case Var0::Right: printf("right"); break;
-        case Var0::TimerAnimate: printf("timeranimate"); break;
-        case Var0::Fade: printf("fade"); break;
-        case Var0::Layer0: printf("layer0"); break;
-        case Var0::Layer1: printf("layer1"); break;
-        case Var0::LayerVC: printf("layervc"); break;
-        case Var0::QuakeX: printf("quakex"); break;
-        case Var0::QuakeY: printf("quakey"); break;
-        case Var0::Quake: printf("quake"); break;
-        case Var0::ScreenGradient: printf("screengradient"); break;
-        case Var0::PMultX: printf("pmultx"); break;
-        case Var0::PMultY: printf("pmulty"); break;
-        case Var0::PDivX: printf("pdivx"); break;
-        case Var0::PDivY: printf("pdivy"); break;
-        case Var0::Volume: printf("volume"); break;
-        case Var0::ParallaxC: printf("parallaxc"); break;
-        case Var0::CancelFade: printf("cancelfade"); break;
-        case Var0::DrawEntities: printf("drawentities"); break;
-        case Var0::CurZone: printf("curzone"); break;
-        case Var0::TileB: printf("tileb"); break;
-        case Var0::TileF: printf("tilef"); break;
-        case Var0::ForegroundLock: printf("foregroundlock"); break;
-        case Var0::XWin1: printf("xwin1"); break;
-        case Var0::YWin1: printf("ywin1"); break;
-        case Var0::Layer1Trans: printf("layer1trans"); break;
-        case Var0::LayerVCTrans: printf("layervctrans"); break;
-        case Var0::FontColor: printf("fontcolor"); break;
-        case Var0::KeepAZ: printf("keepaz"); break;
-        case Var0::LayerVC2: printf("layervc2"); break;
-        case Var0::LayerVC2Trans: printf("layervc2trans"); break;
-        case Var0::VCWriteLayer: printf("vcwritelayer"); break;
-        case Var0::ModPosition: printf("modposition"); break;
+        case Var0::A:               return "a";
+        case Var0::B:               return "b";
+        case Var0::C:               return "c";
+        case Var0::D:               return "d";
+        case Var0::E:               return "e";
+        case Var0::F:               return "f";
+        case Var0::G:               return "g";
+        case Var0::H:               return "h";
+        case Var0::I:               return "i";
+        case Var0::J:               return "j";
+        case Var0::K:               return "k";
+        case Var0::L:               return "l";
+        case Var0::M:               return "m";
+        case Var0::N:               return "n";
+        case Var0::O:               return "o";
+        case Var0::P:               return "p";
+        case Var0::Q:               return "q";
+        case Var0::R:               return "r";
+        case Var0::S:               return "s";
+        case Var0::T:               return "t";
+        case Var0::U:               return "u";
+        case Var0::V:               return "v";
+        case Var0::W:               return "w";
+        case Var0::X:               return "x";
+        case Var0::Y:               return "y";
+        case Var0::Z:               return "z";
+        case Var0::NumChars:        return "numchars";
+        case Var0::GP:              return "gp";
+        case Var0::LocX:            return "locx";
+        case Var0::LocY:            return "locy";
+        case Var0::Timer:           return "timer";
+        case Var0::DrawParty:       return "drawparty";
+        case Var0::Cameratracking:  return "cameratracking";
+        case Var0::XWin:            return "xwin";
+        case Var0::YWin:            return "ywin";
+        case Var0::B1:              return "b1";
+        case Var0::B2:              return "b2";
+        case Var0::B3:              return "b3";
+        case Var0::B4:              return "b4";
+        case Var0::Up:              return "up";
+        case Var0::Down:            return "down";
+        case Var0::Left:            return "left";
+        case Var0::Right:           return "right";
+        case Var0::TimerAnimate:    return "timeranimate";
+        case Var0::Fade:            return "fade";
+        case Var0::Layer0:          return "layer0";
+        case Var0::Layer1:          return "layer1";
+        case Var0::LayerVC:         return "layervc";
+        case Var0::QuakeX:          return "quakex";
+        case Var0::QuakeY:          return "quakey";
+        case Var0::Quake:           return "quake";
+        case Var0::ScreenGradient:  return "screengradient";
+        case Var0::PMultX:          return "pmultx";
+        case Var0::PMultY:          return "pmulty";
+        case Var0::PDivX:           return "pdivx";
+        case Var0::PDivY:           return "pdivy";
+        case Var0::Volume:          return "volume";
+        case Var0::ParallaxC:       return "parallaxc";
+        case Var0::CancelFade:      return "cancelfade";
+        case Var0::DrawEntities:    return "drawentities";
+        case Var0::CurZone:         return "curzone";
+        case Var0::TileB:           return "tileb";
+        case Var0::TileF:           return "tilef";
+        case Var0::ForegroundLock:  return "foregroundlock";
+        case Var0::XWin1:           return "xwin1";
+        case Var0::YWin1:           return "ywin1";
+        case Var0::Layer1Trans:     return "layer1trans";
+        case Var0::LayerVCTrans:    return "layervctrans";
+        case Var0::FontColor:       return "fontcolor";
+        case Var0::KeepAZ:          return "keepaz";
+        case Var0::LayerVC2:        return "layervc2";
+        case Var0::LayerVC2Trans:   return "layervc2trans";
+        case Var0::VCWriteLayer:    return "vcwritelayer";
+        case Var0::ModPosition:     return "modposition";
         default:
             throw std::runtime_error(std::string{"*error* decodeVar0: Unknown var0 index in VC code "} + std::to_string(static_cast<int>(var0)));
     }
+
+    assert(0);
 }
 
-void decodeVar1(Ctx& ctx) {
+std::string decodeVar1(Ctx& ctx) {
     const auto var1 = static_cast<Var1>(ctx.getC());
 
+    std::string result;
+
     switch (var1) {
-        case Var1::Flags: printf("flags"); break;
-        case Var1::Facing: printf("facing"); break;
-        case Var1::Char: printf("char"); break;
-        case Var1::Item: printf("item"); break;
-        case Var1::Var: printf("var"); break;
-        case Var1::PartyIndex: printf("partyindex"); break;
-        case Var1::XP: printf("xp"); break;
-        case Var1::CurHP: printf("curhp"); break;
-        case Var1::MaxHP: printf("maxhp"); break;
-        case Var1::CurMP: printf("curmp"); break;
-        case Var1::MaxMP: printf("maxmp"); break;
-        case Var1::Key: printf("key"); break;
-        case Var1::VCDataBuf: printf("vcdatabuf"); break;
-        case Var1::SpecialFrame: printf("specialframe"); break;
-        case Var1::Face: printf("face"); break;
-        case Var1::Speed: printf("speed"); break;
-        case Var1::EntityMoving: printf("entity.moving"); break;
-        case Var1::EntityCHRIndex: printf("entity.chrindex"); break;
-        case Var1::MoveCode: printf("movecode"); break;
-        case Var1::ActiveMode: printf("activemode"); break;
-        case Var1::ObsMode: printf("obsmode"); break;
-        case Var1::EntityStep: printf("entity.step"); break;
-        case Var1::EntityDelay: printf("entity.delay"); break;
-        case Var1::EntityLocX: printf("entity.locx"); break;
-        case Var1::EntityLocY: printf("entity.locy"); break;
-        case Var1::EntityX1: printf("entity.x1"); break;
-        case Var1::EntityX2: printf("entity.x2"); break;
-        case Var1::EntityY1: printf("entity.y1"); break;
-        case Var1::EntityY2: printf("entity.y2"); break;
-        case Var1::EntityFace: printf("entity.face"); break;
-        case Var1::EntityChasing: printf("entity.chasing"); break;
-        case Var1::EntityChaseDist: printf("entity.chasedist"); break;
-        case Var1::EntityChaseSpeed: printf("entity.chasespeed"); break;
-        case Var1::EntityScriptOfs: printf("entity.scriptofs"); break;
-        case Var1::ATK: printf("atk"); break;
-        case Var1::DEF: printf("def"); break;
-        case Var1::HIT: printf("hit"); break;
-        case Var1::DOD: printf("dod"); break;
-        case Var1::MAG: printf("mag"); break;
-        case Var1::MGR: printf("mgr"); break;
-        case Var1::REA: printf("rea"); break;
-        case Var1::MBL: printf("mbl"); break;
-        case Var1::FER: printf("fer"); break;
-        case Var1::ItemUse: printf("item.use"); break;
-        case Var1::ItemEffect: printf("item.effect"); break;
-        case Var1::ItemType: printf("item.type"); break;
-        case Var1::ItemEquipType: printf("item.equiptype"); break;
-        case Var1::ItemEquipIndex: printf("item.equipindex"); break;
-        case Var1::ItemPrice: printf("item.price"); break;
-        case Var1::SpellUse: printf("spell.use"); break;
-        case Var1::SpellEffect: printf("spell.effect"); break;
-        case Var1::SpellType: printf("spell.type"); break;
-        case Var1::SpellPrice: printf("spell.price"); break;
-        case Var1::SpellCost: printf("spell.cost"); break;
-        case Var1::Lvl: printf("lvl"); break;
-        case Var1::Nxt: printf("nxt"); break;
-        case Var1::Charstatus: printf("charstatus"); break;
-        case Var1::Spell: printf("spell"); break;
+        case Var1::Flags:               result = "flags"; break;
+        case Var1::Facing:              result = "facing"; break;
+        case Var1::Char:                result = "char"; break;
+        case Var1::Item:                result = "item"; break;
+        case Var1::Var:                 result = "var"; break;
+        case Var1::PartyIndex:          result = "partyindex"; break;
+        case Var1::XP:                  result = "xp"; break;
+        case Var1::CurHP:               result = "curhp"; break;
+        case Var1::MaxHP:               result = "maxhp"; break;
+        case Var1::CurMP:               result = "curmp"; break;
+        case Var1::MaxMP:               result = "maxmp"; break;
+        case Var1::Key:                 result = "key"; break;
+        case Var1::VCDataBuf:           result = "vcdatabuf"; break;
+        case Var1::SpecialFrame:        result = "specialframe"; break;
+        case Var1::Face:                result = "face"; break;
+        case Var1::Speed:               result = "speed"; break;
+        case Var1::EntityMoving:        result = "entity.moving"; break;
+        case Var1::EntityCHRIndex:      result = "entity.chrindex"; break;
+        case Var1::MoveCode:            result = "movecode"; break;
+        case Var1::ActiveMode:          result = "activemode"; break;
+        case Var1::ObsMode:             result = "obsmode"; break;
+        case Var1::EntityStep:          result = "entity.step"; break;
+        case Var1::EntityDelay:         result = "entity.delay"; break;
+        case Var1::EntityLocX:          result = "entity.locx"; break;
+        case Var1::EntityLocY:          result = "entity.locy"; break;
+        case Var1::EntityX1:            result = "entity.x1"; break;
+        case Var1::EntityX2:            result = "entity.x2"; break;
+        case Var1::EntityY1:            result = "entity.y1"; break;
+        case Var1::EntityY2:            result = "entity.y2"; break;
+        case Var1::EntityFace:          result = "entity.face"; break;
+        case Var1::EntityChasing:       result = "entity.chasing"; break;
+        case Var1::EntityChaseDist:     result = "entity.chasedist"; break;
+        case Var1::EntityChaseSpeed:    result = "entity.chasespeed"; break;
+        case Var1::EntityScriptOfs:     result = "entity.scriptofs"; break;
+        case Var1::ATK:                 result = "atk"; break;
+        case Var1::DEF:                 result = "def"; break;
+        case Var1::HIT:                 result = "hit"; break;
+        case Var1::DOD:                 result = "dod"; break;
+        case Var1::MAG:                 result = "mag"; break;
+        case Var1::MGR:                 result = "mgr"; break;
+        case Var1::REA:                 result = "rea"; break;
+        case Var1::MBL:                 result = "mbl"; break;
+        case Var1::FER:                 result = "fer"; break;
+        case Var1::ItemUse:             result = "item.use"; break;
+        case Var1::ItemEffect:          result = "item.effect"; break;
+        case Var1::ItemType:            result = "item.type"; break;
+        case Var1::ItemEquipType:       result = "item.equiptype"; break;
+        case Var1::ItemEquipIndex:      result = "item.equipindex"; break;
+        case Var1::ItemPrice:           result = "item.price"; break;
+        case Var1::SpellUse:            result = "spell.use"; break;
+        case Var1::SpellEffect:         result = "spell.effect"; break;
+        case Var1::SpellType:           result = "spell.type"; break;
+        case Var1::SpellPrice:          result = "spell.price"; break;
+        case Var1::SpellCost:           result = "spell.cost"; break;
+        case Var1::Lvl:                 result = "lvl"; break;
+        case Var1::Nxt:                 result = "nxt"; break;
+        case Var1::Charstatus:          result = "charstatus"; break;
+        case Var1::Spell:               result = "spell"; break;
         default:
             throw std::runtime_error(std::string{"*error* decodeVar1: Unknown var1 index in VC code "} + std::to_string(static_cast<int>(var1)));
     }
     // '(' and '[' are equivalent in V1, so we use '[' for 1-argument array-like things, eg. flags.
-    printf("[");
-    decodeOperand(ctx);
-    printf("]");
+    return result + "[" + decodeOperand(ctx) + "]";
 }
 
-void decodeVar2(Ctx& ctx) {
+std::string decodeVar2(Ctx& ctx) {
     const auto var2 = static_cast<Var2>(ctx.getC());
 
+    std::string result;
+
     switch (var2) {
-        case Var2::Random: printf("random"); break;
-        case Var2::Screen: printf("screen"); break;
-        case Var2::Items: printf("items"); break;
-        case Var2::CanEquip: printf("canequip"); break;
-        case Var2::ChooseChar: printf("choosechar"); break;
-        case Var2::Obs: printf("obs"); break;
-        case Var2::Spells: printf("spells"); break;
+        case Var2::Random:      result = "random"; break;
+        case Var2::Screen:      result = "screen"; break;
+        case Var2::Items:       result = "items"; break;
+        case Var2::CanEquip:    result = "canequip"; break;
+        case Var2::ChooseChar:  result = "choosechar"; break;
+        case Var2::Obs:         result = "obs"; break;
+        case Var2::Spells:      result = "spells"; break;
         default:
             throw std::runtime_error(std::string{"*error* decodeVar2: Unknown var2 index in VC code "} + std::to_string(static_cast<int>(var2)));
     }
-    printf("(");
-    decodeOperand(ctx);
-    decodeOperand(ctx);
-    printf(")");    
+    auto op1 = decodeOperand(ctx);
+    auto op2 = decodeOperand(ctx);
+    return result + "(" + op1 + ", " + op2 + ")";
 }
 
 int main(int argc, char** argv) {
