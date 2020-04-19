@@ -621,7 +621,6 @@ if (typeof WebAssembly !== 'object') {
 function setValue(ptr, value, type, noSafe) {
   type = type || 'i8';
   if (type.charAt(type.length-1) === '*') type = 'i32'; // pointers are 32-bit
-  if (noSafe) {
     switch(type) {
       case 'i1': HEAP8[((ptr)>>0)]=value; break;
       case 'i8': HEAP8[((ptr)>>0)]=value; break;
@@ -632,18 +631,6 @@ function setValue(ptr, value, type, noSafe) {
       case 'double': HEAPF64[((ptr)>>3)]=value; break;
       default: abort('invalid type for setValue: ' + type);
     }
-  } else {
-    switch(type) {
-      case 'i1': SAFE_HEAP_STORE(((ptr)|0), ((value)|0), 1); break;
-      case 'i8': SAFE_HEAP_STORE(((ptr)|0), ((value)|0), 1); break;
-      case 'i16': SAFE_HEAP_STORE(((ptr)|0), ((value)|0), 2); break;
-      case 'i32': SAFE_HEAP_STORE(((ptr)|0), ((value)|0), 4); break;
-      case 'i64': (tempI64 = [value>>>0,(tempDouble=value,(+(Math_abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math_min((+(Math_floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math_ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],SAFE_HEAP_STORE(((ptr)|0), ((tempI64[0])|0), 4),SAFE_HEAP_STORE((((ptr)+(4))|0), ((tempI64[1])|0), 4)); break;
-      case 'float': SAFE_HEAP_STORE_D(((ptr)|0), Math_fround(value), 4); break;
-      case 'double': SAFE_HEAP_STORE_D(((ptr)|0), (+(value)), 8); break;
-      default: abort('invalid type for setValue: ' + type);
-    }
-  }
 }
 
 /** @param {number} ptr
@@ -652,7 +639,6 @@ function setValue(ptr, value, type, noSafe) {
 function getValue(ptr, type, noSafe) {
   type = type || 'i8';
   if (type.charAt(type.length-1) === '*') type = 'i32'; // pointers are 32-bit
-  if (noSafe) {
     switch(type) {
       case 'i1': return HEAP8[((ptr)>>0)];
       case 'i8': return HEAP8[((ptr)>>0)];
@@ -663,80 +649,10 @@ function getValue(ptr, type, noSafe) {
       case 'double': return HEAPF64[((ptr)>>3)];
       default: abort('invalid type for getValue: ' + type);
     }
-  } else {
-    switch(type) {
-      case 'i1': return ((SAFE_HEAP_LOAD(((ptr)|0), 1, 0))|0);
-      case 'i8': return ((SAFE_HEAP_LOAD(((ptr)|0), 1, 0))|0);
-      case 'i16': return ((SAFE_HEAP_LOAD(((ptr)|0), 2, 0))|0);
-      case 'i32': return ((SAFE_HEAP_LOAD(((ptr)|0), 4, 0))|0);
-      case 'i64': return ((SAFE_HEAP_LOAD(((ptr)|0), 8, 0))|0);
-      case 'float': return Math_fround(SAFE_HEAP_LOAD_D(((ptr)|0), 4, 0));
-      case 'double': return (+(SAFE_HEAP_LOAD_D(((ptr)|0), 8, 0)));
-      default: abort('invalid type for getValue: ' + type);
-    }
-  }
   return null;
 }
 
 
-/** @param {number|boolean=} isFloat */
-function getSafeHeapType(bytes, isFloat) {
-  switch (bytes) {
-    case 1: return 'i8';
-    case 2: return 'i16';
-    case 4: return isFloat ? 'float' : 'i32';
-    case 8: return 'double';
-    default: assert(0);
-  }
-}
-
-
-/** @param {number|boolean=} isFloat */
-function SAFE_HEAP_STORE(dest, value, bytes, isFloat) {
-  if (dest <= 0) abort('segmentation fault storing ' + bytes + ' bytes to address ' + dest);
-  if (dest % bytes !== 0) abort('alignment error storing to address ' + dest + ', which was expected to be aligned to a multiple of ' + bytes);
-  if (dest + bytes > HEAP32[DYNAMICTOP_PTR>>2]) abort('segmentation fault, exceeded the top of the available dynamic heap when storing ' + bytes + ' bytes to address ' + dest + '. DYNAMICTOP=' + HEAP32[DYNAMICTOP_PTR>>2]);
-  assert(DYNAMICTOP_PTR);
-  assert(HEAP32[DYNAMICTOP_PTR>>2] <= HEAP8.length);
-  setValue(dest, value, getSafeHeapType(bytes, isFloat), 1);
-}
-function SAFE_HEAP_STORE_D(dest, value, bytes) {
-  SAFE_HEAP_STORE(dest, value, bytes, true);
-}
-
-/** @param {number|boolean=} isFloat */
-function SAFE_HEAP_LOAD(dest, bytes, unsigned, isFloat) {
-  if (dest <= 0) abort('segmentation fault loading ' + bytes + ' bytes from address ' + dest);
-  if (dest % bytes !== 0) abort('alignment error loading from address ' + dest + ', which was expected to be aligned to a multiple of ' + bytes);
-  if (dest + bytes > HEAP32[DYNAMICTOP_PTR>>2]) abort('segmentation fault, exceeded the top of the available dynamic heap when loading ' + bytes + ' bytes from address ' + dest + '. DYNAMICTOP=' + HEAP32[DYNAMICTOP_PTR>>2]);
-  assert(DYNAMICTOP_PTR);
-  assert(HEAP32[DYNAMICTOP_PTR>>2] <= HEAP8.length);
-  var type = getSafeHeapType(bytes, isFloat);
-  var ret = getValue(dest, type, 1);
-  if (unsigned) ret = unSign(ret, parseInt(type.substr(1), 10), 1);
-  return ret;
-}
-function SAFE_HEAP_LOAD_D(dest, bytes, unsigned) {
-  return SAFE_HEAP_LOAD(dest, bytes, unsigned, true);
-}
-
-function SAFE_FT_MASK(value, mask) {
-  var ret = value & mask;
-  if (ret !== value) {
-    abort('Function table mask error: function pointer is ' + value + ' which is masked by ' + mask + ', the likely cause of this is that the function pointer is being called by the wrong type.');
-  }
-  return ret;
-}
-
-function segfault() {
-  abort('segmentation fault');
-}
-function alignfault() {
-  abort('alignment fault');
-}
-function ftfault() {
-  abort('Function table mask error');
-}
 
 
 
@@ -748,8 +664,8 @@ var wasmMemory;
 // In the wasm backend, we polyfill the WebAssembly object,
 // so this creates a (non-native-wasm) table for us.
 var wasmTable = new WebAssembly.Table({
-  'initial': 252,
-  'maximum': 252 + 0,
+  'initial': 63,
+  'maximum': 63 + 0,
   'element': 'anyfunc'
 });
 
@@ -1119,7 +1035,7 @@ function lengthBytesUTF8(str) {
 function AsciiToString(ptr) {
   var str = '';
   while (1) {
-    var ch = ((SAFE_HEAP_LOAD(((ptr++)|0), 1, 1))|0);
+    var ch = HEAPU8[((ptr++)>>0)];
     if (!ch) return str;
     str += String.fromCharCode(ch);
   }
@@ -1153,7 +1069,7 @@ function UTF16ToString(ptr) {
 
     var str = '';
     while (1) {
-      var codeUnit = ((SAFE_HEAP_LOAD((((ptr)+(i*2))|0), 2, 0))|0);
+      var codeUnit = HEAP16[(((ptr)+(i*2))>>1)];
       if (codeUnit == 0) return str;
       ++i;
       // fromCharCode constructs a character from a UTF-16 code unit, so we can pass the UTF16 string right through.
@@ -1187,11 +1103,11 @@ function stringToUTF16(str, outPtr, maxBytesToWrite) {
   for (var i = 0; i < numCharsToWrite; ++i) {
     // charCodeAt returns a UTF-16 encoded code unit, so it can be directly written to the HEAP.
     var codeUnit = str.charCodeAt(i); // possibly a lead surrogate
-    SAFE_HEAP_STORE(((outPtr)|0), ((codeUnit)|0), 2);
+    HEAP16[((outPtr)>>1)]=codeUnit;
     outPtr += 2;
   }
   // Null-terminate the pointer to the HEAP.
-  SAFE_HEAP_STORE(((outPtr)|0), ((0)|0), 2);
+  HEAP16[((outPtr)>>1)]=0;
   return outPtr - startPtr;
 }
 
@@ -1207,7 +1123,7 @@ function UTF32ToString(ptr) {
 
   var str = '';
   while (1) {
-    var utf32 = ((SAFE_HEAP_LOAD((((ptr)+(i*4))|0), 4, 0))|0);
+    var utf32 = HEAP32[(((ptr)+(i*4))>>2)];
     if (utf32 == 0)
       return str;
     ++i;
@@ -1251,12 +1167,12 @@ function stringToUTF32(str, outPtr, maxBytesToWrite) {
       var trailSurrogate = str.charCodeAt(++i);
       codeUnit = 0x10000 + ((codeUnit & 0x3FF) << 10) | (trailSurrogate & 0x3FF);
     }
-    SAFE_HEAP_STORE(((outPtr)|0), ((codeUnit)|0), 4);
+    HEAP32[((outPtr)>>2)]=codeUnit;
     outPtr += 4;
     if (outPtr + 4 > endPtr) break;
   }
   // Null-terminate the pointer to the HEAP.
-  SAFE_HEAP_STORE(((outPtr)|0), ((0)|0), 4);
+  HEAP32[((outPtr)>>2)]=0;
   return outPtr - startPtr;
 }
 
@@ -1322,10 +1238,10 @@ function writeArrayToMemory(array, buffer) {
 function writeAsciiToMemory(str, buffer, dontAddNull) {
   for (var i = 0; i < str.length; ++i) {
     assert(str.charCodeAt(i) === str.charCodeAt(i)&0xff);
-    SAFE_HEAP_STORE(((buffer++)|0), ((str.charCodeAt(i))|0), 1);
+    HEAP8[((buffer++)>>0)]=str.charCodeAt(i);
   }
   // Null-terminate the pointer to the HEAP.
-  if (!dontAddNull) SAFE_HEAP_STORE(((buffer)|0), ((0)|0), 1);
+  if (!dontAddNull) HEAP8[((buffer)>>0)]=0;
 }
 
 
@@ -1376,11 +1292,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5762608,
+    STACK_BASE = 5752048,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 519728,
-    DYNAMIC_BASE = 5762608,
-    DYNAMICTOP_PTR = 519552;
+    STACK_MAX = 509168,
+    DYNAMIC_BASE = 5752048,
+    DYNAMICTOP_PTR = 508992;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1903,8 +1819,8 @@ var tempI64;
 // === Body ===
 
 var ASM_CONSTS = {
-  1465: function() {FS.syncfs(false, err => { if (err) { console.error("SaveGame failed!!", err); } });},  
- 6511: function() {window.verge.setLoadingProgress(100);}
+  1462: function() {FS.syncfs(false, err => { if (err) { console.error("SaveGame failed!!", err); } });},  
+ 6432: function() {window.verge.setLoadingProgress(100);}
 };
 
 function _emscripten_asm_const_iii(code, sigPtr, argbuf) {
@@ -1924,7 +1840,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
 
 
 
-// STATICTOP = STATIC_BASE + 518704;
+// STATICTOP = STATIC_BASE + 508144;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -1935,33 +1851,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
 
 
   function demangle(func) {
-      // If demangle has failed before, stop demangling any further function names
-      // This avoids an infinite recursion with malloc()->abort()->stackTrace()->demangle()->malloc()->...
-      demangle.recursionGuard = (demangle.recursionGuard|0)+1;
-      if (demangle.recursionGuard > 1) return func;
-      var __cxa_demangle_func = Module['___cxa_demangle'] || Module['__cxa_demangle'];
-      assert(__cxa_demangle_func);
-      var stackTop = stackSave();
-      try {
-        var s = func;
-        if (s.startsWith('__Z'))
-          s = s.substr(1);
-        var len = lengthBytesUTF8(s)+1;
-        var buf = stackAlloc(len);
-        stringToUTF8(s, buf, len);
-        var status = stackAlloc(4);
-        var ret = __cxa_demangle_func(buf, 0, 0, status);
-        if (((SAFE_HEAP_LOAD(((status)|0), 4, 0))|0) === 0 && ret) {
-          return UTF8ToString(ret);
-        }
-        // otherwise, libcxxabi failed
-      } catch(e) {
-      } finally {
-        _free(ret);
-        stackRestore(stackTop);
-        if (demangle.recursionGuard < 2) --demangle.recursionGuard;
-      }
-      // failure when using libcxxabi, don't demangle
+      warnOnce('warning: build with  -s DEMANGLE_SUPPORT=1  to link in libcxxabi demangling');
       return func;
     }
 
@@ -2047,7 +1937,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
 
   
   function ___setErrNo(value) {
-      if (Module['___errno_location']) SAFE_HEAP_STORE(((Module['___errno_location']())|0), ((value)|0), 4);
+      if (Module['___errno_location']) HEAP32[((Module['___errno_location']())>>2)]=value;
       else err('failed to set errno from JS');
       return value;
     }
@@ -4614,25 +4504,25 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
           }
           throw e;
         }
-        SAFE_HEAP_STORE(((buf)|0), ((stat.dev)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(4))|0), ((0)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(8))|0), ((stat.ino)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(12))|0), ((stat.mode)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(16))|0), ((stat.nlink)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(20))|0), ((stat.uid)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(24))|0), ((stat.gid)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(28))|0), ((stat.rdev)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(32))|0), ((0)|0), 4);
-        (tempI64 = [stat.size>>>0,(tempDouble=stat.size,(+(Math_abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math_min((+(Math_floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math_ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],SAFE_HEAP_STORE((((buf)+(40))|0), ((tempI64[0])|0), 4),SAFE_HEAP_STORE((((buf)+(44))|0), ((tempI64[1])|0), 4));
-        SAFE_HEAP_STORE((((buf)+(48))|0), ((4096)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(52))|0), ((stat.blocks)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(56))|0), (((stat.atime.getTime() / 1000)|0)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(60))|0), ((0)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(64))|0), (((stat.mtime.getTime() / 1000)|0)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(68))|0), ((0)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(72))|0), (((stat.ctime.getTime() / 1000)|0)|0), 4);
-        SAFE_HEAP_STORE((((buf)+(76))|0), ((0)|0), 4);
-        (tempI64 = [stat.ino>>>0,(tempDouble=stat.ino,(+(Math_abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math_min((+(Math_floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math_ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],SAFE_HEAP_STORE((((buf)+(80))|0), ((tempI64[0])|0), 4),SAFE_HEAP_STORE((((buf)+(84))|0), ((tempI64[1])|0), 4));
+        HEAP32[((buf)>>2)]=stat.dev;
+        HEAP32[(((buf)+(4))>>2)]=0;
+        HEAP32[(((buf)+(8))>>2)]=stat.ino;
+        HEAP32[(((buf)+(12))>>2)]=stat.mode;
+        HEAP32[(((buf)+(16))>>2)]=stat.nlink;
+        HEAP32[(((buf)+(20))>>2)]=stat.uid;
+        HEAP32[(((buf)+(24))>>2)]=stat.gid;
+        HEAP32[(((buf)+(28))>>2)]=stat.rdev;
+        HEAP32[(((buf)+(32))>>2)]=0;
+        (tempI64 = [stat.size>>>0,(tempDouble=stat.size,(+(Math_abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math_min((+(Math_floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math_ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],HEAP32[(((buf)+(40))>>2)]=tempI64[0],HEAP32[(((buf)+(44))>>2)]=tempI64[1]);
+        HEAP32[(((buf)+(48))>>2)]=4096;
+        HEAP32[(((buf)+(52))>>2)]=stat.blocks;
+        HEAP32[(((buf)+(56))>>2)]=(stat.atime.getTime() / 1000)|0;
+        HEAP32[(((buf)+(60))>>2)]=0;
+        HEAP32[(((buf)+(64))>>2)]=(stat.mtime.getTime() / 1000)|0;
+        HEAP32[(((buf)+(68))>>2)]=0;
+        HEAP32[(((buf)+(72))>>2)]=(stat.ctime.getTime() / 1000)|0;
+        HEAP32[(((buf)+(76))>>2)]=0;
+        (tempI64 = [stat.ino>>>0,(tempDouble=stat.ino,(+(Math_abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math_min((+(Math_floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math_ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],HEAP32[(((buf)+(80))>>2)]=tempI64[0],HEAP32[(((buf)+(84))>>2)]=tempI64[1]);
         return 0;
       },doMsync:function(addr, stream, len, flags, offset) {
         var buffer = HEAPU8.slice(addr, addr + len);
@@ -4695,8 +4585,8 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       },doReadv:function(stream, iov, iovcnt, offset) {
         var ret = 0;
         for (var i = 0; i < iovcnt; i++) {
-          var ptr = ((SAFE_HEAP_LOAD((((iov)+(i*8))|0), 4, 0))|0);
-          var len = ((SAFE_HEAP_LOAD((((iov)+(i*8 + 4))|0), 4, 0))|0);
+          var ptr = HEAP32[(((iov)+(i*8))>>2)];
+          var len = HEAP32[(((iov)+(i*8 + 4))>>2)];
           var curr = FS.read(stream, HEAP8,ptr, len, offset);
           if (curr < 0) return -1;
           ret += curr;
@@ -4706,8 +4596,8 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       },doWritev:function(stream, iov, iovcnt, offset) {
         var ret = 0;
         for (var i = 0; i < iovcnt; i++) {
-          var ptr = ((SAFE_HEAP_LOAD((((iov)+(i*8))|0), 4, 0))|0);
-          var len = ((SAFE_HEAP_LOAD((((iov)+(i*8 + 4))|0), 4, 0))|0);
+          var ptr = HEAP32[(((iov)+(i*8))>>2)];
+          var len = HEAP32[(((iov)+(i*8 + 4))>>2)];
           var curr = FS.write(stream, HEAP8,ptr, len, offset);
           if (curr < 0) return -1;
           ret += curr;
@@ -4716,7 +4606,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       },varargs:undefined,get:function() {
         assert(SYSCALLS.varargs != undefined);
         SYSCALLS.varargs += 4;
-        var ret = ((SAFE_HEAP_LOAD((((SYSCALLS.varargs)-(4))|0), 4, 0))|0);
+        var ret = HEAP32[(((SYSCALLS.varargs)-(4))>>2)];
         return ret;
       },getStr:function(ptr) {
         var ret = UTF8ToString(ptr);
@@ -4759,7 +4649,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
           var arg = SYSCALLS.get();
           var offset = 0;
           // We're always unlocked.
-          SAFE_HEAP_STORE((((arg)+(offset))|0), ((2)|0), 2);
+          HEAP16[(((arg)+(offset))>>1)]=2;
           return 0;
         }
         case 13:
@@ -4821,7 +4711,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
         case 21519: {
           if (!stream.tty) return -59;
           var argp = SYSCALLS.get();
-          SAFE_HEAP_STORE(((argp)|0), ((0)|0), 4);
+          HEAP32[((argp)>>2)]=0;
           return 0;
         }
         case 21520: {
@@ -4856,8 +4746,6 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
   function _abort() {
       abort();
     }
-
-  var _abs=Math_abs;
 
   function _emscripten_clear_interval(id) {
       clearInterval(id);
@@ -4970,30 +4858,30 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       }};
   
   function __fillGamepadEventData(eventStruct, e) {
-      SAFE_HEAP_STORE_D(((eventStruct)|0), (+(e.timestamp)), 8);
+      HEAPF64[((eventStruct)>>3)]=e.timestamp;
       for(var i = 0; i < e.axes.length; ++i) {
-        SAFE_HEAP_STORE_D((((eventStruct+i*8)+(16))|0), (+(e.axes[i])), 8);
+        HEAPF64[(((eventStruct+i*8)+(16))>>3)]=e.axes[i];
       }
       for(var i = 0; i < e.buttons.length; ++i) {
         if (typeof(e.buttons[i]) === 'object') {
-          SAFE_HEAP_STORE_D((((eventStruct+i*8)+(528))|0), (+(e.buttons[i].value)), 8);
+          HEAPF64[(((eventStruct+i*8)+(528))>>3)]=e.buttons[i].value;
         } else {
-          SAFE_HEAP_STORE_D((((eventStruct+i*8)+(528))|0), (+(e.buttons[i])), 8);
+          HEAPF64[(((eventStruct+i*8)+(528))>>3)]=e.buttons[i];
         }
       }
       for(var i = 0; i < e.buttons.length; ++i) {
         if (typeof(e.buttons[i]) === 'object') {
-          SAFE_HEAP_STORE((((eventStruct+i*4)+(1040))|0), ((e.buttons[i].pressed)|0), 4);
+          HEAP32[(((eventStruct+i*4)+(1040))>>2)]=e.buttons[i].pressed;
         } else {
           // Assigning a boolean to HEAP32, that's ok, but Closure would like to warn about it:
           /** @suppress {checkTypes} */
-          SAFE_HEAP_STORE((((eventStruct+i*4)+(1040))|0), ((e.buttons[i] == 1)|0), 4);
+          HEAP32[(((eventStruct+i*4)+(1040))>>2)]=e.buttons[i] == 1;
         }
       }
-      SAFE_HEAP_STORE((((eventStruct)+(1296))|0), ((e.connected)|0), 4);
-      SAFE_HEAP_STORE((((eventStruct)+(1300))|0), ((e.index)|0), 4);
-      SAFE_HEAP_STORE((((eventStruct)+(8))|0), ((e.axes.length)|0), 4);
-      SAFE_HEAP_STORE((((eventStruct)+(12))|0), ((e.buttons.length)|0), 4);
+      HEAP32[(((eventStruct)+(1296))>>2)]=e.connected;
+      HEAP32[(((eventStruct)+(1300))>>2)]=e.index;
+      HEAP32[(((eventStruct)+(8))>>2)]=e.axes.length;
+      HEAP32[(((eventStruct)+(12))>>2)]=e.buttons.length;
       stringToUTF8(e.id, eventStruct + 1304, 64);
       stringToUTF8(e.mapping, eventStruct + 1368, 64);
     }function _emscripten_get_gamepad_status(index, gamepadState) {
@@ -5024,7 +4912,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 519552;
+      return 508992;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {
@@ -5152,17 +5040,17 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
         var keyEventData = JSEvents.keyEvent;
         stringToUTF8(e.key ? e.key : "", keyEventData + 0, 32);
         stringToUTF8(e.code ? e.code : "", keyEventData + 32, 32);
-        SAFE_HEAP_STORE((((keyEventData)+(64))|0), ((e.location)|0), 4);
-        SAFE_HEAP_STORE((((keyEventData)+(68))|0), ((e.ctrlKey)|0), 4);
-        SAFE_HEAP_STORE((((keyEventData)+(72))|0), ((e.shiftKey)|0), 4);
-        SAFE_HEAP_STORE((((keyEventData)+(76))|0), ((e.altKey)|0), 4);
-        SAFE_HEAP_STORE((((keyEventData)+(80))|0), ((e.metaKey)|0), 4);
-        SAFE_HEAP_STORE((((keyEventData)+(84))|0), ((e.repeat)|0), 4);
+        HEAP32[(((keyEventData)+(64))>>2)]=e.location;
+        HEAP32[(((keyEventData)+(68))>>2)]=e.ctrlKey;
+        HEAP32[(((keyEventData)+(72))>>2)]=e.shiftKey;
+        HEAP32[(((keyEventData)+(76))>>2)]=e.altKey;
+        HEAP32[(((keyEventData)+(80))>>2)]=e.metaKey;
+        HEAP32[(((keyEventData)+(84))>>2)]=e.repeat;
         stringToUTF8(e.locale ? e.locale : "", keyEventData + 88, 32);
         stringToUTF8(e.char ? e.char : "", keyEventData + 120, 32);
-        SAFE_HEAP_STORE((((keyEventData)+(152))|0), ((e.charCode)|0), 4);
-        SAFE_HEAP_STORE((((keyEventData)+(156))|0), ((e.keyCode)|0), 4);
-        SAFE_HEAP_STORE((((keyEventData)+(160))|0), ((e.which)|0), 4);
+        HEAP32[(((keyEventData)+(152))>>2)]=e.charCode;
+        HEAP32[(((keyEventData)+(156))>>2)]=e.keyCode;
+        HEAP32[(((keyEventData)+(160))>>2)]=e.which;
   
         if (dynCall_iiii(callbackfunc, eventTypeId, keyEventData, userData)) e.preventDefault();
       };
@@ -5213,7 +5101,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
   
       var stream = SYSCALLS.getStreamFromFD(fd);
       var num = SYSCALLS.doReadv(stream, iov, iovcnt);
-      SAFE_HEAP_STORE(((pnum)|0), ((num)|0), 4)
+      HEAP32[((pnum)>>2)]=num
       return 0;
     } catch (e) {
     if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
@@ -5235,7 +5123,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       }
   
       FS.llseek(stream, offset, whence);
-      (tempI64 = [stream.position>>>0,(tempDouble=stream.position,(+(Math_abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math_min((+(Math_floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math_ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],SAFE_HEAP_STORE(((newOffset)|0), ((tempI64[0])|0), 4),SAFE_HEAP_STORE((((newOffset)+(4))|0), ((tempI64[1])|0), 4));
+      (tempI64 = [stream.position>>>0,(tempDouble=stream.position,(+(Math_abs(tempDouble))) >= 1.0 ? (tempDouble > 0.0 ? ((Math_min((+(Math_floor((tempDouble)/4294967296.0))), 4294967295.0))|0)>>>0 : (~~((+(Math_ceil((tempDouble - +(((~~(tempDouble)))>>>0))/4294967296.0)))))>>>0) : 0)],HEAP32[((newOffset)>>2)]=tempI64[0],HEAP32[(((newOffset)+(4))>>2)]=tempI64[1]);
       if (stream.getdents && offset === 0 && whence === 0) stream.getdents = null; // reset readdir state
       return 0;
     } catch (e) {
@@ -5248,7 +5136,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
   
       var stream = SYSCALLS.getStreamFromFD(fd);
       var num = SYSCALLS.doWritev(stream, iov, iovcnt);
-      SAFE_HEAP_STORE(((pnum)|0), ((num)|0), 4)
+      HEAP32[((pnum)>>2)]=num
       return 0;
     } catch (e) {
     if (typeof FS === 'undefined' || !(e instanceof FS.ErrnoError)) abort(e);
@@ -5267,7 +5155,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       value = value & 0xff;
       if ((num|0) >= 67 /* 64 bytes for an unrolled loop + 3 bytes for unaligned head*/) {
         while ((ptr&3) != 0) {
-          SAFE_HEAP_STORE(((ptr)|0), ((value)|0), 1);
+          HEAP8[((ptr)>>0)]=value;
           ptr = (ptr+1)|0;
         }
   
@@ -5277,33 +5165,33 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
         block_aligned_end = (aligned_end - 64)|0;
   
         while((ptr|0) <= (block_aligned_end|0)) {
-          SAFE_HEAP_STORE(((ptr)|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(4))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(8))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(12))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(16))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(20))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(24))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(28))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(32))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(36))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(40))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(44))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(48))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(52))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(56))|0), ((value4)|0), 4);
-          SAFE_HEAP_STORE((((ptr)+(60))|0), ((value4)|0), 4);
+          HEAP32[((ptr)>>2)]=value4;
+          HEAP32[(((ptr)+(4))>>2)]=value4;
+          HEAP32[(((ptr)+(8))>>2)]=value4;
+          HEAP32[(((ptr)+(12))>>2)]=value4;
+          HEAP32[(((ptr)+(16))>>2)]=value4;
+          HEAP32[(((ptr)+(20))>>2)]=value4;
+          HEAP32[(((ptr)+(24))>>2)]=value4;
+          HEAP32[(((ptr)+(28))>>2)]=value4;
+          HEAP32[(((ptr)+(32))>>2)]=value4;
+          HEAP32[(((ptr)+(36))>>2)]=value4;
+          HEAP32[(((ptr)+(40))>>2)]=value4;
+          HEAP32[(((ptr)+(44))>>2)]=value4;
+          HEAP32[(((ptr)+(48))>>2)]=value4;
+          HEAP32[(((ptr)+(52))>>2)]=value4;
+          HEAP32[(((ptr)+(56))>>2)]=value4;
+          HEAP32[(((ptr)+(60))>>2)]=value4;
           ptr = (ptr + 64)|0;
         }
   
         while ((ptr|0) < (aligned_end|0) ) {
-          SAFE_HEAP_STORE(((ptr)|0), ((value4)|0), 4);
+          HEAP32[((ptr)>>2)]=value4;
           ptr = (ptr+4)|0;
         }
       }
       // The remaining bytes.
       while ((ptr|0) < (end|0)) {
-        SAFE_HEAP_STORE(((ptr)|0), ((value)|0), 1);
+        HEAP8[((ptr)>>0)]=value;
         ptr = (ptr+1)|0;
       }
       return (end-num)|0;
@@ -6070,18 +5958,18 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       },windowedWidth:0,windowedHeight:0,setFullscreenCanvasSize:function() {
         // check if SDL is available
         if (typeof SDL != "undefined") {
-          var flags = ((SAFE_HEAP_LOAD(((SDL.screen)|0), 4, 1))|0);
+          var flags = HEAPU32[((SDL.screen)>>2)];
           flags = flags | 0x00800000; // set SDL_FULLSCREEN flag
-          SAFE_HEAP_STORE(((SDL.screen)|0), ((flags)|0), 4)
+          HEAP32[((SDL.screen)>>2)]=flags
         }
         Browser.updateCanvasDimensions(Module['canvas']);
         Browser.updateResizeListeners();
       },setWindowedCanvasSize:function() {
         // check if SDL is available
         if (typeof SDL != "undefined") {
-          var flags = ((SAFE_HEAP_LOAD(((SDL.screen)|0), 4, 1))|0);
+          var flags = HEAPU32[((SDL.screen)>>2)];
           flags = flags & ~0x00800000; // clear SDL_FULLSCREEN flag
-          SAFE_HEAP_STORE(((SDL.screen)|0), ((flags)|0), 4)
+          HEAP32[((SDL.screen)>>2)]=flags
         }
         Browser.updateCanvasDimensions(Module['canvas']);
         Browser.updateResizeListeners();
@@ -6141,7 +6029,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
       } catch (e) {
         abort(e);
       }
-    }var Asyncify={State:{Normal:0,Unwinding:1,Rewinding:2},state:0,StackSize:327680,currData:null,handleSleepReturnValue:0,exportCallStack:[],callStackNameToId:{},callStackIdToFunc:{},callStackId:0,afterUnwind:null,asyncFinalizers:[],sleepCallbacks:[],getCallStackId:function(funcName) {
+    }var Asyncify={State:{Normal:0,Unwinding:1,Rewinding:2},state:0,StackSize:32768,currData:null,handleSleepReturnValue:0,exportCallStack:[],callStackNameToId:{},callStackIdToFunc:{},callStackId:0,afterUnwind:null,asyncFinalizers:[],sleepCallbacks:[],getCallStackId:function(funcName) {
         var id = Asyncify.callStackNameToId[funcName];
         if (id === undefined) {
           id = Asyncify.callStackId++;
@@ -6225,14 +6113,14 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
         Asyncify.setDataRewindFunc(ptr);
         return ptr;
       },setDataHeader:function(ptr, stack, stackSize) {
-        SAFE_HEAP_STORE(((ptr)|0), ((stack)|0), 4);
-        SAFE_HEAP_STORE((((ptr)+(4))|0), ((stack + stackSize)|0), 4);
+        HEAP32[((ptr)>>2)]=stack;
+        HEAP32[(((ptr)+(4))>>2)]=stack + stackSize;
       },setDataRewindFunc:function(ptr) {
         var bottomOfCallStack = Asyncify.exportCallStack[0];
         var rewindId = Asyncify.getCallStackId(bottomOfCallStack);
-        SAFE_HEAP_STORE((((ptr)+(8))|0), ((rewindId)|0), 4);
+        HEAP32[(((ptr)+(8))>>2)]=rewindId;
       },getDataRewindFunc:function(ptr) {
-        var id = ((SAFE_HEAP_LOAD((((ptr)+(8))|0), 4, 0))|0);
+        var id = HEAP32[(((ptr)+(8))>>2)];
         var func = Asyncify.callStackIdToFunc[id];
   
   
@@ -6404,7 +6292,7 @@ function intArrayToString(array) {
 // ASM_LIBRARY EXTERN PRIMITIVES: Int8Array,Int32Array
 
 var asmGlobalArg = {};
-var asmLibraryArg = { "__assert_fail": ___assert_fail, "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "__syscall221": ___syscall221, "__syscall5": ___syscall5, "__syscall54": ___syscall54, "abort": _abort, "abs": _abs, "alignfault": alignfault, "downloadAll": downloadAll, "emscripten_asm_const_iii": _emscripten_asm_const_iii, "emscripten_clear_interval": _emscripten_clear_interval, "emscripten_get_gamepad_status": _emscripten_get_gamepad_status, "emscripten_get_num_gamepads": _emscripten_get_num_gamepads, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "emscripten_sample_gamepad_data": _emscripten_sample_gamepad_data, "emscripten_set_gamepadconnected_callback_on_thread": _emscripten_set_gamepadconnected_callback_on_thread, "emscripten_set_gamepaddisconnected_callback_on_thread": _emscripten_set_gamepaddisconnected_callback_on_thread, "emscripten_set_interval": _emscripten_set_interval, "emscripten_set_keydown_callback_on_thread": _emscripten_set_keydown_callback_on_thread, "emscripten_set_keyup_callback_on_thread": _emscripten_set_keyup_callback_on_thread, "emscripten_sleep": _emscripten_sleep, "exit": _exit, "fd_close": _fd_close, "fd_read": _fd_read, "fd_seek": _fd_seek, "fd_write": _fd_write, "fetchSync": fetchSync, "memory": wasmMemory, "segfault": segfault, "setTempRet0": _setTempRet0, "table": wasmTable, "wasm_initFileSystem": wasm_initFileSystem, "wasm_initSound": wasm_initSound, "wasm_initvga": wasm_initvga, "wasm_loadSound": wasm_loadSound, "wasm_nextFrame": wasm_nextFrame, "wasm_playSong": wasm_playSong, "wasm_playSound": wasm_playSound, "wasm_setVolume": wasm_setVolume, "wasm_vgadump": wasm_vgadump };
+var asmLibraryArg = { "__assert_fail": ___assert_fail, "__cxa_allocate_exception": ___cxa_allocate_exception, "__cxa_atexit": ___cxa_atexit, "__cxa_throw": ___cxa_throw, "__handle_stack_overflow": ___handle_stack_overflow, "__syscall221": ___syscall221, "__syscall5": ___syscall5, "__syscall54": ___syscall54, "abort": _abort, "downloadAll": downloadAll, "emscripten_asm_const_iii": _emscripten_asm_const_iii, "emscripten_clear_interval": _emscripten_clear_interval, "emscripten_get_gamepad_status": _emscripten_get_gamepad_status, "emscripten_get_num_gamepads": _emscripten_get_num_gamepads, "emscripten_get_sbrk_ptr": _emscripten_get_sbrk_ptr, "emscripten_memcpy_big": _emscripten_memcpy_big, "emscripten_resize_heap": _emscripten_resize_heap, "emscripten_sample_gamepad_data": _emscripten_sample_gamepad_data, "emscripten_set_gamepadconnected_callback_on_thread": _emscripten_set_gamepadconnected_callback_on_thread, "emscripten_set_gamepaddisconnected_callback_on_thread": _emscripten_set_gamepaddisconnected_callback_on_thread, "emscripten_set_interval": _emscripten_set_interval, "emscripten_set_keydown_callback_on_thread": _emscripten_set_keydown_callback_on_thread, "emscripten_set_keyup_callback_on_thread": _emscripten_set_keyup_callback_on_thread, "emscripten_sleep": _emscripten_sleep, "exit": _exit, "fd_close": _fd_close, "fd_read": _fd_read, "fd_seek": _fd_seek, "fd_write": _fd_write, "fetchSync": fetchSync, "memory": wasmMemory, "setTempRet0": _setTempRet0, "table": wasmTable, "wasm_initFileSystem": wasm_initFileSystem, "wasm_initSound": wasm_initSound, "wasm_initvga": wasm_initvga, "wasm_loadSound": wasm_loadSound, "wasm_nextFrame": wasm_nextFrame, "wasm_playSong": wasm_playSong, "wasm_playSound": wasm_playSound, "wasm_setVolume": wasm_setVolume, "wasm_vgadump": wasm_vgadump };
 Asyncify.instrumentWasmImports(asmLibraryArg);
 var asm = createWasm();
 Module["asm"] = asm;
@@ -6458,13 +6346,6 @@ var _setThrew = Module["_setThrew"] = function() {
 };
 
 /** @type {function(...*):?} */
-var ___cxa_demangle = Module["___cxa_demangle"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["__cxa_demangle"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
 var ___set_stack_limit = Module["___set_stack_limit"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -6500,17 +6381,17 @@ var __growWasmMemory = Module["__growWasmMemory"] = function() {
 };
 
 /** @type {function(...*):?} */
-var dynCall_vi = Module["dynCall_vi"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_vi"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
 var dynCall_ii = Module["dynCall_ii"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["dynCall_ii"].apply(null, arguments)
+};
+
+/** @type {function(...*):?} */
+var dynCall_vi = Module["dynCall_vi"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["dynCall_vi"].apply(null, arguments)
 };
 
 /** @type {function(...*):?} */
@@ -6553,13 +6434,6 @@ var dynCall_iidiiii = Module["dynCall_iidiiii"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["dynCall_iidiiii"].apply(null, arguments)
-};
-
-/** @type {function(...*):?} */
-var dynCall_v = Module["dynCall_v"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["dynCall_v"].apply(null, arguments)
 };
 
 /** @type {function(...*):?} */
