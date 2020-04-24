@@ -198,7 +198,9 @@
                 }
             };
 
-            window.Module = {arguments: ["Phage5/"]};
+            const u = new URLSearchParams(window.location.search);
+            let game = u.get('game') || 'sully';
+            window.Module = {arguments: [game + '/']};
 
         </script>
         <script async type="text/javascript" src="verge.out.js"></script>
