@@ -8,6 +8,8 @@ I chose it as a guinea pig to play with ~NaCl~ WASM development because it's sop
 
 Install SCons and Emscripten.
 
+Note: Python 3 and `python3-distutils` are required by Emscripten.
+
 ```bash
 $ scons
 ```
