@@ -484,10 +484,16 @@ void ProcessSwitch() {
 }
 
 void ExecuteScript(unsigned short int s) {
+    char* const saveBase = basevc;
+    char* const saveCode = code;
+
     basevc = mapvc;
     code = mapvc + scriptofstbl[s];
 
     ExecuteBlock();
+
+    basevc = saveBase;
+    code = saveCode;
 }
 
 void ExecuteHookedScript(unsigned short int s) {
