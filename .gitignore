@@ -13,3 +13,7 @@ devcc/*.map
 devcc/*.vcs
 devcc/*.vc
 devcc/*.exe
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-v1wasm
