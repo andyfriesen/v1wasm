@@ -1292,11 +1292,11 @@ function updateGlobalBufferAndViews(buf) {
 }
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 5752064,
+    STACK_BASE = 5752112,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 509184,
-    DYNAMIC_BASE = 5752064,
-    DYNAMICTOP_PTR = 509008;
+    STACK_MAX = 509232,
+    DYNAMIC_BASE = 5752112,
+    DYNAMICTOP_PTR = 509056;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1840,7 +1840,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
 
 
 
-// STATICTOP = STATIC_BASE + 508160;
+// STATICTOP = STATIC_BASE + 508208;
 /* global initializers */  __ATINIT__.push({ func: function() { ___wasm_call_ctors() } });
 
 
@@ -4912,7 +4912,7 @@ function wasm_initvga(){ window.vergeCanvas = document.getElementById('vergeCanv
     }
 
   function _emscripten_get_sbrk_ptr() {
-      return 509008;
+      return 509056;
     }
 
   function _emscripten_memcpy_big(dest, src, num) {

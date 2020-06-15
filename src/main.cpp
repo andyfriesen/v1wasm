@@ -29,6 +29,8 @@ extern unsigned char menuptr[256], qabort, itmptr[576], charptr[960];
 extern char menuactive;
 extern char fade;
 
+bool statCheat = false;
+
 extern unsigned int effectofstbl[1024], startupofstbl[1024], magicofstbl[1024];
 
 namespace verge {
@@ -301,6 +303,22 @@ void InitPStats() {
         pstats[i].invcnt = 6;
         memset(&pstats[i].inv, 0, 512);
         vclose(cdat);
+
+        if (statCheat) {
+            pstats[i].curhp = 9999;
+            pstats[i].maxhp = 9999;
+            pstats[i].curmp = 9999;
+            pstats[i].maxmp = 9999;
+            pstats[i].str = 9999;
+            pstats[i].end = 9999;
+            pstats[i].mag = 9999;
+            pstats[i].mgr = 9999;
+            pstats[i].hit = 9999;
+            pstats[i].dod = 9999;
+            pstats[i].mbl = 9999;
+            pstats[i].fer = 9999;
+            pstats[i].rea = 9999;
+        }
     }
     vclose(pdat);
 }
@@ -733,6 +751,10 @@ fadeloop:
 
 int main(int argc, const char* argv[]) {
     gameRoot = argv[1];
+    if (argc > 2 && argv[2] == std::string_view{"statCheat"}) {
+        printf("Cheater, cheater, pumpkin eater!!\n");
+        statCheat = true;
+    }
 
     verge::downloadGame();
     verge::initFileSystem();
