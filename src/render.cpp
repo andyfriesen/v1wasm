@@ -335,7 +335,7 @@ void DrawLayer0(int xw, int yw) {
     for (auto i = 0; i < 14; i++)
         for (auto j = 0; j < 21; j++) {
             auto tileIndex = map0[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)];
-            auto img = vsp0 + (tileidx[tileIndex] << 8);
+            auto img = vsp0.data() + (tileidx[tileIndex] << 8);
             copytile((j << 4) + xofs, (i << 4) + yofs, img);
         }
 }
@@ -361,7 +361,7 @@ void DrawLayer1Trans(int xw, int yw) {
         for (auto j = 0; j < 21; j++) {
             auto tileIndex = map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)];
             if (tileIndex != 0) {
-                auto img = vsp0 + (tileidx[tileIndex] << 8);
+                auto img = vsp0.data() + (tileidx[tileIndex] << 8);
                 Tcopysprite((j << 4) + xofs, (i << 4) + yofs, 16, 16, img);
             }
         }
@@ -388,8 +388,8 @@ void _DrawLayer1Trans(int xw, int yw) {
 
     for (i = 0; i < 14; i++)
         for (j = 0; j < 21; j++) {
-            img = vsp0 + (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
-            if (img != vsp0) {
+            img = vsp0.data() + (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
+            if (img != vsp0.data()) {
                 _Tcopysprite((j << 4) + xofs, (i << 4) + yofs, 16, 16, img);
             }
         }
@@ -425,8 +425,8 @@ void DrawLayer1NoSpeed(int xw, int yw) {
 
     for (auto i = 0; i < 14; i++) {
         for (auto j = 0; j < 21; j++) {
-            auto img = vsp0 + (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
-            if (img != vsp0) {
+            auto img = vsp0.data() + (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
+            if (img != vsp0.data()) {
                 tcopysprite((j << 4) + xofs, (i << 4) + yofs, 16, 16, img);
             }
         }
@@ -463,8 +463,8 @@ void DrawLayer1Speed(int xw, int yw) {
     for (auto i = 0; i < 14; i++) {
         for (auto j = 0; j < 21; j++) {
             auto a = (tileidx[map1[(((ytc + i) % ysize) * xsize) + ((xtc + j) % xsize)]] << 8);
-            auto img = vsp0 + a;
-            if (img != vsp0) {
+            auto img = vsp0.data() + a;
+            if (img != vsp0.data()) {
                 tcopytile((j << 4) + xofs, (i << 4) + yofs, img, vspmask + a);
             }
         }

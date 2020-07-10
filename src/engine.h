@@ -138,7 +138,8 @@ extern std::vector<short> map1;
 extern std::vector<unsigned char> mapp;
 extern short unsigned xsize, ysize, vadelay[100];
 extern unsigned char layerc, pmultx, pdivx, pmulty, pdivy, saveflag;
-extern unsigned char* vsp0, autoent;
+extern std::vector<uint8_t> vsp0;
+extern unsigned char autoent;
 
 void* valloc(int amount, const char* whatfor);
 void vfree(void* thismem);

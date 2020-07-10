@@ -73,7 +73,9 @@ std::vector<short> map0; // Tile data
 std::vector<short> map1;
 std::vector<unsigned char> mapp;
 
-unsigned char* vsp0, *chrs;      // graphic data pointers
+std::vector<uint8_t> vsp0;
+
+unsigned char* chrs;      // graphic data pointers
 unsigned char* itemicons, *chr2;       // more graphic ptrs
 
 /* Not sure what's correct here.
@@ -279,6 +281,8 @@ void LoadCHRList() {
 }
 
 void load_map(char* fname) {
+    printf("load_map %s\n", fname);
+
     unsigned char b;
     int i;
 
@@ -372,12 +376,10 @@ void load_map(char* fname) {
     }
     vread(&numtiles, 1, 2, vsp);
 
-    // -- aen; 31/May/98 -- dynamic map mem allocation
-    vfree(vsp0);
     vspm = numtiles << 8;
-    vsp0 = (unsigned char*)valloc(vspm, "load_map:vsp0");
+    vsp0.resize(vspm);
 
-    vread(vsp0, 1, vspm, vsp);
+    vread(vsp0.data(), 1, vspm, vsp);
     vread(&va0, 1, sizeof(va0), vsp);
     vclose(vsp);
 

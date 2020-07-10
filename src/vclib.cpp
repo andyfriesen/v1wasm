@@ -1244,7 +1244,7 @@ void VCBlitTile() {
     int y1 = ResolveOperand();
     int t = ResolveOperand();
 
-    unsigned char* img = vsp0 + (t * 256);
+    unsigned char* img = vsp0.data() + (t * 256);
     VCtcopysprite(x1, y1, 16, 16, img);
 }
 
