@@ -196,6 +196,11 @@ namespace verge {
         saveGameRoot = "/persist/" + gameRoot;
         wasm_initFileSystem(saveGameRoot.c_str());
     }
+
+    EM_JS(void, setBuildDate, (const char* date), {
+        if (verge.setBuildDate)
+            verge.setBuildDate(UTF8ToString(date));
+    });
 }
 
 int Exist(const char* fname) {
@@ -756,6 +761,7 @@ int main(int argc, const char* argv[]) {
         statCheat = true;
     }
 
+    verge::setBuildDate(__DATE__);
     verge::downloadGame();
     verge::initFileSystem();
 
