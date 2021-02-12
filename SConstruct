@@ -16,7 +16,7 @@ if not emcc:
     sys.exit(1)
 
 def EmscriptenEnvironment():
-    if sys.platform == 'windows':
+    if sys.platform in ('windows', 'win32'):
         env_dict = {
             'path': os.environ['PATH']
         }
