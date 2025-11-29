@@ -21,7 +21,7 @@ def EmscriptenEnvironment():
             'path': os.environ['PATH']
         }
 
-        for key in ['HOME', 'USERPROFILE', 'EM_CONFIG']:
+        for key in ['HOME', 'USERPROFILE', 'EM_CONFIG', 'EMSDK_PYTHON', 'EMSDK_NODE']:
             value = os.environ.get(key)
             if value is not None:
                 env_dict[key] = value
