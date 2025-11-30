@@ -39,12 +39,13 @@ def EmscriptenEnvironment():
         '-s', 'FETCH=1',
         '-s', 'FORCE_FILESYSTEM=1',
         '-s', 'ALLOW_MEMORY_GROWTH=1',
+        '-s', 'STACK_SIZE=5MB',
     ]
 
     cflags = ['-fcolor-diagnostics']
 
     asmjs = ARGUMENTS.get('asmjs', 0)
-    debug = ARGUMENTS.get('debug', 0)
+    debug = int(ARGUMENTS.get('debug', 0))
     asan = ARGUMENTS.get('asan', 0)
     ubsan = ARGUMENTS.get('ubsan', 0)
 
@@ -59,13 +60,13 @@ def EmscriptenEnvironment():
             '-s', 'ASSERTIONS=1',
             '-s', 'STACK_OVERFLOW_CHECK=1',
             '-s', 'DEMANGLE_SUPPORT=1',
+            '-s', 'STACK_SIZE=5MB',
         ]
 
         cflags.append('-g')
 
         env.Append(LINKFLAGS=[
             '-g',
-            '--source-map-base', 'https://localhost/',
         ])
 
     else:
