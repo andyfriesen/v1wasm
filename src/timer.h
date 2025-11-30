@@ -15,4 +15,5 @@ int getTimerCount();
 int getVcTimer();
 void setVcTimer(int value);
 
+void timerUpdate();
 void runTimerHooks();

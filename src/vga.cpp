@@ -79,6 +79,7 @@ EM_JS(void, wasm_nextFrame, (), {
 
 void wait() {
     wasm_nextFrame();
+    timerUpdate();
     runTimerHooks();
 }
 

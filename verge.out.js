@@ -1223,10 +1223,12 @@ function wasm_loadSound(filename,soundData,soundDataSize) { const name = UTF8ToS
 function wasm_playSound(filename) { const name = UTF8ToString(filename); const sound = window.verge.sounds[name]; if (!sound) { console.error("Unknown sound ", name); return; } const source = window.verge.audioContext.createBufferSource(); source.connect(window.verge.audioContext.destination); source.buffer = sound; source.start(0); }
 function wasm_playSong(data,length) { window.verge.mptInited.then(() => { if (!window.verge.mptNode) { return; } const buffer = Module.HEAP8.buffer.slice(data, data + length); const v = new Uint8Array(buffer); window.verge.mptNode.port.postMessage({ songData: buffer, setRepeatCount: -1 }); }); }
 function wasm_setVolume(volume) { console.log('setvolume', volume); window.verge.gainNode.gain.setValueAtTime(volume / 100, window.verge.audioContext.currentTime); }
-function downloadAll(manifest,putFile) { return Asyncify.handleSleep(resume => { let promises = []; let count = 0; console.log('handleSleep'); function download(pathPtr) { const path = UTF8ToString(pathPtr); console.log('download', path); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; throw 'fetchSync failed'; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); const dataPtr = _malloc(bytes.length); HEAP8.set(bytes, dataPtr); Module.dynCall_viii(putFile, pathPtr, bytes.length, dataPtr); console.log(path, ':', count, '/', promises.length); ++count; verge.setLoadingProgress((100 * count / promises.length) | 0) }); } while (true) { let pathPtr = HEAPU32[manifest >> 2]; if (pathPtr == 0) { break; } manifest += 4; promises.push(download(pathPtr)); console.log('promise', pathPtr); } console.log('waiting on promises'); Promise.all(promises).then(() => { console.log('resume'); resume(); }); }); }
+function downloadAll(manifest,putFile) { return Asyncify.handleSleep(resume => { let promises = []; let count = 0; function download(pathPtr) { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; throw 'fetchSync failed'; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); const dataPtr = _malloc(bytes.length); HEAP8.set(bytes, dataPtr); Module.dynCall_viii(putFile, pathPtr, bytes.length, dataPtr); ++count; verge.setLoadingProgress((100 * count / promises.length) | 0) }); } while (true) { let pathPtr = HEAPU32[manifest >> 2]; if (pathPtr == 0) { break; } manifest += 4; promises.push(download(pathPtr)); } Promise.all(promises).then(() => { resume(); }); }); }
 function fetchSync(pathPtr,size,data) { return Asyncify.handleSleep(resume => { const path = UTF8ToString(pathPtr); return fetch(path).then(response => { if (!response.ok) { console.error('fetchSync failed', path); HEAP32[size >> 2] = 0; HEAP32[data >> 2] = 0; resume(); return; } return response.blob(); }).then(blob => blob.arrayBuffer() ).then(array => { const bytes = new Uint8Array(array); HEAP32[size >> 2] = bytes.length; const dataPtr = _malloc(bytes.length); HEAP32[data >> 2] = dataPtr; HEAP8.set(bytes, dataPtr); resume(); }); }); }
 function wasm_initFileSystem(c) { let sgr = UTF8ToString(c); if (sgr.endsWith('/')) sgr = sgr.substr(0, sgr.length - 1); FS.mkdir("/persist"); FS.mkdir(sgr); FS.mount(IDBFS, {}, sgr); FS.syncfs(true, function (err) { if (err) console.error('wasm_initFileSystem failed!', err); }); }
 function setBuildDate(date) { if (verge.setBuildDate) verge.setBuildDate(UTF8ToString(date)); }
+function wasm_initTimer() { window.VERGE_TIMER_FRAME_STEP = 10; window.vergeTimerLast = performance.now(); window.vergeTimerAccumulator = 0; }
+function wasm_timerUpdate() { if (typeof(window.vergeTimerLast) === 'undefined') { return; } const time = performance.now(); window.vergeTimerAccumulator += Math.max(time - window.vergeTimerLast, 0); window.vergeTimerLast = time; const frameDelta = Math.floor(window.vergeTimerAccumulator / window.VERGE_TIMER_FRAME_STEP); window.vergeTimerAccumulator -= frameDelta * window.VERGE_TIMER_FRAME_STEP; return frameDelta; }
 function wasm_initvga() { window.vergeCanvas = document.getElementById('vergeCanvas'); window.vergeContext = window.vergeCanvas.getContext('2d'); window.vergeImageData = new ImageData(320, 200); window.vergeImageArray = window.vergeImageData.data; }
 function wasm_vgadump(frameBuffer,frameBufferSize,palette) { const pal = HEAPU8.subarray(palette, palette + 768); const fb = HEAPU8.subarray(frameBuffer, frameBuffer + frameBufferSize); const stride = 0; let srcIndex = 0; let destIndex = 0; const ia = window.vergeImageArray; for (let y = 0; y < 200; ++y) { for (let x = 0; x < 320; ++x) { let c = fb[srcIndex++]; ia[destIndex++] = pal[c * 3]; ia[destIndex++] = pal[c * 3 + 1]; ia[destIndex++] = pal[c * 3 + 2]; ia[destIndex++] = 0xFF; } srcIndex += stride; } window.vergeContext.putImageData(window.vergeImageData, 0, 0); }
 function wasm_nextFrame() { return Asyncify.handleSleep(requestAnimationFrame); }
@@ -5199,12 +5201,14 @@ var asmLibraryArg = {
   "setBuildDate": setBuildDate,
   "wasm_initFileSystem": wasm_initFileSystem,
   "wasm_initSound": wasm_initSound,
+  "wasm_initTimer": wasm_initTimer,
   "wasm_initvga": wasm_initvga,
   "wasm_loadSound": wasm_loadSound,
   "wasm_nextFrame": wasm_nextFrame,
   "wasm_playSong": wasm_playSong,
   "wasm_playSound": wasm_playSound,
   "wasm_setVolume": wasm_setVolume,
+  "wasm_timerUpdate": wasm_timerUpdate,
   "wasm_vgadump": wasm_vgadump
 };
 Asyncify.instrumentWasmImports(asmLibraryArg);
@@ -5315,7 +5319,7 @@ var _asyncify_start_rewind = Module["_asyncify_start_rewind"] = createExportWrap
 var _asyncify_stop_rewind = Module["_asyncify_stop_rewind"] = createExportWrapper("asyncify_stop_rewind");
 
 var ___start_em_js = Module['___start_em_js'] = 5249378;
-var ___stop_em_js = Module['___stop_em_js'] = 5254063;
+var ___stop_em_js = Module['___stop_em_js'] = 5254380;
 
 
 
