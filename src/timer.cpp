@@ -41,10 +41,17 @@ namespace {
     int vc_timer;
 }
 
-void incTimerCount(void*);
+void timerInterval(void*);
+
+EM_JS(void, wasm_initTimer, (), {
+    window.VERGE_TIMER_FRAME_STEP = 10;
+    window.vergeTimerLast = performance.now();
+    window.vergeTimerAccumulator = 0;
+});
 
 int timer_init() {
-    globalTimer = emscripten_set_interval(&incTimerCount, 10, nullptr);
+    wasm_initTimer();
+    globalTimer = emscripten_set_interval(&timerInterval, 10, nullptr);
     return 0;
 }
 
@@ -65,7 +72,7 @@ void setTimerCount(int offset) {
     timer_count = offset;
 }
 
-void incTimerCount(void*) {
+void incTimerCount() {
     timer_count++;
     vc_timer++;
     lastTick++;
@@ -86,6 +93,33 @@ void incTimerCount(void*) {
     }
 
     // FIXME: HookTimer.  Can't run it here.
+}
+
+EM_JS(int, wasm_timerUpdate, (), {
+    if (typeof(window.vergeTimerLast) === 'undefined') {
+        return;
+    }
+
+    const time = performance.now();
+    window.vergeTimerAccumulator += Math.max(time - window.vergeTimerLast, 0);
+    window.vergeTimerLast = time;
+
+    const frameDelta = Math.floor(window.vergeTimerAccumulator / window.VERGE_TIMER_FRAME_STEP);
+    window.vergeTimerAccumulator -= frameDelta * window.VERGE_TIMER_FRAME_STEP;
+
+    return frameDelta;
+});
+
+void timerUpdate() {
+    const auto frameDelta = wasm_timerUpdate();
+
+    for (int i = 0; i < frameDelta; i++) {
+        incTimerCount();
+    }
+}
+
+void timerInterval(void*) {
+    timerUpdate();
 }
 
 // The original engine ran this in a DOS interrupt.
